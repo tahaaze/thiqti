@@ -5,32 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Resultats - Thiqti</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='28' height='28' rx='8' fill='%230066FF'/><path d='M7 14L14 7l7 7-7 7z' fill='white' opacity='.9'/></svg>">
 </head>
 <body>
 
 <nav class="navbar">
   <a href="index.html" class="nav-brand">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#0066FF"/><path d="M7 14L14 7l7 7-7 7z" fill="#fff" opacity=".9"/></svg>
+    <svg width="32" height="32" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#ng)"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#0066FF"/><stop offset="1" stop-color="#0044CC"/></linearGradient></defs><path d="M7 14L14 7l7 7-7 7z" fill="#fff" opacity=".9"/></svg>
     Thiqti
   </a>
   <div class="nav-actions">
-    <a href="favorites.html" class="nav-link">&#9829; Favoris</a>
+    <a href="results.html" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Explorer
+    </a>
+    <a href="compare.html" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+      Comparer
+    </a>
+    <a href="favorites.html" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      Favoris
+    </a>
   </div>
 </nav>
 
-<div class="container" style="padding-top:16px">
-  <div class="search search-compact" style="margin-bottom:16px">
-    <svg width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<div class="container" style="padding-top:20px">
+  <div class="search search-compact anim-up" style="margin-bottom:20px">
+    <svg width="16" height="16" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" value="SUV hybride confortable pour la famille, 350 000 DH" id="searchInput">
     <button class="btn btn-p btn-sm" onclick="doSearch()">Rechercher</button>
   </div>
 
-  <div class="results-top">
+  <div class="results-top anim-up anim-delay-1">
     <div><strong>8 vehicules</strong> correspondent a votre recherche</div>
     <div class="sort-bar">
       <div class="view-tog">
-        <div class="vt on"><svg width="12" height="12" fill="#1A1D26" viewBox="0 0 16 16"><rect width="7" height="7" rx="1"/><rect x="9" width="7" height="7" rx="1"/><rect y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/></svg></div>
-        <div class="vt"><svg width="12" height="12" fill="#9CA3AF" viewBox="0 0 16 16"><rect y="1" width="16" height="3" rx="1"/><rect y="6.5" width="16" height="3" rx="1"/><rect y="12" width="16" height="3" rx="1"/></svg></div>
+        <div class="vt on"><svg width="12" height="12" fill="#0F172A" viewBox="0 0 16 16"><rect width="7" height="7" rx="1.5"/><rect x="9" width="7" height="7" rx="1.5"/><rect y="9" width="7" height="7" rx="1.5"/><rect x="9" y="9" width="7" height="7" rx="1.5"/></svg></div>
+        <div class="vt"><svg width="12" height="12" fill="#94A3B8" viewBox="0 0 16 16"><rect y="1" width="16" height="3" rx="1.5"/><rect y="6.5" width="16" height="3" rx="1.5"/><rect y="12" width="16" height="3" rx="1.5"/></svg></div>
       </div>
       <select class="sort-sel"><option>Pertinence</option><option>Prix croissant</option><option>Meilleure reputation</option></select>
     </div>
@@ -40,18 +52,18 @@
     <div class="results-list">
 
       <!-- Card 1 -->
-      <div class="card" onclick="window.location.href='vehicle.html'">
-        <div class="card-badge"><span class="tag tag-b" style="width:28px;height:28px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.75rem">1</span></div>
+      <div class="card anim-up anim-delay-1" onclick="window.location.href='vehicle.html'" style="cursor:pointer">
+        <div class="card-badge"><span class="tag tag-b" style="width:30px;height:30px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-weight:900">1</span></div>
         <div class="card-fav">&#9825;</div>
-        <div class="card-img" style="height:180px"><svg viewBox="0 0 400 180"><rect width="400" height="180" fill="#EBF5FF"/><g transform="translate(80,30)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#0066FF"/><circle cx="85" cy="100" r="18" fill="#0066FF"/><circle cx="265" cy="100" r="18" fill="#0066FF"/></g><text x="200" y="135" text-anchor="middle" font-family="Inter" font-size="15" font-weight="800" fill="#1A1D26">Toyota RAV4 Hybrid</text><text x="200" y="155" text-anchor="middle" font-family="Inter" font-size="10" fill="#5F6B7A">Comfort CVT - 2026</text></svg></div>
+        <div class="card-img" style="height:200px"><svg viewBox="0 0 400 200"><defs><linearGradient id="cg1" x1="0" y1="0" x2="400" y2="200"><stop offset="0" stop-color="#EBF5FF"/><stop offset="1" stop-color="#F0F5FF"/></linearGradient></defs><rect width="400" height="200" fill="url(#cg1)"/><g transform="translate(80,35)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#0066FF"/><circle cx="85" cy="100" r="18" fill="#0066FF"/><circle cx="265" cy="100" r="18" fill="#0066FF"/></g><text x="200" y="148" text-anchor="middle" font-family="Inter" font-size="16" font-weight="900" fill="#0F172A">Toyota RAV4 Hybrid</text><text x="200" y="170" text-anchor="middle" font-family="Inter" font-size="11" fill="#475569">Comfort CVT - 2026</text></svg></div>
         <div class="card-body">
-          <span class="tag tag-b" style="margin-bottom:6px">Meilleur match</span>
+          <span class="tag tag-b" style="margin-bottom:8px">Meilleur match</span>
           <div class="card-title">Toyota RAV4 Hybrid</div>
           <div class="card-sub">Comfort CVT - 2026</div>
           <div class="price-row">
-            <div><span class="price">349 900 DH</span></div>
+            <div><span class="price">349 900 DH</span><span class="price-old">365 000 DH</span></div>
             <div class="score">
-              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#16A34A" stroke-dasharray="107" stroke-dashoffset="19" transform="rotate(-90 22 22)"/></svg></div>
+              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#10B981" stroke-dasharray="107" stroke-dashoffset="19" transform="rotate(-90 22 22)"/></svg></div>
               <span class="score-val">8.2</span><span class="score-of">214 avis</span>
             </div>
           </div>
@@ -62,17 +74,17 @@
       </div>
 
       <!-- Card 2 -->
-      <div class="card" onclick="window.location.href='vehicle.html'">
-        <div class="card-badge"><span class="tag tag-gr" style="width:28px;height:28px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.75rem">2</span></div>
+      <div class="card anim-up anim-delay-2" onclick="window.location.href='vehicle.html'" style="cursor:pointer">
+        <div class="card-badge"><span class="tag tag-gr" style="width:30px;height:30px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-weight:900">2</span></div>
         <div class="card-fav">&#9825;</div>
-        <div class="card-img" style="height:180px"><svg viewBox="0 0 400 180"><rect width="400" height="180" fill="#F0EDE8"/><g transform="translate(80,30)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#5F6B7A"/><circle cx="85" cy="100" r="18" fill="#5F6B7A"/><circle cx="265" cy="100" r="18" fill="#5F6B7A"/></g><text x="200" y="135" text-anchor="middle" font-family="Inter" font-size="15" font-weight="800" fill="#1A1D26">Hyundai Tucson Hybrid</text><text x="200" y="155" text-anchor="middle" font-family="Inter" font-size="10" fill="#5F6B7A">Confort AT6 - 2026</text></svg></div>
+        <div class="card-img" style="height:200px"><svg viewBox="0 0 400 200"><defs><linearGradient id="cg2" x1="0" y1="0" x2="400" y2="200"><stop offset="0" stop-color="#F0EDE8"/><stop offset="1" stop-color="#F5F0E8"/></linearGradient></defs><rect width="400" height="200" fill="url(#cg2)"/><g transform="translate(80,35)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#64748B"/><circle cx="85" cy="100" r="18" fill="#64748B"/><circle cx="265" cy="100" r="18" fill="#64748B"/></g><text x="200" y="148" text-anchor="middle" font-family="Inter" font-size="16" font-weight="900" fill="#0F172A">Hyundai Tucson Hybrid</text><text x="200" y="170" text-anchor="middle" font-family="Inter" font-size="11" fill="#475569">Confort AT6 - 2026</text></svg></div>
         <div class="card-body">
           <div class="card-title">Hyundai Tucson Hybrid</div>
           <div class="card-sub">Confort AT6 - 2026</div>
           <div class="price-row">
             <div><span class="price">359 000 DH</span></div>
             <div class="score">
-              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#16A34A" stroke-dasharray="107" stroke-dashoffset="24" transform="rotate(-90 22 22)"/></svg></div>
+              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#10B981" stroke-dasharray="107" stroke-dashoffset="24" transform="rotate(-90 22 22)"/></svg></div>
               <span class="score-val">7.8</span><span class="score-of">187 avis</span>
             </div>
           </div>
@@ -83,17 +95,17 @@
       </div>
 
       <!-- Card 3 -->
-      <div class="card" onclick="window.location.href='vehicle.html'">
-        <div class="card-badge"><span class="tag tag-gr" style="width:28px;height:28px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.75rem">3</span></div>
+      <div class="card anim-up anim-delay-3" onclick="window.location.href='vehicle.html'" style="cursor:pointer">
+        <div class="card-badge"><span class="tag tag-gr" style="width:30px;height:30px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-weight:900">3</span></div>
         <div class="card-fav">&#9825;</div>
-        <div class="card-img" style="height:180px"><svg viewBox="0 0 400 180"><rect width="400" height="180" fill="#F5F0E8"/><g transform="translate(80,30)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#B8860B"/><circle cx="85" cy="100" r="18" fill="#B8860B"/><circle cx="265" cy="100" r="18" fill="#B8860B"/></g><text x="200" y="135" text-anchor="middle" font-family="Inter" font-size="15" font-weight="800" fill="#1A1D26">Kia Sportage Hybrid</text><text x="200" y="155" text-anchor="middle" font-family="Inter" font-size="10" fill="#5F6B7A">Prestige DCT - 2026</text></svg></div>
+        <div class="card-img" style="height:200px"><svg viewBox="0 0 400 200"><defs><linearGradient id="cg3" x1="0" y1="0" x2="400" y2="200"><stop offset="0" stop-color="#FEF3C7"/><stop offset="1" stop-color="#FFFBEB"/></linearGradient></defs><rect width="400" height="200" fill="url(#cg3)"/><g transform="translate(80,35)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#D97706"/><circle cx="85" cy="100" r="18" fill="#D97706"/><circle cx="265" cy="100" r="18" fill="#D97706"/></g><text x="200" y="148" text-anchor="middle" font-family="Inter" font-size="16" font-weight="900" fill="#0F172A">Kia Sportage Hybrid</text><text x="200" y="170" text-anchor="middle" font-family="Inter" font-size="11" fill="#475569">Prestige DCT - 2026</text></svg></div>
         <div class="card-body">
           <div class="card-title">Kia Sportage Hybrid</div>
           <div class="card-sub">Prestige DCT - 2026</div>
           <div class="price-row">
             <div><span class="price">369 000 DH</span></div>
             <div class="score">
-              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#D97706" stroke-dasharray="107" stroke-dashoffset="31" transform="rotate(-90 22 22)"/></svg></div>
+              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#F59E0B" stroke-dasharray="107" stroke-dashoffset="31" transform="rotate(-90 22 22)"/></svg></div>
               <span class="score-val">7.1</span><span class="score-of">142 avis</span>
             </div>
           </div>
@@ -104,17 +116,17 @@
       </div>
 
       <!-- Card 4 -->
-      <div class="card" onclick="window.location.href='vehicle.html'">
-        <div class="card-badge"><span class="tag tag-gr" style="width:28px;height:28px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.75rem">4</span></div>
+      <div class="card anim-up anim-delay-4" onclick="window.location.href='vehicle.html'" style="cursor:pointer">
+        <div class="card-badge"><span class="tag tag-gr" style="width:30px;height:30px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-weight:900">4</span></div>
         <div class="card-fav">&#9825;</div>
-        <div class="card-img" style="height:180px"><svg viewBox="0 0 400 180"><rect width="400" height="180" fill="#E8F0E8"/><g transform="translate(80,30)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#2E7D32"/><circle cx="85" cy="100" r="18" fill="#2E7D32"/><circle cx="265" cy="100" r="18" fill="#2E7D32"/></g><text x="200" y="135" text-anchor="middle" font-family="Inter" font-size="15" font-weight="800" fill="#1A1D26">Nissan Qashqai e-Power</text><text x="200" y="155" text-anchor="middle" font-family="Inter" font-size="10" fill="#5F6B7A">Tekna CVT - 2026</text></svg></div>
+        <div class="card-img" style="height:200px"><svg viewBox="0 0 400 200"><defs><linearGradient id="cg4" x1="0" y1="0" x2="400" y2="200"><stop offset="0" stop-color="#ECFDF5"/><stop offset="1" stop-color="#F0FDF4"/></linearGradient></defs><rect width="400" height="200" fill="url(#cg4)"/><g transform="translate(80,35)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#059669"/><circle cx="85" cy="100" r="18" fill="#059669"/><circle cx="265" cy="100" r="18" fill="#059669"/></g><text x="200" y="148" text-anchor="middle" font-family="Inter" font-size="16" font-weight="900" fill="#0F172A">Nissan Qashqai e-Power</text><text x="200" y="170" text-anchor="middle" font-family="Inter" font-size="11" fill="#475569">Tekna CVT - 2026</text></svg></div>
         <div class="card-body">
           <div class="card-title">Nissan Qashqai e-Power</div>
           <div class="card-sub">Tekna CVT - 2026</div>
           <div class="price-row">
             <div><span class="price">339 000 DH</span></div>
             <div class="score">
-              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#16A34A" stroke-dasharray="107" stroke-dashoffset="21" transform="rotate(-90 22 22)"/></svg></div>
+              <div class="gauge"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#10B981" stroke-dasharray="107" stroke-dashoffset="21" transform="rotate(-90 22 22)"/></svg></div>
               <span class="score-val">8.0</span><span class="score-of">98 avis</span>
             </div>
           </div>
@@ -127,7 +139,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar anim-up anim-delay-2">
       <div class="side-head"><h3>Affiner</h3><span class="reset">Reinitialiser</span></div>
       <label>Budget maximum</label>
       <input type="range" min="200000" max="600000" value="380000">
@@ -139,7 +151,7 @@
       <label>Carrosserie</label>
       <div class="chip-grp"><span class="chip on">SUV</span><span class="chip">Berline</span><span class="chip">Citadine</span></div>
       <label>Couleur</label>
-      <div class="color-row"><span class="cdot" style="background:#1A1D26"></span><span class="cdot" style="background:#F4F5F7"></span><span class="cdot" style="background:#DC2626"></span><span class="cdot" style="background:#2563EB"></span><span class="cdot" style="background:#16A34A"></span></div>
+      <div class="color-row"><span class="cdot active" style="background:#0F172A"></span><span class="cdot" style="background:#F1F5F9"></span><span class="cdot" style="background:#EF4444"></span><span class="cdot" style="background:#3B82F6"></span><span class="cdot" style="background:#10B981"></span></div>
       <label>Delai de livraison</label>
       <select><option>Tous delais</option><option>Moins de 2 semaines</option><option>2 a 4 semaines</option><option>Plus de 4 semaines</option></select>
       <label>Places</label>
@@ -149,7 +161,10 @@
 </div>
 
 <footer class="footer">
-  <div class="container"><p><b>Thiqti</b> - Volund Ventures SARL - VV-SLP-2026-001</p></div>
+  <div class="container">
+    <p><b>Thiqti</b> - Volund Ventures SARL</p>
+    <div class="footer-links"><a href="index.html">Accueil</a><a href="compare.html">Comparer</a><a href="favorites.html">Favoris</a></div>
+  </div>
 </footer>
 
 <script>
