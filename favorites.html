@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes favoris - Thiqti</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#0066FF"/><path d="M7 14L14 7l7 7-7 7z" fill="#fff" opacity=".9"/></svg>
+    Thiqti
+  </a>
+  <div class="nav-actions">
+    <a href="favorites.html" class="nav-link active">&#9829; Mes favoris</a>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:24px">
+  <h1 style="font-size:1.5rem;font-weight:900;margin-bottom:4px;letter-spacing:-.5px">Mes favoris</h1>
+  <p style="font-size:.875rem;color:var(--tx2);margin-bottom:20px">3 vehicules sauvegardes - Stockage local, aucun compte requis</p>
+
+  <div class="fav-grid">
+
+    <div class="card" onclick="window.location.href='vehicle.html'">
+      <div class="card-fav" style="color:var(--er)">&#10084;</div>
+      <div class="card-img" style="height:140px"><svg viewBox="0 0 400 160"><rect width="400" height="160" fill="#EBF5FF"/><g transform="translate(100,15)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#0066FF"/><circle cx="85" cy="100" r="18" fill="#0066FF"/><circle cx="265" cy="100" r="18" fill="#0066FF"/></g><text x="200" y="115" text-anchor="middle" font-family="Inter" font-size="14" font-weight="800" fill="#1A1D26">RAV4</text></svg></div>
+      <div class="card-body">
+        <div class="card-title">Toyota RAV4 Hybrid</div>
+        <div class="card-sub">Comfort CVT - 2026</div>
+        <div class="price-row"><span class="price">349 900 DH</span><span style="font-size:.8125rem;color:var(--ok);font-weight:800">8.2</span></div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <a href="vehicle.html" class="btn btn-p btn-sm" style="flex:1;text-decoration:none;text-align:center">Voir la fiche</a>
+          <a href="compare.html" class="btn btn-s btn-sm" style="flex:1;text-decoration:none;text-align:center">Comparer</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" onclick="window.location.href='vehicle.html'">
+      <div class="card-fav" style="color:var(--er)">&#10084;</div>
+      <div class="card-img" style="height:140px"><svg viewBox="0 0 400 160"><rect width="400" height="160" fill="#F0EDE8"/><g transform="translate(100,15)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#5F6B7A"/><circle cx="85" cy="100" r="18" fill="#5F6B7A"/><circle cx="265" cy="100" r="18" fill="#5F6B7A"/></g><text x="200" y="115" text-anchor="middle" font-family="Inter" font-size="14" font-weight="800" fill="#1A1D26">Tucson</text></svg></div>
+      <div class="card-body">
+        <div class="card-title">Hyundai Tucson Hybrid</div>
+        <div class="card-sub">Confort AT6 - 2026</div>
+        <div class="price-row"><span class="price">359 000 DH</span><span style="font-size:.8125rem;color:var(--ok);font-weight:800">7.8</span></div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <a href="vehicle.html" class="btn btn-p btn-sm" style="flex:1;text-decoration:none;text-align:center">Voir la fiche</a>
+          <a href="compare.html" class="btn btn-s btn-sm" style="flex:1;text-decoration:none;text-align:center">Comparer</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" onclick="window.location.href='vehicle.html'">
+      <div class="card-fav" style="color:var(--er)">&#10084;</div>
+      <div class="card-img" style="height:140px"><svg viewBox="0 0 400 160"><rect width="400" height="160" fill="#E8F0E8"/><g transform="translate(100,15)" opacity=".12"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#2E7D32"/><circle cx="85" cy="100" r="18" fill="#2E7D32"/><circle cx="265" cy="100" r="18" fill="#2E7D32"/></g><text x="200" y="115" text-anchor="middle" font-family="Inter" font-size="14" font-weight="800" fill="#1A1D26">Qashqai</text></svg></div>
+      <div class="card-body">
+        <div class="card-title">Nissan Qashqai e-Power</div>
+        <div class="card-sub">Tekna CVT - 2026</div>
+        <div class="price-row"><span class="price">339 000 DH</span><span style="font-size:.8125rem;color:var(--ok);font-weight:800">8.0</span></div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <a href="vehicle.html" class="btn btn-p btn-sm" style="flex:1;text-decoration:none;text-align:center">Voir la fiche</a>
+          <a href="compare.html" class="btn btn-s btn-sm" style="flex:1;text-decoration:none;text-align:center">Comparer</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><p><b>Thiqti</b> - Volund Ventures SARL - VV-SLP-2026-001</p></div>
+</footer>
+</body>
+</html>

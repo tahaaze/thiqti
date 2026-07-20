@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toyota RAV4 Hybrid - Thiqti</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#0066FF"/><path d="M7 14L14 7l7 7-7 7z" fill="#fff" opacity=".9"/></svg>
+    Thiqti
+  </a>
+  <div class="nav-actions">
+    <a href="favorites.html" class="nav-link">&#9829; Favoris</a>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:20px">
+  <div class="breadcrumb">
+    <a href="index.html">Accueil</a><span>/</span>
+    <a href="results.html">Resultats</a><span>/</span>
+    <strong>Toyota RAV4 Hybrid</strong>
+  </div>
+
+  <div class="vh-hero">
+    <div class="vh-img">
+      <svg viewBox="0 0 500 320" style="width:100%">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="500" y2="320" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EBF5FF"/><stop offset="1" stop-color="#F0F5FF"/></linearGradient></defs>
+        <rect width="500" height="320" fill="url(#g1)" rx="12"/>
+        <g transform="translate(100,55)" opacity=".1"><path d="M20,90L40,50l30-20 70-10 80 0 30 15 20 20 10 0 10 10v10l10 0 10 5v10H30V100z" fill="#0066FF"/><circle cx="85" cy="100" r="18" fill="#0066FF"/><circle cx="265" cy="100" r="18" fill="#0066FF"/></g>
+        <text x="250" y="210" text-anchor="middle" font-family="Inter" font-size="22" font-weight="900" fill="#1A1D26">Toyota RAV4 Hybrid</text>
+        <text x="250" y="238" text-anchor="middle" font-family="Inter" font-size="13" fill="#5F6B7A">Comfort CVT - 2026</text>
+      </svg>
+    </div>
+    <div class="vh-info">
+      <span class="tag tag-b" style="margin-bottom:8px">Meilleur match</span>
+      <h1>Toyota RAV4 Hybrid</h1>
+      <p style="font-size:.875rem;color:var(--tx2)">Comfort CVT - 2026 - SUV 5 places</p>
+      <div class="vh-tags"><span class="tag tag-b">Hybride</span><span class="tag tag-b">Auto CVT</span><span class="tag tag-b">SUV</span></div>
+      <div class="vh-price"><span class="main price">349 900 DH</span><span class="price-old">365 000 DH</span><span class="tag tag-g" style="margin-left:8px">-4%</span></div>
+      <div class="vh-meta">
+        <div class="vh-mi">
+          <div class="gauge" style="width:40px;height:40px"><svg viewBox="0 0 44 44"><circle class="gauge-bg" cx="22" cy="22" r="17"/><circle class="gauge-fill" cx="22" cy="22" r="17" stroke="#16A34A" stroke-dasharray="107" stroke-dashoffset="19" transform="rotate(-90 22 22)"/></svg></div>
+          <div><strong>8.2</strong><span>214 avis</span></div>
+        </div>
+        <div class="vh-div"></div>
+        <div class="vh-mi"><div><strong>Livraison</strong><span>2 a 4 semaines</span></div></div>
+      </div>
+      <div class="vh-acts">
+        <button class="btn btn-p" onclick="toggleFav()">&#9825; Favoris</button>
+        <a href="compare.html" class="btn btn-s" style="text-decoration:none">Comparer</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs" style="margin-top:24px">
+    <button class="tab on" onclick="showTab('specs')">Fiche technique</button>
+    <button class="tab" onclick="showTab('rep')">Reputation</button>
+    <button class="tab" onclick="showTab('offers')">Offres</button>
+  </div>
+
+  <!-- SPECS -->
+  <div id="tab-specs">
+    <div class="specs">
+      <div class="spec"><div class="l">Motorisation</div><div class="v">Hybride 2.5L</div></div>
+      <div class="spec"><div class="l">Puissance</div><div class="v">218 ch</div></div>
+      <div class="spec"><div class="l">Transmission</div><div class="v">CVT Auto</div></div>
+      <div class="spec"><div class="l">Consommation</div><div class="v">4.8 L/100km</div></div>
+      <div class="spec"><div class="l">CO2</div><div class="v">122 g/km</div></div>
+      <div class="spec"><div class="l">0-100 km/h</div><div class="v">8.1 s</div></div>
+      <div class="spec"><div class="l">Places</div><div class="v">5</div></div>
+      <div class="spec"><div class="l">Coffre</div><div class="v">580 L</div></div>
+    </div>
+  </div>
+
+  <!-- REPUTATION -->
+  <div id="tab-rep" style="display:none">
+    <div class="rep">
+      <div class="rep-head">
+        <div class="rep-gauge">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#E5E7EB" stroke-width="8"/><circle cx="50" cy="50" r="40" fill="none" stroke="#16A34A" stroke-width="8" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="45"/></svg>
+          <div class="gauge-lbl"><span class="sc">8.2</span><span class="mx">/ 10</span></div>
+        </div>
+        <div class="rep-info">
+          <div class="rep-title">Reputation</div>
+          <div class="rep-meta"><strong>214 avis</strong> des 18 derniers mois</div>
+          <div class="rep-sub">Fenetre : Janvier 2025 - Juillet 2026</div>
+        </div>
+        <span class="rel-badge">&#10003; Echantillon fiable</span>
+      </div>
+      <div class="rep-sec"><h4>Points forts</h4><div class="rep-tags"><span class="tag tag-g">Confort</span><span class="tag tag-g">Consommation</span><span class="tag tag-g">Fiabilite</span><span class="tag tag-g">Design</span><span class="tag tag-g">Equipements</span></div></div>
+      <div class="rep-sec"><h4>Points faibles</h4><div class="rep-tags"><span class="tag tag-r">Infodivertissement lent</span><span class="tag tag-r">Coffre etroit</span><span class="tag tag-r">Bruit haute vitesse</span></div></div>
+      <div class="rep-sec"><h4>Extraits d'avis anonymises</h4>
+        <div class="quotes">
+          <div class="q">Tres confortable en ville et sur autoroute. La consommation est vraiment au rendez-vous, environ 5L/100km en mixte.</div>
+          <div class="q">Le systeme multimedia est un peu date. L'ecran ralent parfois. Mais la fiabilite Toyota rassure.</div>
+          <div class="q">Superbe rapport qualite/prix pour un hybride. Les sieges sont tres confortables pour les longs trajets.</div>
+          <div class="q">J'ai choisi ce modele pour la securite. Toyota Safety Sense est complet. Aucun souci en 18 mois.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFERS -->
+  <div id="tab-offers" style="display:none">
+    <div class="rep" style="text-align:center;padding:48px">
+      <div style="font-size:2.5rem;margin-bottom:12px">&#128663;</div>
+      <h3 style="margin-bottom:8px">Offres de concessions</h3>
+      <p style="color:var(--tx2);font-size:.875rem;max-width:360px;margin:0 auto">Bientot disponible. Recevez les meilleures offres de concessions partenaires au Maroc.</p>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><p><b>Thiqti</b> - Volund Ventures SARL - VV-SLP-2026-001</p></div>
+</footer>
+
+<script>
+function showTab(t){
+  document.querySelectorAll('[id^="tab-"]').forEach(e=>e.style.display='none');
+  document.getElementById('tab-'+t).style.display='block';
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
+  event.target.classList.add('on');
+}
+function toggleFav(){
+  var b=event.target;b.innerHTML=b.innerHTML.includes('&#9829;')?'&#10084; Sauvegarde':'&#9825; Favoris';
+  b.classList.toggle('btn-p');b.classList.toggle('btn-g');
+}
+</script>
+</body>
+</html>

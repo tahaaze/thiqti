@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparateur - Thiqti</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#0066FF"/><path d="M7 14L14 7l7 7-7 7z" fill="#fff" opacity=".9"/></svg>
+    Thiqti
+  </a>
+  <div class="nav-actions">
+    <a href="favorites.html" class="nav-link">&#9829; Favoris</a>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:24px">
+  <div class="cmp">
+    <h2>Comparaison cote a cote</h2>
+    <p>3 vehicules compares - Les ecarts sont mis en evidence</p>
+
+    <table class="cmp-tbl">
+      <thead><tr><th></th>
+        <th class="c-hd">
+          <div class="c-hd-img"><svg viewBox="0 0 140 80"><rect width="140" height="80" fill="#EBF5FF" rx="6"/><g transform="translate(20,12)" opacity=".18"><path d="M5,35L12,20l13-8 30-4 35 0 10 6 8 8 4 0 4 4v4l5 0 3 2v4H12V40z" fill="#0066FF"/><circle cx="32" cy="40" r="7" fill="#0066FF"/><circle cx="108" cy="40" r="7" fill="#0066FF"/></g><text x="70" y="62" text-anchor="middle" font-family="Inter" font-size="9" font-weight="800" fill="#1A1D26">RAV4</text></svg></div>
+          <strong>Toyota RAV4</strong><span>349 900 DH</span>
+        </th>
+        <th class="c-hd">
+          <div class="c-hd-img"><svg viewBox="0 0 140 80"><rect width="140" height="80" fill="#F0EDE8" rx="6"/><g transform="translate(20,12)" opacity=".18"><path d="M5,35L12,20l13-8 30-4 35 0 10 6 8 8 4 0 4 4v4l5 0 3 2v4H12V40z" fill="#5F6B7A"/><circle cx="32" cy="40" r="7" fill="#5F6B7A"/><circle cx="108" cy="40" r="7" fill="#5F6B7A"/></g><text x="70" y="62" text-anchor="middle" font-family="Inter" font-size="9" font-weight="800" fill="#1A1D26">Tucson</text></svg></div>
+          <strong>Hyundai Tucson</strong><span>359 000 DH</span>
+        </th>
+        <th class="c-hd">
+          <div class="c-hd-img"><svg viewBox="0 0 140 80"><rect width="140" height="80" fill="#F5F0E8" rx="6"/><g transform="translate(20,12)" opacity=".18"><path d="M5,35L12,20l13-8 30-4 35 0 10 6 8 8 4 0 4 4v4l5 0 3 2v4H12V40z" fill="#B8860B"/><circle cx="32" cy="40" r="7" fill="#B8860B"/><circle cx="108" cy="40" r="7" fill="#B8860B"/></g><text x="70" y="62" text-anchor="middle" font-family="Inter" font-size="9" font-weight="800" fill="#1A1D26">Sportage</text></svg></div>
+          <strong>Kia Sportage</strong><span>369 000 DH</span>
+        </th>
+      </tr></thead>
+      <tbody>
+        <tr><td colspan="4" class="grp">Performances</td></tr>
+        <tr><td class="rl">Consommation</td><td class="win">4.8 L/100km</td><td>5.4 L/100km</td><td>5.8 L/100km</td></tr>
+        <tr><td class="rl">Puissance</td><td>218 ch</td><td class="win">230 ch</td><td class="win">230 ch</td></tr>
+        <tr><td class="rl">0-100 km/h</td><td>8.1 s</td><td>7.8 s</td><td class="win">7.6 s</td></tr>
+        <tr><td colspan="4" class="grp">Dimensions</td></tr>
+        <tr><td class="rl">Coffre</td><td>580 L</td><td class="win">616 L</td><td>591 L</td></tr>
+        <tr><td class="rl">Longueur</td><td>4 600 mm</td><td class="win">4 630 mm</td><td>4 515 mm</td></tr>
+        <tr><td colspan="4" class="grp">Reputation</td></tr>
+        <tr><td class="rl">Score</td><td class="win" style="font-weight:700">8.2 / 10</td><td>7.8 / 10</td><td>7.1 / 10</td></tr>
+        <tr><td class="rl">Volume</td><td class="win">214 avis</td><td>187 avis</td><td>142 avis</td></tr>
+        <tr><td class="rl">Points forts</td><td>Confort, conso, fiabilite</td><td>Coffre, equipements</td><td>Finition riche</td></tr>
+        <tr><td colspan="4" class="grp">Prix</td></tr>
+        <tr><td class="rl">Catalogue</td><td class="win" style="font-weight:700">349 900 DH</td><td>359 000 DH</td><td>369 000 DH</td></tr>
+        <tr><td class="rl">Livraison</td><td class="win">2-4 semaines</td><td>3-5 semaines</td><td>4-6 semaines</td></tr>
+      </tbody>
+    </table>
+
+    <div class="cmp-sum"><strong>Resume IA :</strong> Le Toyota RAV4 est le meilleur choix global : plus proche du budget, meilleure reputation (8.2/10, 214 avis), consommation la plus basse (4.8L/100km), et delai de livraison le plus court.</div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><p><b>Thiqti</b> - Volund Ventures SARL - VV-SLP-2026-001</p></div>
+</footer>
+</body>
+</html>
