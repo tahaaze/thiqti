@@ -1,10 +1,12 @@
 {
   "name": "thiqti",
   "private": true,
+  "main": "index.js",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/api\" \"npm run dev -w apps/ai\"",
-    "build": "npm run build -w apps/web && npm run build -w apps/api",
+    "build": "npm run build -w apps/web && node copy-static.js",
+    "start": "node apps/web/.next/standalone/server.js",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/api",
     "db:migrate": "npm run migrate -w packages/database",
     "db:seed": "npm run seed -w packages/database",
