@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+img
+*.html
+*.css
+mockup.*
+packages
+apps/api
+apps/ai
