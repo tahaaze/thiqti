@@ -1,0 +1,28 @@
+declare module "lucide-react" {
+  import { FC, SVGProps } from "react";
+  export const Search: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Star: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Shield: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const BarChart3: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ChevronRight: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ChevronLeft: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Zap: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const TrendingUp: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Users: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const MapPin: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Fuel: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Gauge: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Heart: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Grid3X3: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const List: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const SlidersHorizontal: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Calendar: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Share2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const AlertTriangle: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const CheckCircle2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const MessageSquare: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Trash2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ExternalLink: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Plus: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const X: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+}

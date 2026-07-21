@@ -1,0 +1,46 @@
+version: '3.9'
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: thiqti-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: thiqti
+      POSTGRES_PASSWORD: thiqti_secret
+      POSTGRES_DB: thiqti
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./packages/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./packages/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U thiqti"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: thiqti-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.7
+    container_name: thiqti-search
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: thiqti_meili_key
+      MEILI_ENV: development
+    volumes:
+      - meilidata:/meili_data
+
+volumes:
+  pgdata:
+  meilidata:

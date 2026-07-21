@@ -1,0 +1,10 @@
+{
+  "name": "@thiqti/database",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "migrate": "psql $DATABASE_URL -f schema.sql",
+    "seed": "psql $DATABASE_URL -f seed.sql",
+    "reset": "psql $DATABASE_URL -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' && npm run migrate && npm run seed"
+  }
+}
