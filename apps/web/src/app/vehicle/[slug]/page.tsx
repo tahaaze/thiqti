@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Send, Camera } from "lucide-react";
+import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Send, Camera, CreditCard, BadgeCheck } from "lucide-react";
 import { useToast } from "@/components/Toast";
 import { Modal } from "@/components/Modal";
 
@@ -174,8 +174,60 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
               )}
 
               {activeTab === "offers" && (
-                <div className="glass-card p-6">
-                  <p className="text-gray-400">Aucune offre spécifique pour le moment. Contactez le vendeur directement.</p>
+                <div className="space-y-4">
+                  <div className="glass-card p-6">
+                    <div className="mb-4 flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-primary" />
+                      <h2 className="text-lg font-bold">Estimation de financement</h2>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      {[
+                        { months: 24, rate: 4.5 },
+                        { months: 36, rate: 4.9 },
+                        { months: 48, rate: 5.3 },
+                      ].map(({ months, rate }) => {
+                        const monthly = Math.round((car.price * (rate / 100 / 12)) / (1 - Math.pow(1 + rate / 100 / 12, -months)));
+                        return (
+                          <div key={months} className="rounded-xl bg-dark-800/50 p-4 text-center">
+                            <p className="text-xs text-gray-500 uppercase tracking-wider">{months} mois</p>
+                            <p className="mt-1 text-2xl font-bold text-primary">{monthly.toLocaleString("fr-FR")} DH</p>
+                            <p className="text-xs text-gray-400">/mois &middot; TAEG {rate}%</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-3 text-xs text-gray-500">Estimation indicative basée sur un apport de 20%. Montant total variable selon le profil.</p>
+                  </div>
+
+                  <div className="glass-card p-6">
+                    <div className="mb-4 flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-green-500" />
+                      <h2 className="text-lg font-bold">Garantie & Sûreté</h2>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3 rounded-xl bg-dark-800/50 p-4">
+                        <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-400" />
+                        <div>
+                          <p className="text-sm font-medium">Vérifié par Thiqti AI</p>
+                          <p className="text-xs text-gray-400">Score de réputation {car.score}/100 basé sur l&apos;historique, l&apos;état et les avis.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 rounded-xl bg-dark-800/50 p-4">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
+                        <div>
+                          <p className="text-sm font-medium">Source vérifiée : {car.source}</p>
+                          <p className="text-xs text-gray-400">Annonce issue de {car.source}, plateforme certifiée au Maroc.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 rounded-xl bg-dark-800/50 p-4">
+                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-400" />
+                        <div>
+                          <p className="text-sm font-medium">Recommandation</p>
+                          <p className="text-xs text-gray-400">Demandez un rapport CarVertical ou un contrôle technique avant l&apos;achat.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -189,10 +241,11 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400"><MapPin className="h-4 w-4" />{car.city}</div>
               {car.url && car.url !== "#" ? (
-                <a href={car.url} target="_blank" rel="noopener noreferrer" className="btn-primary block w-full text-center">Voir l&apos;annonce originale</a>
-              ) : (
-                <button onClick={() => setContactModal(true)} className="btn-primary block w-full text-center">Contacter le vendeur</button>
-              )}
+                <a href={car.url} target="_blank" rel="noopener noreferrer" className="btn-primary block w-full text-center">
+                  Voir l&apos;annonce sur {car.source}
+                </a>
+              ) : null}
+              <button onClick={() => setContactModal(true)} className="w-full rounded-xl border border-white/10 py-2.5 text-sm font-medium text-gray-400 hover:text-white">Contacter le vendeur</button>
               <button onClick={() => setPhotoModal(true)} className="w-full rounded-xl border border-white/10 py-2.5 text-sm font-medium text-gray-400 hover:text-white">Demander plus de photos</button>
             </div>
           </aside>

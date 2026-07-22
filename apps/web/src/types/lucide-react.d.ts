@@ -29,4 +29,8 @@ declare module "lucide-react" {
   export const Send: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Camera: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Loader: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const BadgeCheck: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ThumbsUp: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Wallet: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const CreditCard: FC<SVGProps<SVGSVGElement> & { className?: string }>;
 }
