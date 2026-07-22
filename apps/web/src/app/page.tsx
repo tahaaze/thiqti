@@ -22,9 +22,9 @@ interface CarListing {
 }
 
 const STATS = [
-  { label: "Véhicules listés", value: "20+", icon: TrendingUp },
-  { label: "Sources IA", value: "Google + Avito + Moteur", icon: Users },
-  { label: "Villes couvertes", value: "10+", icon: MapPin },
+  { label: "Véhicules en direct", value: "85+", icon: TrendingUp },
+  { label: "Sources IA", value: "Auto24.ma + Google", icon: Users },
+  { label: "Marques disponibles", value: "25+", icon: MapPin },
 ];
 
 const BRANDS = ["Dacia", "Renault", "Toyota", "Hyundai", "Kia", "Peugeot", "Volkswagen", "BMW", "Mercedes", "Nissan"];

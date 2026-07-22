@@ -95,13 +95,13 @@ export default function ResultsPage() {
                 <label className="mb-2 block text-xs font-medium text-gray-400 uppercase tracking-wider">Marque</label>
                 <select onChange={(e) => { setQuery(e.target.value); doSearch(e.target.value); }} className="input-field text-sm">
                   <option value="">Toutes les marques</option>
-                  {["Dacia", "Renault", "Toyota", "Hyundai", "Kia", "Peugeot", "Volkswagen", "BMW", "Mercedes", "Nissan"].map(m => <option key={m} value={m}>{m}</option>)}
+                  {["Dacia", "Renault", "Peugeot", "Toyota", "Hyundai", "Kia", "BMW", "Mercedes", "Volkswagen", "Audi", "Ford", "Fiat", "Nissan", "Opel", "Citroen"].map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
               <div>
                 <label className="mb-2 block text-xs font-medium text-gray-400 uppercase tracking-wider">Carburant</label>
                 <div className="flex flex-wrap gap-2">
-                  {["Essence", "Diesel", "Hybride"].map((f) => (
+                  {["Essence", "Diesel", "Hybride", "Électrique"].map((f) => (
                     <button key={f} onClick={() => { setQuery(f); doSearch(f); }} className="chip text-xs">{f}</button>
                   ))}
                 </div>
