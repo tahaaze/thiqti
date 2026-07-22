@@ -142,6 +142,7 @@ export default function RootLayout({
                 <Link href="/results" className="text-sm text-gray-400 transition hover:text-white">Rechercher</Link>
                 <Link href="/compare" className="text-sm text-gray-400 transition hover:text-white">Comparer</Link>
                 <Link href="/favorites" className="text-sm text-gray-400 transition hover:text-white">Favoris</Link>
+                <Link href="/entreprises" className="rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition hover:bg-primary/20">Entreprises</Link>
               </div>
               <div className="hidden items-center gap-3 md:flex">
                 <button onClick={() => setAuthModal("login")} className="btn-secondary text-sm">Connexion</button>
@@ -157,6 +158,7 @@ export default function RootLayout({
                   <Link href="/results" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Rechercher</Link>
                   <Link href="/compare" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Comparer</Link>
                   <Link href="/favorites" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Favoris</Link>
+                  <Link href="/entreprises" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-primary hover:text-primary/80">Entreprises</Link>
                   <div className="flex gap-3 pt-2">
                     <button onClick={() => { setMenuOpen(false); setAuthModal("login"); }} className="btn-secondary text-sm flex-1">Connexion</button>
                     <button onClick={() => { setMenuOpen(false); setAuthModal("signup"); }} className="btn-primary text-sm flex-1">S&apos;inscrire</button>

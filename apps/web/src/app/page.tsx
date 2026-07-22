@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Star, Shield, BarChart3, ChevronRight, Zap, TrendingUp, Users, MapPin, Fuel } from "lucide-react";
+import { Search, Star, Shield, BarChart3, ChevronRight, Zap, TrendingUp, Users, MapPin, Fuel, Building2 } from "lucide-react";
 
 interface CarListing {
   id: string;
@@ -196,9 +196,61 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* B2B Teaser */}
+      <section className="relative px-6 py-20">
+        <div className="mx-auto max-w-4xl">
+          <div className="glass-card p-10 text-center" style={{ background: "linear-gradient(135deg, rgba(0,102,255,0.1) 0%, rgba(0,212,255,0.03) 100%)" }}>
+            <Building2 className="mx-auto mb-4 h-10 w-10 text-primary" />
+            <h2 className="mb-3 text-2xl font-bold">Vous êtes professionnel ?</h2>
+            <p className="mx-auto mb-6 max-w-xl text-gray-400">
+              Thiqti Business offre intelligence marché, leads qualifiés, API et white-label
+              pour les concessionnaires, flottes et banques au Maroc.
+            </p>
+            <Link href="/entreprises" className="btn-primary inline-flex items-center gap-2">
+              Découvrir Thiqti Business <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-white/5 px-6 py-12">
-        <div className="mx-auto max-w-6xl text-center text-sm text-gray-500">
-          <p>&copy; 2026 Thiqti. Tous droits réservés. Propulsé par l&apos;IA.</p>
+        <div className="mx-auto max-w-6xl">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-blue-400 text-sm font-bold text-white">T</div>
+                <span className="font-bold">Thiqti</span>
+              </div>
+              <p className="text-xs text-gray-500">Plateforme IA de recherche automobile au Maroc.</p>
+            </div>
+            <div>
+              <p className="mb-3 text-sm font-semibold">Particuliers</p>
+              <div className="space-y-2">
+                <Link href="/results" className="block text-xs text-gray-400 hover:text-white">Rechercher</Link>
+                <Link href="/compare" className="block text-xs text-gray-400 hover:text-white">Comparer</Link>
+                <Link href="/favorites" className="block text-xs text-gray-400 hover:text-white">Favoris</Link>
+              </div>
+            </div>
+            <div>
+              <p className="mb-3 text-sm font-semibold">Entreprises</p>
+              <div className="space-y-2">
+                <Link href="/entreprises" className="block text-xs text-gray-400 hover:text-white">Plateforme B2B</Link>
+                <Link href="/entreprises/dashboard" className="block text-xs text-gray-400 hover:text-white">Dashboard</Link>
+                <Link href="/entreprises/marche" className="block text-xs text-gray-400 hover:text-white">Intelligence marché</Link>
+                <Link href="/entreprises/api" className="block text-xs text-gray-400 hover:text-white">Documentation API</Link>
+              </div>
+            </div>
+            <div>
+              <p className="mb-3 text-sm font-semibold">Légal</p>
+              <div className="space-y-2">
+                <p className="text-xs text-gray-400">Propulsé par Volund Ventures SARL</p>
+                <p className="text-xs text-gray-400">Données: Auto24.ma</p>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-6 text-center text-xs text-gray-500">
+            <p>&copy; 2026 Thiqti. Tous droits réservés.</p>
+          </div>
         </div>
       </footer>
     </div>
