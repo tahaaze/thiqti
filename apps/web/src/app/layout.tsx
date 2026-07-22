@@ -1,55 +1,88 @@
-import type { Metadata } from "next";
-import "./globals.css";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Thiqti - Trouvez votre voiture idéale au Maroc",
-  description:
-    "Plateforme intelligente de recherche de voitures d'occasion au Maroc. Comparez, évaluez et achetez en toute confiance.",
-};
+import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
+import { ToastProvider } from "@/components/Toast";
+import { Modal } from "@/components/Modal";
+import "./globals.css";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [authModal, setAuthModal] = useState<"login" | "signup" | null>(null);
+
+  useEffect(() => {
+    document.title = "Thiqti - Trouvez votre voiture idéale au Maroc";
+  }, []);
+
   return (
     <html lang="fr" className="dark">
       <body className="min-h-screen bg-dark-900 text-white antialiased">
-        <nav className="sticky top-0 z-50 glass border-b border-white/5">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-            <a href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-400 text-sm font-bold text-white">
-                T
+        <ToastProvider>
+          <nav className="sticky top-0 z-50 glass border-b border-white/5">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+              <a href="/" className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-400 text-sm font-bold text-white">
+                  T
+                </div>
+                <span className="text-xl font-bold tracking-tight">Thiqti</span>
+              </a>
+              <div className="hidden items-center gap-8 md:flex">
+                <a href="/results" className="text-sm text-gray-400 transition hover:text-white">Rechercher</a>
+                <a href="/compare" className="text-sm text-gray-400 transition hover:text-white">Comparer</a>
+                <a href="/favorites" className="text-sm text-gray-400 transition hover:text-white">Favoris</a>
               </div>
-              <span className="text-xl font-bold tracking-tight">Thiqti</span>
-            </a>
-            <div className="hidden items-center gap-8 md:flex">
-              <a
-                href="/results"
-                className="text-sm text-gray-400 transition hover:text-white"
-              >
-                Rechercher
-              </a>
-              <a
-                href="/compare"
-                className="text-sm text-gray-400 transition hover:text-white"
-              >
-                Comparer
-              </a>
-              <a
-                href="/favorites"
-                className="text-sm text-gray-400 transition hover:text-white"
-              >
-                Favoris
-              </a>
+              <div className="hidden items-center gap-3 md:flex">
+                <button onClick={() => setAuthModal("login")} className="btn-secondary text-sm">Connexion</button>
+                <button onClick={() => setAuthModal("signup")} className="btn-primary text-sm">S&apos;inscrire</button>
+              </div>
+              <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-lg p-2 text-gray-400 hover:text-white md:hidden">
+                {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="btn-secondary text-sm">Connexion</button>
-              <button className="btn-primary text-sm">S&apos;inscrire</button>
+            {menuOpen && (
+              <div className="border-t border-white/5 px-6 py-4 md:hidden">
+                <div className="flex flex-col gap-4">
+                  <a href="/results" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Rechercher</a>
+                  <a href="/compare" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Comparer</a>
+                  <a href="/favorites" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Favoris</a>
+                  <div className="flex gap-3 pt-2">
+                    <button onClick={() => { setMenuOpen(false); setAuthModal("login"); }} className="btn-secondary text-sm flex-1">Connexion</button>
+                    <button onClick={() => { setMenuOpen(false); setAuthModal("signup"); }} className="btn-primary text-sm flex-1">S&apos;inscrire</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </nav>
+          <main>{children}</main>
+
+          <Modal open={authModal !== null} onClose={() => setAuthModal(null)} title={authModal === "login" ? "Connexion" : "Créer un compte"}>
+            <p className="mb-6 text-sm text-gray-400">
+              {authModal === "login"
+                ? "Connectez-vous pour accéder à vos favoris et gérer vos alertes."
+                : "Créez un compte pour sauvegarder vos recherches et recevoir des alertes."}
+            </p>
+            <div className="space-y-4">
+              <input type="email" placeholder="Adresse email" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+              <input type="password" placeholder="Mot de passe" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setAuthModal(null);
+                }}
+                className="btn-primary w-full text-center"
+              >
+                {authModal === "login" ? "Se connecter" : "S'inscrire"}
+              </button>
             </div>
-          </div>
-        </nav>
-        <main>{children}</main>
+            <p className="mt-4 text-center text-xs text-gray-500">
+              Fonctionnalité à venir — l&apos;authentification sera bientôt disponible.
+            </p>
+          </Modal>
+        </ToastProvider>
       </body>
     </html>
   );

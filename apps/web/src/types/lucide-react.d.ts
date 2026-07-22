@@ -24,5 +24,8 @@ declare module "lucide-react" {
   export const Trash2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const ExternalLink: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Plus: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Menu: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const X: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Send: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Camera: FC<SVGProps<SVGSVGElement> & { className?: string }>;
 }

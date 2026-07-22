@@ -25,10 +25,13 @@ export default function ComparePage() {
   const [selected, setSelected] = useState<CarListing[]>([]);
 
   useEffect(() => {
-    fetch("/api/search").then(r => r.json()).then(data => {
+    fetch("/api/search").then(r => {
+      if (!r.ok) throw new Error("Erreur réseau");
+      return r.json();
+    }).then(data => {
       setAll(data.results);
       setSelected(data.results.slice(0, 2));
-    });
+    }).catch(() => {});
   }, []);
 
   const addCar = (id: string) => {

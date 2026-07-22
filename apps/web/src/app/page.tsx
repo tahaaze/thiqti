@@ -37,6 +37,7 @@ export default function HomePage() {
     setLoading(true);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error("Erreur réseau");
       const data = await res.json();
       setCars(data.results.slice(0, 6));
     } catch { setCars([]); }

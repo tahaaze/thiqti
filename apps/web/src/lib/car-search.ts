@@ -73,8 +73,8 @@ export async function searchCars(query: string): Promise<CarListing[]> {
           });
         }
       }
-    } catch (err) {
-      console.error("Google search failed, using local data:", err);
+    } catch {
+      // Google search unavailable, falling back to local data
     }
   }
 

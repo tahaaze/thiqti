@@ -27,10 +27,20 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("thiqti_favorites");
+    if (saved) setFavorites(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
   const doSearch = async (q: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error("Erreur réseau");
       const data = await res.json();
       setCars(data.results);
     } catch { setCars([]); }

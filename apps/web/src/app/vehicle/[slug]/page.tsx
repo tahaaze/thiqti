@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle } from "lucide-react";
+import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Send, Camera } from "lucide-react";
+import { useToast } from "@/components/Toast";
+import { Modal } from "@/components/Modal";
 
 interface CarListing {
   id: string;
@@ -30,17 +32,50 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   const [car, setCar] = useState<CarListing | null>(null);
   const [activeTab, setActiveTab] = useState<"specs" | "reputation" | "offers">("specs");
   const [fav, setFav] = useState(false);
+  const [contactModal, setContactModal] = useState(false);
+  const [photoModal, setPhotoModal] = useState(false);
+  const [error, setError] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     params.then(({ slug }) => {
-      fetch(`/api/search`).then(r => r.json()).then(data => {
+      fetch(`/api/search`).then(r => {
+        if (!r.ok) throw new Error("Erreur réseau");
+        return r.json();
+      }).then(data => {
         const found = data.results.find((c: CarListing) => c.id === slug);
-        setCar(found || null);
-      });
+        if (found) {
+          setCar(found);
+        } else {
+          setError(true);
+        }
+      }).catch(() => { setError(true); });
+      const saved = localStorage.getItem("thiqti_favorites");
+      if (saved) setFav(JSON.parse(saved).includes(slug));
     });
   }, [params]);
 
-  if (!car) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse text-gray-400">Chargement...</div></div>;
+  useEffect(() => {
+    if (!car) return;
+    const saved = localStorage.getItem("thiqti_favorites");
+    const list: string[] = saved ? JSON.parse(saved) : [];
+    const updated = fav ? (list.includes(car.id) ? list : [...list, car.id]) : list.filter((id) => id !== car.id);
+    localStorage.setItem("thiqti_favorites", JSON.stringify(updated));
+  }, [fav, car]);
+
+  if (error) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <AlertTriangle className="h-12 w-12 text-yellow-500" />
+      <p className="text-gray-400">Véhicule introuvable</p>
+      <a href="/results" className="btn-primary">Voir tous les résultats</a>
+    </div>
+  );
+
+  if (!car) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse text-gray-400">Chargement...</div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen px-6 py-8">
@@ -64,7 +99,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setFav(!fav)} className="rounded-lg border border-white/10 p-2 text-gray-400 hover:text-red-400"><Heart className={`h-5 w-5 ${fav ? "fill-red-400 text-red-400" : ""}`} /></button>
-                    <button className="rounded-lg border border-white/10 p-2 text-gray-400 hover:text-primary"><Share2 className="h-5 w-5" /></button>
+                    <button onClick={() => { navigator.clipboard.writeText(window.location.href); showToast("Lien copié dans le presse-papier !", "success"); }} className="rounded-lg border border-white/10 p-2 text-gray-400 hover:text-primary"><Share2 className="h-5 w-5" /></button>
                   </div>
                 </div>
                 <p className="mt-4 text-3xl font-extrabold text-primary">{car.priceFormatted}</p>
@@ -143,12 +178,46 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                 <div><p className="font-bold">{car.score}/100</p><p className="text-xs text-gray-400">Reputation Score</p></div>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400"><MapPin className="h-4 w-4" />{car.city}</div>
-              <a href={car.url} target="_blank" rel="noopener noreferrer" className="btn-primary block w-full text-center">Contacter le vendeur</a>
-              <button className="w-full rounded-xl border border-white/10 py-2.5 text-sm font-medium text-gray-400 hover:text-white">Demander plus de photos</button>
+              {car.url && car.url !== "#" ? (
+                <a href={car.url} target="_blank" rel="noopener noreferrer" className="btn-primary block w-full text-center">Voir l&apos;annonce originale</a>
+              ) : (
+                <button onClick={() => setContactModal(true)} className="btn-primary block w-full text-center">Contacter le vendeur</button>
+              )}
+              <button onClick={() => setPhotoModal(true)} className="w-full rounded-xl border border-white/10 py-2.5 text-sm font-medium text-gray-400 hover:text-white">Demander plus de photos</button>
             </div>
           </aside>
         </div>
       </div>
+
+      <Modal open={contactModal} onClose={() => setContactModal(false)} title="Contacter le vendeur">
+        <p className="mb-4 text-sm text-gray-400">
+          Contactez le vendeur pour {car.title} ({car.priceFormatted}).
+        </p>
+        <div className="space-y-3">
+          <input type="text" placeholder="Votre nom" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <input type="email" placeholder="Votre email" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <textarea placeholder="Votre message..." className="input-field text-sm min-h-[100px]" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <button onClick={() => { setContactModal(false); showToast("Message envoyé au vendeur !", "success"); }} className="btn-primary flex w-full items-center justify-center gap-2">
+            <Send className="h-4 w-4" /> Envoyer
+          </button>
+        </div>
+        <p className="mt-3 text-center text-xs text-gray-500">Les annonces complètes seront disponibles avec la connexion aux sources Avito et Moteur.ma.</p>
+      </Modal>
+
+      <Modal open={photoModal} onClose={() => setPhotoModal(false)} title="Demander plus de photos">
+        <p className="mb-4 text-sm text-gray-400">
+          Demandez des photos supplémentaires pour {car.title}.
+        </p>
+        <div className="space-y-3">
+          <input type="text" placeholder="Votre nom" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <input type="email" placeholder="Votre email" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <textarea placeholder="Photos souhaitées (intérieur, moteur, etc.)..." className="input-field text-sm min-h-[100px]" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <button onClick={() => { setPhotoModal(false); showToast("Demande de photos envoyée !", "success"); }} className="btn-primary flex w-full items-center justify-center gap-2">
+            <Camera className="h-4 w-4" /> Envoyer la demande
+          </button>
+        </div>
+        <p className="mt-3 text-center text-xs text-gray-500">Fonctionnalité à venir — le vendeur recevra votre demande par email.</p>
+      </Modal>
     </div>
   );
 }
