@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { Search, SlidersHorizontal, Star, MapPin, Fuel, Heart, Grid3X3, List } from "lucide-react";
 
 interface CarListing {
@@ -26,17 +27,20 @@ export default function ResultsPage() {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("thiqti_favorites");
     if (saved) setFavorites(JSON.parse(saved));
+    loadedRef.current = true;
   }, []);
 
   useEffect(() => {
+    if (!loadedRef.current) return;
     localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  const doSearch = async (q: string) => {
+  const doSearch = useCallback(async (q: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
@@ -45,14 +49,14 @@ export default function ResultsPage() {
       setCars(data.results);
     } catch { setCars([]); }
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q") || params.get("brand") || params.get("category") || "";
     setQuery(q);
     doSearch(q);
-  }, []);
+  }, [doSearch]);
 
   const toggleFav = (id: string) => {
     setFavorites((prev) => prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]);
@@ -130,11 +134,11 @@ export default function ResultsPage() {
             ) : (
               <div className={view === "grid" ? "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" : "space-y-4"}>
                 {cars.map((v) => (
-                  <a key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
+                  <Link key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
                     <div className="relative h-44 overflow-hidden">
                       <img src={v.image} alt={v.title} className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
                       <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
-                      <button onClick={(e) => { e.preventDefault(); toggleFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
                         <Heart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-400 text-red-400" : ""}`} />
                       </button>
                     </div>
@@ -152,7 +156,7 @@ export default function ResultsPage() {
                         </span>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             )}

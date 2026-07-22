@@ -43,6 +43,10 @@ const MOROCCAN_CARS: CarListing[] = [
   { id: "20", title: "Skoda Kamiq 1.0 TSI", make: "Skoda", model: "Kamiq", year: 2022, price: 220000, priceFormatted: "220 000 DH", km: 18000, fuel: "Essence", city: "Agadir", image: "https://picsum.photos/seed/kamiq/600/400", score: 85, source: "Moteur.ma", url: "#" },
 ];
 
+function formatPrice(price: number): string {
+  return price.toLocaleString("fr-FR") + " DH";
+}
+
 export async function searchCars(query: string): Promise<CarListing[]> {
   if (GOOGLE_API_KEY && GOOGLE_CX) {
     try {
@@ -54,14 +58,15 @@ export async function searchCars(query: string): Promise<CarListing[]> {
         if (data.items && data.items.length > 0) {
           return data.items.map((item: Record<string, string>, i: number) => {
             const city = MOROCCAN_CITIES[i % MOROCCAN_CITIES.length];
+            const price = 150000 + Math.floor(Math.random() * 200000);
             return {
               id: `g${i}`,
               title: item.title || "Voiture",
               make: "",
               model: "",
               year: 2022,
-              price: 150000 + Math.floor(Math.random() * 200000),
-              priceFormatted: "",
+              price,
+              priceFormatted: formatPrice(price),
               km: 10000 + Math.floor(Math.random() * 50000),
               fuel: "Essence",
               city,

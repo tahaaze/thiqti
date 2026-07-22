@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Heart, Star, MapPin, Fuel, Trash2 } from "lucide-react";
 
 interface CarListing {
@@ -23,11 +24,20 @@ interface CarListing {
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [cars, setCars] = useState<CarListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("thiqti_favorites");
     if (saved) setFavorites(JSON.parse(saved));
+    loadedRef.current = true;
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
+  }, [favorites]);
 
   useEffect(() => {
     if (favorites.length === 0) return;
@@ -42,7 +52,6 @@ export default function FavoritesPage() {
   const removeFav = (id: string) => {
     const updated = favorites.filter(f => f !== id);
     setFavorites(updated);
-    localStorage.setItem("thiqti_favorites", JSON.stringify(updated));
     setCars(prev => prev.filter(c => c.id !== id));
   };
 
@@ -54,26 +63,30 @@ export default function FavoritesPage() {
             <Heart className="h-8 w-8 text-red-400 fill-red-400" />
             Mes favoris
           </h1>
-          <p className="mt-2 text-gray-400">{favorites.length} véhicule(s) sauvegardé(s)</p>
+          <p className="mt-2 text-gray-400">{loadedRef.current ? `${favorites.length} véhicule(s) sauvegardé(s)` : "Chargement..."}</p>
         </div>
 
-        {favorites.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1,2,3].map(i => <div key={i} className="glass-card animate-pulse h-72" />)}
+          </div>
+        ) : favorites.length === 0 ? (
           <div className="glass-card p-12 text-center">
             <Heart className="mx-auto mb-4 h-12 w-12 text-gray-600" />
             <p className="text-gray-400">Aucun favori pour le moment</p>
             <p className="mt-2 text-sm text-gray-500">Cliquez sur le cœur dans les résultats pour sauvegarder</p>
-            <a href="/results" className="btn-primary mt-6 inline-flex items-center gap-2">
+            <Link href="/results" className="btn-primary mt-6 inline-flex items-center gap-2">
               Explorer les annonces
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {cars.map((v) => (
-              <a key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
+              <Link key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
                 <div className="relative h-44 overflow-hidden">
                   <img src={v.image} alt={v.title} className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
                   <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
-                  <button onClick={(e) => { e.preventDefault(); removeFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
+                  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -91,7 +104,7 @@ export default function FavoritesPage() {
                     </span>
                   </div>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         )}

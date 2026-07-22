@@ -28,4 +28,5 @@ declare module "lucide-react" {
   export const X: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Send: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Camera: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Loader: FC<SVGProps<SVGSVGElement> & { className?: string }>;
 }

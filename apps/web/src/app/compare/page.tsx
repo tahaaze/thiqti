@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Star, Fuel, MapPin } from "lucide-react";
+import Link from "next/link";
+import { X, Star, Fuel, MapPin, Loader } from "lucide-react";
 
 interface CarListing {
   id: string;
@@ -23,6 +24,7 @@ interface CarListing {
 export default function ComparePage() {
   const [all, setAll] = useState<CarListing[]>([]);
   const [selected, setSelected] = useState<CarListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/search").then(r => {
@@ -31,7 +33,8 @@ export default function ComparePage() {
     }).then(data => {
       setAll(data.results);
       setSelected(data.results.slice(0, 2));
-    }).catch(() => {});
+      setLoading(false);
+    }).catch(() => { setLoading(false); });
   }, []);
 
   const addCar = (id: string) => {
@@ -53,6 +56,23 @@ export default function ComparePage() {
     { label: "Score", format: (v: CarListing) => `${v.score}/100` },
     { label: "Source", format: (v: CarListing) => v.source },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen px-6 py-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">Comparaison</h1>
+            <p className="mt-2 text-gray-400">Comparez jusqu&apos;à 3 véhicules côte à côte</p>
+          </div>
+          <div className="glass-card p-12 text-center">
+            <Loader className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
+            <p className="text-gray-400">Chargement des véhicules...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen px-6 py-8">
@@ -76,7 +96,12 @@ export default function ComparePage() {
                 ))}
                 {selected.length < 3 && (
                   <th className="p-4 text-center">
-                    <select onChange={(e) => { addCar(e.target.value); e.currentTarget.value = ""; }} className="input-field w-48 text-sm" defaultValue="">
+                    <select
+                      key={selected.length}
+                      onChange={(e) => { if (e.target.value) addCar(e.target.value); }}
+                      value=""
+                      className="input-field w-48 text-sm"
+                    >
                       <option value="" disabled>+ Ajouter</option>
                       {available.map((v) => <option key={v.id} value={v.id}>{v.title}</option>)}
                     </select>
@@ -97,6 +122,15 @@ export default function ComparePage() {
             </tbody>
           </table>
         </div>
+
+        {selected.length === 0 && (
+          <div className="mt-6 glass-card p-12 text-center">
+            <p className="text-gray-400">Aucun véhicule sélectionné</p>
+            <Link href="/results" className="btn-primary mt-4 inline-flex items-center gap-2">
+              Explorer les annonces
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

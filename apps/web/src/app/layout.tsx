@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ToastProvider } from "@/components/Toast";
 import { Modal } from "@/components/Modal";
@@ -24,16 +25,16 @@ export default function RootLayout({
         <ToastProvider>
           <nav className="sticky top-0 z-50 glass border-b border-white/5">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-              <a href="/" className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-400 text-sm font-bold text-white">
                   T
                 </div>
                 <span className="text-xl font-bold tracking-tight">Thiqti</span>
-              </a>
+              </Link>
               <div className="hidden items-center gap-8 md:flex">
-                <a href="/results" className="text-sm text-gray-400 transition hover:text-white">Rechercher</a>
-                <a href="/compare" className="text-sm text-gray-400 transition hover:text-white">Comparer</a>
-                <a href="/favorites" className="text-sm text-gray-400 transition hover:text-white">Favoris</a>
+                <Link href="/results" className="text-sm text-gray-400 transition hover:text-white">Rechercher</Link>
+                <Link href="/compare" className="text-sm text-gray-400 transition hover:text-white">Comparer</Link>
+                <Link href="/favorites" className="text-sm text-gray-400 transition hover:text-white">Favoris</Link>
               </div>
               <div className="hidden items-center gap-3 md:flex">
                 <button onClick={() => setAuthModal("login")} className="btn-secondary text-sm">Connexion</button>
@@ -46,9 +47,9 @@ export default function RootLayout({
             {menuOpen && (
               <div className="border-t border-white/5 px-6 py-4 md:hidden">
                 <div className="flex flex-col gap-4">
-                  <a href="/results" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Rechercher</a>
-                  <a href="/compare" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Comparer</a>
-                  <a href="/favorites" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Favoris</a>
+                  <Link href="/results" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Rechercher</Link>
+                  <Link href="/compare" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Comparer</Link>
+                  <Link href="/favorites" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Favoris</Link>
                   <div className="flex gap-3 pt-2">
                     <button onClick={() => { setMenuOpen(false); setAuthModal("login"); }} className="btn-secondary text-sm flex-1">Connexion</button>
                     <button onClick={() => { setMenuOpen(false); setAuthModal("signup"); }} className="btn-primary text-sm flex-1">S&apos;inscrire</button>
@@ -66,8 +67,8 @@ export default function RootLayout({
                 : "Créez un compte pour sauvegarder vos recherches et recevoir des alertes."}
             </p>
             <div className="space-y-4">
-              <input type="email" placeholder="Adresse email" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
-              <input type="password" placeholder="Mot de passe" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
+              <input type="email" placeholder="Adresse email" className="input-field text-sm" autoComplete="email" />
+              <input type="password" placeholder="Mot de passe" className="input-field text-sm" autoComplete="current-password" />
               <button
                 onClick={(e) => {
                   e.preventDefault();

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Send, Camera } from "lucide-react";
 import { useToast } from "@/components/Toast";
 import { Modal } from "@/components/Modal";
@@ -36,6 +37,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   const [photoModal, setPhotoModal] = useState(false);
   const [error, setError] = useState(false);
   const { showToast } = useToast();
+  const favLoadedRef = useRef(false);
 
   useEffect(() => {
     params.then(({ slug }) => {
@@ -50,16 +52,24 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
           setError(true);
         }
       }).catch(() => { setError(true); });
+
       const saved = localStorage.getItem("thiqti_favorites");
-      if (saved) setFav(JSON.parse(saved).includes(slug));
+      if (saved) {
+        const favList: string[] = JSON.parse(saved);
+        setFav(favList.includes(slug));
+      }
+      favLoadedRef.current = true;
     });
-  }, [params]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    if (!car) return;
+    if (!car || !favLoadedRef.current) return;
     const saved = localStorage.getItem("thiqti_favorites");
     const list: string[] = saved ? JSON.parse(saved) : [];
-    const updated = fav ? (list.includes(car.id) ? list : [...list, car.id]) : list.filter((id) => id !== car.id);
+    const updated = fav
+      ? (list.includes(car.id) ? list : [...list, car.id])
+      : list.filter((id) => id !== car.id);
     localStorage.setItem("thiqti_favorites", JSON.stringify(updated));
   }, [fav, car]);
 
@@ -67,7 +77,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
       <AlertTriangle className="h-12 w-12 text-yellow-500" />
       <p className="text-gray-400">Véhicule introuvable</p>
-      <a href="/results" className="btn-primary">Voir tous les résultats</a>
+      <Link href="/results" className="btn-primary">Voir tous les résultats</Link>
     </div>
   );
 
@@ -80,9 +90,9 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   return (
     <div className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-6xl">
-        <a href="/results" className="mb-6 inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white">
+        <Link href="/results" className="mb-6 inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white">
           <ChevronLeft className="h-4 w-4" /> Retour aux résultats
-        </a>
+        </Link>
 
         <div className="flex flex-col gap-8 lg:flex-row">
           <div className="flex-1">
@@ -194,9 +204,9 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
           Contactez le vendeur pour {car.title} ({car.priceFormatted}).
         </p>
         <div className="space-y-3">
-          <input type="text" placeholder="Votre nom" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
-          <input type="email" placeholder="Votre email" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
-          <textarea placeholder="Votre message..." className="input-field text-sm min-h-[100px]" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <input type="text" placeholder="Votre nom" className="input-field text-sm" />
+          <input type="email" placeholder="Votre email" className="input-field text-sm" />
+          <textarea placeholder="Votre message..." className="input-field text-sm min-h-[100px]" />
           <button onClick={() => { setContactModal(false); showToast("Message envoyé au vendeur !", "success"); }} className="btn-primary flex w-full items-center justify-center gap-2">
             <Send className="h-4 w-4" /> Envoyer
           </button>
@@ -209,9 +219,9 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
           Demandez des photos supplémentaires pour {car.title}.
         </p>
         <div className="space-y-3">
-          <input type="text" placeholder="Votre nom" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
-          <input type="email" placeholder="Votre email" className="input-field text-sm" readOnly onFocus={(e) => e.target.readOnly = false} />
-          <textarea placeholder="Photos souhaitées (intérieur, moteur, etc.)..." className="input-field text-sm min-h-[100px]" readOnly onFocus={(e) => e.target.readOnly = false} />
+          <input type="text" placeholder="Votre nom" className="input-field text-sm" />
+          <input type="email" placeholder="Votre email" className="input-field text-sm" />
+          <textarea placeholder="Photos souhaitées (intérieur, moteur, etc.)..." className="input-field text-sm min-h-[100px]" />
           <button onClick={() => { setPhotoModal(false); showToast("Demande de photos envoyée !", "success"); }} className="btn-primary flex w-full items-center justify-center gap-2">
             <Camera className="h-4 w-4" /> Envoyer la demande
           </button>

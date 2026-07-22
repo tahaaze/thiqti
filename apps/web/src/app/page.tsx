@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Search, Star, Shield, BarChart3, ChevronRight, Zap, TrendingUp, Users, MapPin, Fuel } from "lucide-react";
 
 interface CarListing {
@@ -120,9 +121,9 @@ export default function HomePage() {
                 {loading ? "Recherche en cours..." : `${cars.length} véhicules trouvés`}
               </p>
             </div>
-            <a href="/results" className="flex items-center gap-1 text-sm text-primary hover:underline">
+            <Link href="/results" className="flex items-center gap-1 text-sm text-primary hover:underline">
               Voir tout <ChevronRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
 
           {loading ? (
@@ -134,7 +135,7 @@ export default function HomePage() {
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {cars.map((car) => (
-                <a key={car.id} href={`/vehicle/${car.id}`} className="glass-card group block overflow-hidden">
+                <Link key={car.id} href={`/vehicle/${car.id}`} className="glass-card group block overflow-hidden">
                   <div className="relative h-48 overflow-hidden">
                     <img
                       src={car.image}
@@ -164,7 +165,7 @@ export default function HomePage() {
                     </div>
                     <p className="mt-3 text-xl font-bold text-primary">{car.priceFormatted}</p>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           )}
