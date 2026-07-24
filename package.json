@@ -1,0 +1,17 @@
+{
+  "name": "thiqti",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/api\" \"npm run dev -w apps/ai\"",
+    "build": "npm run build -w apps/web && node copy-static.js",
+    "start": "node apps/web/.next/standalone/server.js",
+    "lint": "npm run lint -w apps/web && npm run lint -w apps/api",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.5.0"
+  }
+}

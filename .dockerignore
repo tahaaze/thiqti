@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+img
+mockup.*
+packages
+apps/api
+apps/ai
