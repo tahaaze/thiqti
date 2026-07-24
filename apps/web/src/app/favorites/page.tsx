@@ -41,18 +41,18 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     if (favorites.length === 0) return;
-    fetch("/api/search").then(r => {
-      if (!r.ok) throw new Error("Erreur réseau");
-      return r.json();
-    }).then(data => {
-      setCars(data.results.filter((c: CarListing) => favorites.includes(c.id)));
-    }).catch(() => {});
+    fetch("/api/search")
+      .then((r) => r.json())
+      .then((data) => {
+        setCars(data.results.filter((c: CarListing) => favorites.includes(c.id)));
+      })
+      .catch(() => {});
   }, [favorites]);
 
   const removeFav = (id: string) => {
-    const updated = favorites.filter(f => f !== id);
+    const updated = favorites.filter((f) => f !== id);
     setFavorites(updated);
-    setCars(prev => prev.filter(c => c.id !== id));
+    setCars((prev) => prev.filter((c) => c.id !== id));
   };
 
   return (
@@ -68,7 +68,9 @@ export default function FavoritesPage() {
 
         {loading ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1,2,3].map(i => <div key={i} className="glass-card animate-pulse h-72" />)}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="glass-card animate-pulse h-72" />
+            ))}
           </div>
         ) : favorites.length === 0 ? (
           <div className="glass-card p-12 text-center">

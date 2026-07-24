@@ -104,11 +104,11 @@ function AuthModal({ mode, onClose }: AuthModalProps) {
           disabled={loading}
           className="btn-primary w-full text-center disabled:opacity-50"
         >
-          {loading ? "Veuillez patienter..." : mode === "login" ? "Se connecter" : "S'inscrire"}
+          {loading ? "Veuillez patienter..." : mode === "login" ? "Se connecter" : "S&apos;inscrire"}
         </button>
       </div>
       <p className="mt-4 text-center text-xs text-gray-500">
-        Données stockées localement — aucune donnée envoyée à un serveur.
+        Données stockées localement, aucune donnée envoyée à un serveur.
       </p>
     </Modal>
   );
@@ -123,7 +123,7 @@ export default function RootLayout({
   const [authModal, setAuthModal] = useState<"login" | "signup" | null>(null);
 
   useEffect(() => {
-    document.title = "Thiqti - Trouvez votre voiture idéale au Maroc";
+    document.title = "Sleipnir - Trouvez votre voiture idéale au Maroc";
   }, []);
 
   return (
@@ -134,15 +134,14 @@ export default function RootLayout({
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
               <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-400 text-sm font-bold text-white">
-                  T
+                  S
                 </div>
-                <span className="text-xl font-bold tracking-tight">Thiqti</span>
+                <span className="text-xl font-bold tracking-tight">Sleipnir</span>
               </Link>
               <div className="hidden items-center gap-8 md:flex">
                 <Link href="/results" className="text-sm text-gray-400 transition hover:text-white">Rechercher</Link>
                 <Link href="/compare" className="text-sm text-gray-400 transition hover:text-white">Comparer</Link>
                 <Link href="/favorites" className="text-sm text-gray-400 transition hover:text-white">Favoris</Link>
-                <Link href="/entreprises" className="rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition hover:bg-primary/20">Entreprises</Link>
               </div>
               <div className="hidden items-center gap-3 md:flex">
                 <button onClick={() => setAuthModal("login")} className="btn-secondary text-sm">Connexion</button>
@@ -158,7 +157,6 @@ export default function RootLayout({
                   <Link href="/results" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Rechercher</Link>
                   <Link href="/compare" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Comparer</Link>
                   <Link href="/favorites" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Favoris</Link>
-                  <Link href="/entreprises" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-primary hover:text-primary/80">Entreprises</Link>
                   <div className="flex gap-3 pt-2">
                     <button onClick={() => { setMenuOpen(false); setAuthModal("login"); }} className="btn-secondary text-sm flex-1">Connexion</button>
                     <button onClick={() => { setMenuOpen(false); setAuthModal("signup"); }} className="btn-primary text-sm flex-1">S&apos;inscrire</button>
