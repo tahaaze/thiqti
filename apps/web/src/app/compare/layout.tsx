@@ -1,3 +1,5 @@
-export default function CompareLayout({ children }: { children: React.ReactNode }) {
+import { ReactNode } from "react";
+
+export default function CompareLayout({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }

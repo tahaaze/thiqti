@@ -5,13 +5,19 @@ export class SoeezAutoCollector implements SourceCollector {
 
   async fetch(): Promise<UnifiedCar[]> {
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+
       const res = await fetch("https://www.soeezauto.ma/prix", {
+        signal: controller.signal,
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
           Accept: "text/html",
         },
         next: { revalidate: 3600 },
       });
+
+      clearTimeout(timer);
       if (!res.ok) return [];
 
       const html = await res.text();

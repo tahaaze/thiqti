@@ -1,6 +1,5 @@
 "use client";
 
-// @ts-expect-error - lucide-react 0.400 lacks type declarations
 import { SearchX, RotateCcw } from "lucide-react";
 
 interface EmptyStateProps {

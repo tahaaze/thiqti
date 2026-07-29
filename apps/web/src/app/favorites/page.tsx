@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Heart, Star, MapPin, Fuel, Trash2 } from "lucide-react";
+import CarImage from "@/components/CarImage";
 
 interface CarListing {
   id: string;
@@ -68,25 +69,21 @@ export default function FavoritesPage() {
 
         {loading ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="glass-card animate-pulse h-72" />
-            ))}
+            {[1, 2, 3].map((i) => (<div key={i} className="glass-card animate-pulse h-72" />))}
           </div>
         ) : favorites.length === 0 ? (
           <div className="glass-card p-12 text-center">
             <Heart className="mx-auto mb-4 h-12 w-12 text-gray-600" />
             <p className="text-gray-400">Aucun favori pour le moment</p>
-            <p className="mt-2 text-sm text-gray-500">Cliquez sur le cœur dans les résultats pour sauvegarder</p>
-            <Link href="/results" className="btn-primary mt-6 inline-flex items-center gap-2">
-              Explorer les annonces
-            </Link>
+            <p className="mt-2 text-sm text-gray-500">Cliquez sur le coeur dans les résultats pour sauvegarder</p>
+            <Link href="/results" className="btn-primary mt-6 inline-flex items-center gap-2">Explorer les annonces</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {cars.map((v) => (
               <Link key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
                 <div className="relative h-44 overflow-hidden">
-                  <img src={v.image} alt={v.title} className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
+                  <CarImage src={v.image} alt={v.title} make={v.make} model={v.model} className="h-full w-full object-cover transition group-hover:scale-105" />
                   <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
                     <Trash2 className="h-4 w-4" />

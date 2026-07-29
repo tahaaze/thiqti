@@ -43,7 +43,11 @@ export class Auto24Collector implements SourceCollector {
 
   async fetch(): Promise<UnifiedCar[]> {
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+
       const res = await fetch(AUTO24_API, {
+        signal: controller.signal,
         headers: {
           "User-Agent": "Mozilla/5.0",
           Accept: "application/json",
@@ -52,6 +56,8 @@ export class Auto24Collector implements SourceCollector {
         },
         next: { revalidate: 300 },
       });
+
+      clearTimeout(timer);
       if (!res.ok) throw new Error(`Auto24 API: ${res.status}`);
       const data = await res.json();
       const cars: Auto24Car[] = data.cars || [];

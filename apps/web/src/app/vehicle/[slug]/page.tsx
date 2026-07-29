@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Send, Camera, CreditCard, BadgeCheck, BarChart3, Clock, TrendingUp, TrendingDown, Brain } from "lucide-react";
+import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Clock, TrendingUp, TrendingDown, Brain, BadgeCheck, Info } from "lucide-react";
 import CarImage from "@/components/CarImage";
 import { useToast } from "@/components/Toast";
-import { Modal } from "@/components/Modal";
 
 interface CarListing {
   id: string;
@@ -30,17 +29,27 @@ interface ReputationData {
   avgScore: number | null;
   windowMonths: number;
   lastUpdated: string;
+  positiveTags: string[];
+  negativeTags: string[];
   categories: { name: string; score: number | null }[];
   excerpts: { text: string; sentiment: "positive" | "negative" | "neutral"; score: number }[];
   volume: { total: number; positive: number; negative: number; neutral: number };
+  reliability: "elevee" | "moyenne" | "faible";
+  reliabilityLabel: string;
 }
+
+const MIN_REVIEWS = 30;
+
+const RELIABILITY_COLORS = {
+  elevee: { border: "border-green-500/30", bg: "bg-green-500/10", text: "text-green-400" },
+  moyenne: { border: "border-yellow-500/30", bg: "bg-yellow-500/10", text: "text-yellow-400" },
+  faible: { border: "border-red-500/30", bg: "bg-red-500/10", text: "text-red-400" },
+};
 
 export default function VehiclePage({ params }: { params: Promise<{ slug: string }> }) {
   const [car, setCar] = useState<CarListing | null>(null);
   const [activeTab, setActiveTab] = useState<"specs" | "reputation" | "offers">("specs");
   const [fav, setFav] = useState(false);
-  const [contactModal, setContactModal] = useState(false);
-  const [photoModal, setPhotoModal] = useState(false);
   const [error, setError] = useState(false);
   const [reputation, setReputation] = useState<ReputationData | null>(null);
   const [loadingRep, setLoadingRep] = useState(false);
@@ -107,7 +116,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
       </div>
     );
 
-  const hasEnoughReviews = reputation && reputation.totalReviews >= 30;
+  const hasEnoughReviews = reputation && reputation.totalReviews >= MIN_REVIEWS;
 
   return (
     <div className="min-h-screen px-6 py-8">
@@ -183,202 +192,17 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                       <p className="text-sm text-yellow-300">Données indisponibles pour ce modèle.</p>
                     </div>
                   ) : !hasEnoughReviews ? (
-                    <div className="space-y-4">
-                      <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
-                        <div className="flex items-center gap-3">
-                          <AlertTriangle className="h-5 w-5 text-yellow-400" />
-                          <div>
-                            <p className="text-sm font-medium text-yellow-300">Seuil insuffisant</p>
-                            <p className="text-xs text-yellow-400/70 mt-1">
-                              {reputation.totalReviews} avis collectés sur 30 minimum requis. Le score ne sera publié qu&apos;à 30 avis exploitables.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="rounded-xl bg-dark-800/50 p-4 text-center">
-                          <p className="text-2xl font-bold text-primary">{reputation.volume.total}</p>
-                          <p className="text-xs text-gray-500">Avis collectés</p>
-                          <div className="mt-2 h-1.5 w-full rounded-full bg-white/5">
-                            <div
-                              className="h-full rounded-full bg-primary transition-all"
-                              style={{ width: `${Math.min(100, (reputation.volume.total / 30) * 100)}%` }}
-                            />
-                          </div>
-                          <p className="mt-1 text-[10px] text-gray-600">{reputation.volume.total}/30</p>
-                        </div>
-                        <div className="rounded-xl bg-dark-800/50 p-4 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <TrendingUp className="h-3 w-3 text-green-400" />
-                            <span className="text-lg font-bold text-green-400">{reputation.volume.positive}</span>
-                          </div>
-                          <p className="text-xs text-gray-500">Positifs</p>
-                        </div>
-                        <div className="rounded-xl bg-dark-800/50 p-4 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <TrendingDown className="h-3 w-3 text-red-400" />
-                            <span className="text-lg font-bold text-red-400">{reputation.volume.negative}</span>
-                          </div>
-                          <p className="text-xs text-gray-500">Négatifs</p>
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl bg-dark-800/50 p-3 flex items-center gap-3">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <p className="text-xs text-gray-500">
-                          Fenêtre d&apos;observation : {reputation.windowMonths} mois &middot; Dernière MAJ : {reputation.lastUpdated}
-                        </p>
-                      </div>
-                    </div>
+                    <ReputationInsufficient reputation={reputation} />
                   ) : (
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        {reputation.categories.map((cat) => (
-                          <div key={cat.name} className="rounded-xl bg-dark-800/50 p-4 text-center">
-                            <div className="relative mx-auto h-16 w-16">
-                              <svg className="h-16 w-16 -rotate-90" viewBox="0 0 60 60">
-                                <circle cx="30" cy="30" r="25" fill="none" stroke="currentColor" strokeWidth="4" className="text-white/5" />
-                                <circle
-                                  cx="30" cy="30" r="25" fill="none" strokeWidth="4"
-                                  strokeDasharray={`${(cat.score || 0) * 1.57} 157`}
-                                  className={`${cat.score && cat.score >= 80 ? "text-green-400" : cat.score && cat.score >= 60 ? "text-yellow-400" : "text-red-400"}`}
-                                  stroke="currentColor"
-                                />
-                              </svg>
-                              <span className={`absolute inset-0 flex items-center justify-center text-sm font-bold ${cat.score && cat.score >= 80 ? "text-green-400" : cat.score && cat.score >= 60 ? "text-yellow-400" : "text-red-400"}`}>
-                                {cat.score !== null ? cat.score : "N/A"}
-                              </span>
-                            </div>
-                            <p className="mt-2 text-xs text-gray-400">{cat.name}</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-6 rounded-xl bg-dark-800/50 p-4">
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-primary">{reputation.avgScore}</p>
-                          <p className="text-xs text-gray-500">Score global</p>
-                        </div>
-                        <div className="h-10 w-px bg-white/10" />
-                        <div className="text-center">
-                          <p className="text-2xl font-bold">{reputation.totalReviews}</p>
-                          <p className="text-xs text-gray-500">Avis exploités</p>
-                        </div>
-                        <div className="h-10 w-px bg-white/10" />
-                        <div className="text-center">
-                          <div className="flex items-center gap-2">
-                            <BarChart3 className="h-4 w-4 text-green-400" />
-                            <span className="text-sm font-medium text-green-400">{reputation.volume.positive}+</span>
-                            <span className="text-sm text-gray-500">/</span>
-                            <span className="text-sm font-medium text-red-400">{reputation.volume.negative}-</span>
-                          </div>
-                          <p className="text-xs text-gray-500">Répartition</p>
-                        </div>
-                      </div>
-
-                      <div className="rounded-xl bg-dark-800/50 p-3 flex items-center gap-3">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <p className="text-xs text-gray-500">
-                          Fenêtre d&apos;observation : {reputation.windowMonths} mois &middot; Dernière MAJ : {reputation.lastUpdated}
-                        </p>
-                      </div>
-                    </div>
+                    <ReputationSummary reputation={reputation} />
                   )}
-
-                  <h3 className="font-semibold mb-4 mt-6">Avis utilisateurs</h3>
-                  <div className="space-y-3">
-                    {reputation?.excerpts.map((review, i) => (
-                      <div key={i} className="rounded-xl bg-dark-800/50 p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                              {String.fromCharCode(65 + (i % 26))}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium">Utilisateur anonyme</p>
-                              <p className="text-xs text-gray-500">Avis collecté automatiquement</p>
-                            </div>
-                          </div>
-                          <span className={`rounded-lg px-2 py-1 text-xs font-bold ${review.score >= 8 ? "bg-green-500/20 text-green-400" : review.score >= 6 ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"}`}>
-                            {review.score}/10
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-300">{review.text}</p>
-                        <div className="mt-2">
-                          {review.sentiment === "positive" ? (
-                            <span className="flex items-center gap-1 text-xs text-green-400"><CheckCircle2 className="h-3 w-3" /> Avis positif</span>
-                          ) : review.sentiment === "negative" ? (
-                            <span className="flex items-center gap-1 text-xs text-red-400"><AlertTriangle className="h-3 w-3" /> Avis négatif</span>
-                          ) : (
-                            <span className="flex items-center gap-1 text-xs text-gray-400"><MessageSquare className="h-3 w-3" /> Avis mitigé</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               )}
 
               {activeTab === "offers" && (
                 <div className="glass-card p-6">
                   <h2 className="mb-6 text-lg font-bold">Offres & Financement</h2>
-
-                  <div className="mb-8">
-                    <h3 className="mb-4 flex items-center gap-2 font-semibold">
-                      <CreditCard className="h-4 w-4 text-primary" />
-                      Calculateur de financement
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                      {[
-                        { months: 24, rate: 3.5 },
-                        { months: 36, rate: 4.2 },
-                        { months: 48, rate: 4.9 },
-                      ].map(({ months, rate }) => {
-                        const monthly = Math.round((car.price * (rate / 100 / 12)) / (1 - Math.pow(1 + rate / 100 / 12, -months)));
-                        return (
-                          <div key={months} className="rounded-xl bg-dark-800/50 p-4">
-                            <p className="text-sm text-gray-500">{months} mois, TAEG {rate}%</p>
-                            <p className="mt-1 text-xl font-bold text-primary">{monthly.toLocaleString("fr-FR")} DH/mois</p>
-                            <p className="text-xs text-gray-500 mt-1">Coût total : {(monthly * months).toLocaleString("fr-FR")} DH</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="mb-8">
-                    <h3 className="mb-4 flex items-center gap-2 font-semibold">
-                      <Shield className="h-4 w-4 text-primary" />
-                      Garantie
-                    </h3>
-                    <div className="rounded-xl bg-dark-800/50 p-4">
-                      <div className="flex items-center gap-3">
-                        <BadgeCheck className="h-8 w-8 text-green-400" />
-                        <div>
-                          <p className="font-semibold">Garantie constructeur</p>
-                          <p className="text-sm text-gray-400">
-                            {2026 - car.year <= 1 ? "Garantie active, encore sous couverture constructeur" : 2026 - car.year <= 3 ? "Garantie expirée, extension possible via nos partenaires" : "Pas de garantie constructeur, garantie étendue disponible"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="mb-4 flex items-center gap-2 font-semibold">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      Contacter le vendeur
-                    </h3>
-                    <div className="flex gap-3">
-                      <button onClick={() => setContactModal(true)} className="btn-primary flex items-center gap-2">
-                        <Send className="h-4 w-4" /> Contacter
-                      </button>
-                      <button onClick={() => setPhotoModal(true)} className="btn-secondary flex items-center gap-2">
-                        <Camera className="h-4 w-4" /> Demander des photos
-                      </button>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-400">Contactez le concessionnaire pour les offres en cours.</p>
                 </div>
               )}
             </div>
@@ -405,12 +229,14 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-400">Réputation</span>
                       {hasEnoughReviews ? (
-                        <span className={`text-sm font-bold ${reputation.avgScore && reputation.avgScore >= 80 ? "text-green-400" : reputation.avgScore && reputation.avgScore >= 60 ? "text-yellow-400" : "text-red-400"}`}>
-                          {reputation.avgScore}/100
-                        </span>
+                        <span className="text-sm font-bold text-primary">{reputation.avgScore}/10</span>
                       ) : (
-                        <span className="text-xs text-yellow-400">En collecte ({reputation.totalReviews}/30)</span>
+                        <span className="text-xs text-yellow-400">En collecte ({reputation.totalReviews}/{MIN_REVIEWS})</span>
                       )}
+                    </div>
+                    <div className="mt-2 flex items-center gap-1">
+                      <Info className="h-3 w-3 text-gray-500" />
+                      <span className="text-xs text-gray-500">Sur {reputation.totalReviews} avis</span>
                     </div>
                   </div>
                 )}
@@ -424,28 +250,190 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <Modal open={contactModal} onClose={() => setContactModal(false)} title="Contacter le vendeur">
-        <div className="space-y-4">
-          <input type="text" placeholder="Votre nom" className="input-field text-sm" />
-          <input type="email" placeholder="Votre email" className="input-field text-sm" />
-          <textarea placeholder="Votre message..." className="input-field text-sm h-24 resize-none" defaultValue={`Bonjour, je suis intéressé par le ${car.title} (${car.year}) à ${car.priceFormatted}. Est-il encore disponible ?`} />
-          <button onClick={() => { setContactModal(false); showToast("Message envoyé avec succès !", "success"); }} className="btn-primary w-full flex items-center justify-center gap-2">
-            <Send className="h-4 w-4" /> Envoyer
-          </button>
+function ReputationInsufficient({ reputation }: { reputation: ReputationData }) {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+        <div className="flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-yellow-400" />
+          <div>
+            <p className="text-sm font-medium text-yellow-300">Données insuffisantes</p>
+            <p className="text-xs text-yellow-400/70 mt-1">
+              {reputation.totalReviews} avis collectés sur {MIN_REVIEWS} minimum requis. Le score ne sera publié qu&apos;à {MIN_REVIEWS} avis exploitables.
+            </p>
+          </div>
         </div>
-      </Modal>
+      </div>
 
-      <Modal open={photoModal} onClose={() => setPhotoModal(false)} title="Demander des photos">
-        <div className="space-y-4">
-          <input type="text" placeholder="Votre nom" className="input-field text-sm" />
-          <input type="email" placeholder="Votre email" className="input-field text-sm" />
-          <textarea placeholder="Décrivez les angles souhaités..." className="input-field text-sm h-24 resize-none" defaultValue={`Merci de m'envoyer des photos du ${car.title} : intérieur, extérieur, état des pneus, moteur.`} />
-          <button onClick={() => { setPhotoModal(false); showToast("Demande envoyée !", "success"); }} className="btn-primary w-full flex items-center justify-center gap-2">
-            <Camera className="h-4 w-4" /> Envoyer la demande
-          </button>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl bg-dark-800/50 p-4 text-center">
+          <p className="text-2xl font-bold text-primary">{reputation.volume.total}</p>
+          <p className="text-xs text-gray-500">Avis collectés</p>
+          <div className="mt-2 h-1.5 w-full rounded-full bg-white/5">
+            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${Math.min(100, (reputation.volume.total / MIN_REVIEWS) * 100)}%` }} />
+          </div>
+          <p className="mt-1 text-[10px] text-gray-600">{reputation.volume.total}/{MIN_REVIEWS}</p>
         </div>
-      </Modal>
+        <div className="rounded-xl bg-dark-800/50 p-4 text-center">
+          <div className="flex items-center justify-center gap-1">
+            <TrendingUp className="h-3 w-3 text-green-400" />
+            <span className="text-lg font-bold text-green-400">{reputation.volume.positive}</span>
+          </div>
+          <p className="text-xs text-gray-500">Positifs</p>
+        </div>
+        <div className="rounded-xl bg-dark-800/50 p-4 text-center">
+          <div className="flex items-center justify-center gap-1">
+            <TrendingDown className="h-3 w-3 text-red-400" />
+            <span className="text-lg font-bold text-red-400">{reputation.volume.negative}</span>
+          </div>
+          <p className="text-xs text-gray-500">Négatifs</p>
+        </div>
+      </div>
+
+      <div className="rounded-xl bg-dark-800/50 p-3 flex items-center gap-3">
+        <Clock className="h-4 w-4 text-gray-500" />
+        <p className="text-xs text-gray-500">
+          Fenêtre d&apos;observation : {reputation.windowMonths} mois &middot; Dernière MAJ : {reputation.lastUpdated}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ReputationSummary({ reputation }: { reputation: ReputationData }) {
+  const relColors = RELIABILITY_COLORS[reputation.reliability];
+
+  return (
+    <div className="space-y-6">
+      {/* Header: score + volume + window */}
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="text-center">
+          <p className="text-4xl font-extrabold text-primary">{reputation.avgScore}</p>
+          <p className="text-xs text-gray-500">sur 10</p>
+        </div>
+        <div className="h-12 w-px bg-white/10" />
+        <div>
+          <p className="text-sm text-gray-300">Sur <strong>{reputation.totalReviews}</strong> avis</p>
+          <p className="text-xs text-gray-500">des {reputation.windowMonths} derniers mois</p>
+        </div>
+        <div className="h-12 w-px bg-white/10" />
+        <div className={`rounded-lg border ${relColors.border} ${relColors.bg} px-3 py-1.5`}>
+          <div className="flex items-center gap-1.5">
+            <BadgeCheck className={`h-4 w-4 ${relColors.text}`} />
+            <span className={`text-xs font-medium ${relColors.text}`}>Fiabilité {reputation.reliabilityLabel}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tags */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-green-400">Points forts</p>
+          <div className="flex flex-wrap gap-2">
+            {reputation.positiveTags.map((tag) => (
+              <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-300">
+                <CheckCircle2 className="h-3 w-3" />{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-400">Points faibles</p>
+          <div className="flex flex-wrap gap-2">
+            {reputation.negativeTags.map((tag) => (
+              <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-300">
+                <AlertTriangle className="h-3 w-3" />{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Category gauges */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        {reputation.categories.map((cat) => (
+          <div key={cat.name} className="rounded-xl bg-dark-800/50 p-4 text-center">
+            <div className="relative mx-auto h-16 w-16">
+              <svg className="h-16 w-16 -rotate-90" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="25" fill="none" stroke="currentColor" strokeWidth="4" className="text-white/5" />
+                <circle
+                  cx="30" cy="30" r="25" fill="none" strokeWidth="4"
+                  strokeDasharray={`${(cat.score || 0) * 15.7} 157`}
+                  className={`${cat.score && cat.score >= 8 ? "text-green-400" : cat.score && cat.score >= 6 ? "text-yellow-400" : "text-red-400"}`}
+                  stroke="currentColor"
+                />
+              </svg>
+              <span className={`absolute inset-0 flex items-center justify-center text-sm font-bold ${cat.score && cat.score >= 8 ? "text-green-400" : cat.score && cat.score >= 6 ? "text-yellow-400" : "text-red-400"}`}>
+                {cat.score !== null ? cat.score : "N/A"}
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-gray-400">{cat.name}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Volume breakdown */}
+      <div className="flex items-center gap-4 rounded-xl bg-dark-800/50 p-4">
+        <div className="flex items-center gap-2 text-sm">
+          <TrendingUp className="h-4 w-4 text-green-400" />
+          <span className="text-green-400 font-medium">{reputation.volume.positive}</span>
+          <span className="text-gray-500">positifs</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <TrendingDown className="h-4 w-4 text-red-400" />
+          <span className="text-red-400 font-medium">{reputation.volume.negative}</span>
+          <span className="text-gray-500">négatifs</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <MessageSquare className="h-4 w-4 text-gray-400" />
+          <span className="text-gray-400 font-medium">{reputation.volume.neutral}</span>
+          <span className="text-gray-500">neutres</span>
+        </div>
+      </div>
+
+      {/* Window */}
+      <div className="rounded-xl bg-dark-800/50 p-3 flex items-center gap-3">
+        <Clock className="h-4 w-4 text-gray-500" />
+        <p className="text-xs text-gray-500">
+          Fenêtre d&apos;observation : {reputation.windowMonths} mois &middot; Dernière MAJ : {reputation.lastUpdated}
+        </p>
+      </div>
+
+      {/* Review excerpts */}
+      <div>
+        <h3 className="font-semibold mb-4">Extraits d&apos;avis</h3>
+        <div className="space-y-3">
+          {reputation.excerpts.map((review, i) => (
+            <div key={i} className="rounded-xl bg-dark-800/50 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    {String.fromCharCode(65 + (i % 26))}
+                  </div>
+                  <p className="text-xs text-gray-500">Avis anonyme</p>
+                </div>
+                <span className={`rounded-lg px-2 py-1 text-xs font-bold ${review.score >= 8 ? "bg-green-500/20 text-green-400" : review.score >= 6 ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"}`}>
+                  {review.score}/10
+                </span>
+              </div>
+              <p className="text-sm text-gray-300">&laquo;{review.text}&raquo;</p>
+              <div className="mt-2">
+                {review.sentiment === "positive" ? (
+                  <span className="flex items-center gap-1 text-xs text-green-400"><CheckCircle2 className="h-3 w-3" /> Avis positif</span>
+                ) : review.sentiment === "negative" ? (
+                  <span className="flex items-center gap-1 text-xs text-red-400"><AlertTriangle className="h-3 w-3" /> Avis négatif</span>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs text-gray-400"><MessageSquare className="h-3 w-3" /> Avis mitigé</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

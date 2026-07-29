@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   if (!q || q.trim().length < 2) {
     const allCars = await fetchAllSources();
     return NextResponse.json({
-      results: allCars.slice(0, 50),
+      results: allCars,
       total: allCars.length,
       criteria: null,
       sources: getSourceStats(allCars),
@@ -17,15 +17,9 @@ export async function GET(request: NextRequest) {
   }
 
   const criteria = parseQuery(q);
-  const keywordParts: string[] = [];
-  if (criteria.marque) keywordParts.push(criteria.marque);
-  if (criteria.carrosserie) keywordParts.push(criteria.carrosserie);
-  if (criteria.motorisation) keywordParts.push(criteria.motorisation);
-  if (criteria.ville) keywordParts.push(criteria.ville);
-  const keywordQuery = keywordParts.join(" ");
 
-  const allCars = keywordQuery
-    ? await searchAllSources(keywordQuery)
+  const allCars = q.trim().length >= 2
+    ? await searchAllSources(q)
     : await fetchAllSources();
 
   const ranked = rankVehicles(allCars, criteria);

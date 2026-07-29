@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-// @ts-expect-error lucide-react 0.400 types incomplete
-import { Search, SlidersHorizontal, Star, MapPin, Fuel, Heart, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, GitCompareArrows, Loader } from "lucide-react";
+import { Search, SlidersHorizontal, Star, MapPin, Fuel, Heart, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, GitCompareArrows } from "lucide-react";
 import CarImage from "@/components/CarImage";
 import VoiceInput from "@/components/VoiceInput";
 import SearchSuggestions from "@/components/SearchSuggestions";
@@ -53,6 +52,11 @@ interface SearchCriteria {
   intent: string[];
 }
 
+const BODY_TYPES = ["SUV", "Berline", "Citadine", "Compacte", "Crossover", "Break", "Utilitaire", "Monospace", "Pickup", "Coupé", "Cabriolet"];
+const FUEL_TYPES = ["Essence", "Diesel", "Hybride", "Électrique"];
+const BRANDS = ["Dacia", "Renault", "Peugeot", "Toyota", "Hyundai", "Kia", "Volkswagen", "BMW", "Mercedes", "Audi", "Ford", "Nissan", "Citroën", "Opel", "Fiat", "Jeep", "Škoda", "Seat", "Suzuki", "Mazda", "Honda", "Volvo", "BYD", "MG", "Chery", "Omoda", "Jaecoo", "Changan", "Haval", "Geely", "GAC", "DFSK"];
+const CITIES = ["Casablanca", "Rabat", "Marrakech", "Fès", "Tanger", "Agadir", "Meknès", "Oujda", "Kénitra", "Tétouan", "Nador", "El Jadida", "Béni Mellal", "Safi", "Mohammedia", "Khouribga", "Témara", "Salé", "Dakhla", "Laâyoune"];
+
 export default function ResultsPage() {
   const [cars, setCars] = useState<CarListing[]>([]);
   const [query, setQuery] = useState("");
@@ -72,6 +76,7 @@ export default function ResultsPage() {
     ville: "",
   });
   const loadedRef = useRef(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("thiqti_favorites");
@@ -112,7 +117,7 @@ export default function ResultsPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const q = params.get("q") || params.get("brand") || params.get("category") || "";
+    const q = params.get("q") || "";
     setQuery(q);
     doSearch(q);
   }, [doSearch]);
@@ -121,35 +126,32 @@ export default function ResultsPage() {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
   };
 
-  const buildRefineQuery = useCallback(() => {
-    const parts: string[] = [];
-    if (refine.carrosserie) parts.push(refine.carrosserie);
-    if (refine.motorisation) parts.push(refine.motorisation);
-    if (refine.marque) parts.push(refine.marque);
-    if (refine.ville) parts.push(refine.ville);
-    if (refine.budgetMax) parts.push(`sous ${refine.budgetMax} dh`);
-    if (refine.anneeMin) parts.push(`depuis ${refine.anneeMin}`);
-    if (refine.kmMax) parts.push(`moins de ${refine.kmMax} km`);
-    return parts.join(" ");
-  }, [refine]);
+  // Instant refine: auto-search when any refine field changes
+  const handleRefineChange = (field: string, value: string) => {
+    const updated = { ...refine, [field]: value };
+    setRefine(updated);
 
-  const applyRefine = useCallback(() => {
-    const q = buildRefineQuery();
-    setQuery(q);
-    doSearch(q);
-  }, [buildRefineQuery, doSearch]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      const parts: string[] = [];
+      if (updated.carrosserie) parts.push(updated.carrosserie);
+      if (updated.motorisation) parts.push(updated.motorisation);
+      if (updated.marque) parts.push(updated.marque);
+      if (updated.ville) parts.push(updated.ville);
+      if (updated.budgetMax) parts.push(`sous ${updated.budgetMax} dh`);
+      if (updated.anneeMin) parts.push(`depuis ${updated.anneeMin}`);
+      if (updated.kmMax) parts.push(`moins de ${updated.kmMax} km`);
+      const q = parts.join(" ");
+      setQuery(q || "");
+      doSearch(q || query);
+    }, 400);
+  };
 
-  const formatCriteriaLabel = (key: string, _value: any): string => {
+  const formatCriteriaLabel = (key: string): string => {
     const labels: Record<string, string> = {
-      carrosserie: "Carrosserie",
-      motorisation: "Motorisation",
-      transmission: "Transmission",
-      marque: "Marque",
-      budgetMax: "Budget max",
-      budgetMin: "Budget min",
-      ville: "Ville",
-      anneeMin: "Année min",
-      kmMax: "Km max",
+      carrosserie: "Carrosserie", motorisation: "Motorisation", transmission: "Transmission",
+      marque: "Marque", budgetMax: "Budget max", budgetMin: "Budget min",
+      ville: "Ville", anneeMin: "Année min", kmMax: "Km max",
     };
     return labels[key] || key;
   };
@@ -196,7 +198,7 @@ export default function ResultsPage() {
                     })
                     .map(([key, value]) => (
                       <div key={key} className="flex items-center justify-between rounded-lg bg-dark-800/50 px-3 py-2">
-                        <span className="text-xs text-gray-400">{formatCriteriaLabel(key, value)}</span>
+                        <span className="text-xs text-gray-400">{formatCriteriaLabel(key)}</span>
                         <span className="text-xs font-medium text-primary">{String(value)}</span>
                       </div>
                     ))}
@@ -213,124 +215,62 @@ export default function ResultsPage() {
               </div>
             )}
 
-            {criteria && (
-              <div className="glass-card p-5">
-                <button
-                  onClick={() => setRefineOpen(!refineOpen)}
-                  className="flex w-full items-center justify-between text-sm font-semibold"
-                >
-                  <span className="flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4 text-primary" />
-                    Affiner la recherche
-                  </span>
-                  {refineOpen ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
-                </button>
-                {refineOpen && (
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Carrosserie</label>
-                      <select value={refine.carrosserie} onChange={(e) => setRefine({ ...refine, carrosserie: e.target.value })} className="input-field text-sm">
-                        <option value="">Toutes</option>
-                        {["SUV", "Berline", "Citadine", "Compacte", "Crossover", "Break", "Utilitaire"].map((b) => (
-                          <option key={b} value={b}>{b}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Motorisation</label>
-                      <select value={refine.motorisation} onChange={(e) => setRefine({ ...refine, motorisation: e.target.value })} className="input-field text-sm">
-                        <option value="">Toutes</option>
-                        {["Essence", "Diesel", "Hybride", "Électrique"].map((f) => (
-                          <option key={f} value={f}>{f}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Budget maximum (DH)</label>
-                      <input
-                        type="number"
-                        value={refine.budgetMax}
-                        onChange={(e) => setRefine({ ...refine, budgetMax: e.target.value })}
-                        placeholder="Ex: 350000"
-                        className="input-field text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Année minimum</label>
-                      <input
-                        type="number"
-                        value={refine.anneeMin}
-                        onChange={(e) => setRefine({ ...refine, anneeMin: e.target.value })}
-                        placeholder="Ex: 2020"
-                        className="input-field text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Kilométrage maximum</label>
-                      <input
-                        type="number"
-                        value={refine.kmMax}
-                        onChange={(e) => setRefine({ ...refine, kmMax: e.target.value })}
-                        placeholder="Ex: 50000"
-                        className="input-field text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Marque</label>
-                      <select value={refine.marque} onChange={(e) => setRefine({ ...refine, marque: e.target.value })} className="input-field text-sm">
-                        <option value="">Toutes</option>
-                        {["Dacia", "Renault", "Peugeot", "Toyota", "Hyundai", "Kia", "Volkswagen", "BMW", "Mercedes", "Audi", "Ford", "Nissan"].map((m) => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs text-gray-400">Ville</label>
-                      <select value={refine.ville} onChange={(e) => setRefine({ ...refine, ville: e.target.value })} className="input-field text-sm">
-                        <option value="">Toutes</option>
-                        {["Casablanca", "Rabat", "Marrakech", "Fès", "Tanger", "Agadir"].map((c) => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={applyRefine} className="btn-primary flex-1 text-sm">
-                        Appliquer
-                      </button>
-                      <button onClick={() => {
-                        setRefine({ carrosserie: "", motorisation: "", budgetMax: "", anneeMin: "", kmMax: "", marque: "", ville: "" });
-                        doSearch("");
-                      }} className="btn-secondary flex-1 text-sm">
-                        Réinitialiser
-                      </button>
-                    </div>
+            {/* Refine form - shown after results, instant update */}
+            <div className="glass-card p-5">
+              <button
+                onClick={() => setRefineOpen(!refineOpen)}
+                className="flex w-full items-center justify-between text-sm font-semibold"
+              >
+                <span className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
+                  Affiner la recherche
+                </span>
+                {refineOpen ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+              </button>
+              {refineOpen && (
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Carrosserie</label>
+                    <select value={refine.carrosserie} onChange={(e) => handleRefineChange("carrosserie", e.target.value)} className="input-field text-sm">
+                      <option value="">Toutes</option>
+                      {BODY_TYPES.map((b) => (<option key={b} value={b}>{b}</option>))}
+                    </select>
                   </div>
-                )}
-              </div>
-            )}
-
-            <div className="glass-card p-5 space-y-5">
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <SlidersHorizontal className="h-4 w-4 text-primary" />
-                Filtres IA
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-400 uppercase tracking-wider">Carburant</label>
-                <div className="flex flex-wrap gap-2">
-                  {["Essence", "Diesel", "Hybride", "Électrique"].map((f) => (
-                    <button key={f} onClick={() => { setQuery(f); doSearch(f); }} className="chip text-xs">{f}</button>
-                  ))}
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Motorisation</label>
+                    <select value={refine.motorisation} onChange={(e) => handleRefineChange("motorisation", e.target.value)} className="input-field text-sm">
+                      <option value="">Toutes</option>
+                      {FUEL_TYPES.map((f) => (<option key={f} value={f}>{f}</option>))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Budget max (DH)</label>
+                    <input type="number" value={refine.budgetMax} onChange={(e) => handleRefineChange("budgetMax", e.target.value)} placeholder="Ex: 350000" className="input-field text-sm" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Année min</label>
+                    <input type="number" value={refine.anneeMin} onChange={(e) => handleRefineChange("anneeMin", e.target.value)} placeholder="Ex: 2020" className="input-field text-sm" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Km max</label>
+                    <input type="number" value={refine.kmMax} onChange={(e) => handleRefineChange("kmMax", e.target.value)} placeholder="Ex: 50000" className="input-field text-sm" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Marque</label>
+                    <select value={refine.marque} onChange={(e) => handleRefineChange("marque", e.target.value)} className="input-field text-sm">
+                      <option value="">Toutes</option>
+                      {BRANDS.map((m) => (<option key={m} value={m}>{m}</option>))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-gray-400">Ville</label>
+                    <select value={refine.ville} onChange={(e) => handleRefineChange("ville", e.target.value)} className="input-field text-sm">
+                      <option value="">Toutes</option>
+                      {CITIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-400 uppercase tracking-wider">Ville</label>
-                <div className="flex flex-wrap gap-2">
-                  {["Casablanca", "Rabat", "Marrakech", "Fès", "Tanger"].map((c) => (
-                    <button key={c} onClick={() => { setQuery(c); doSearch(c); }} className="chip text-xs">{c}</button>
-                  ))}
-                </div>
-              </div>
-              <button onClick={() => { setQuery(""); doSearch(""); }} className="w-full rounded-xl border border-white/10 py-2 text-sm text-gray-400 hover:text-white">Réinitialiser</button>
+              )}
             </div>
           </aside>
 
@@ -357,16 +297,12 @@ export default function ResultsPage() {
                       <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
                       <div className="absolute right-2 top-2">
                         {v.meetsBudget === false ? (
-                          <span className="rounded-lg bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-300 backdrop-blur">
-                            Hors budget
-                          </span>
+                          <span className="rounded-lg bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-300 backdrop-blur">Hors budget</span>
                         ) : v.matchPercent !== undefined && v.matchPercent >= 80 ? (
-                          <span className="rounded-lg bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300 backdrop-blur">
-                            {v.matchPercent}% match
-                          </span>
+                          <span className="rounded-lg bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300 backdrop-blur">{v.matchPercent}% match</span>
                         ) : null}
                       </div>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
                         <Heart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-400 text-red-400" : ""}`} />
                       </button>
                     </div>
@@ -387,11 +323,7 @@ export default function ResultsPage() {
                       {v.explanations && v.explanations.length > 0 && (
                         <div className="mt-3 border-t border-white/5 pt-3">
                           <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setExpandedExplanations(expandedExplanations === v.id ? null : v.id);
-                            }}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedExplanations(expandedExplanations === v.id ? null : v.id); }}
                             className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
                           >
                             <Brain className="h-3 w-3" />
@@ -401,17 +333,11 @@ export default function ResultsPage() {
                             <div className="mt-2 space-y-1">
                               {v.explanations.map((exp, i) => (
                                 <div key={i} className="flex items-center gap-2 text-[11px]">
-                                  {exp.impact === "positive" ? (
-                                    <CheckCircle2 className="h-3 w-3 shrink-0 text-green-400" />
-                                  ) : exp.impact === "negative" ? (
-                                    <AlertTriangle className="h-3 w-3 shrink-0 text-red-400" />
-                                  ) : (
-                                    <MessageSquare className="h-3 w-3 shrink-0 text-yellow-400" />
-                                  )}
+                                  {exp.impact === "positive" ? <CheckCircle2 className="h-3 w-3 shrink-0 text-green-400" /> :
+                                   exp.impact === "negative" ? <AlertTriangle className="h-3 w-3 shrink-0 text-red-400" /> :
+                                   <MessageSquare className="h-3 w-3 shrink-0 text-yellow-400" />}
                                   <span className="text-gray-400">{exp.label}:</span>
-                                  <span className={exp.impact === "positive" ? "text-green-300" : exp.impact === "negative" ? "text-red-300" : "text-yellow-300"}>
-                                    {exp.reason}
-                                  </span>
+                                  <span className={exp.impact === "positive" ? "text-green-300" : exp.impact === "negative" ? "text-red-300" : "text-yellow-300"}>{exp.reason}</span>
                                 </div>
                               ))}
                             </div>

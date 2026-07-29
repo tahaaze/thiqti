@@ -3,8 +3,6 @@ import { UnifiedCar, SourceCollector, generateId, computeScore, normalizeBrand, 
 const AVITO_URLS = [
   "https://www.avito.ma/fr/maroc/voitures-%C3%A0_vendre",
   "https://www.avito.ma/fr/casablanca/voitures-%C3%A0_vendre",
-  "https://www.avito.ma/fr/rabat/voitures-%C3%A0_vendre",
-  "https://www.avito.ma/fr/marrakech/voitures-%C3%A0_vendre",
 ];
 
 interface AvitoListing {
@@ -106,8 +104,8 @@ async function scrapePage(url: string): Promise<AvitoListing[]> {
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await page.waitForTimeout(5000);
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(3000);
 
     const items = await page.evaluate(() => {
       const results: { text: string; href: string; img: string }[] = [];
@@ -152,7 +150,7 @@ export class AvitoCollector implements SourceCollector {
         const listings = await scrapePage(url);
         allListings.push(...listings);
         console.log(`[Avito] ${url}: ${listings.length} listings`);
-        await new Promise((r) => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, 1000));
       } catch (err) {
         console.error(`[Avito] Failed: ${url}`, err);
       }

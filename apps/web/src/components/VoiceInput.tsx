@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-// @ts-expect-error lucide-react 0.400 types incomplete
 import { Mic, MicOff, Loader2 } from "lucide-react";
 
 type RecordingState = "idle" | "listening" | "processing" | "error";
@@ -119,7 +118,7 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
   if (!isSupported) {
     return (
       <div className={`flex items-center gap-2 text-zinc-500 ${className}`}>
-        <MicOff size={20} />
+        <MicOff className="h-5 w-5" />
         <span className="text-sm">Speech not supported</span>
       </div>
     );
@@ -153,13 +152,13 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
           <span className="absolute inset-0 rounded-full animate-ping bg-red-400/30" />
         )}
         {isProcessing ? (
-          <Loader2 size={18} className="animate-spin" />
+          <Loader2 className="h-[18px] w-[18px] animate-spin" />
         ) : isActive ? (
-          <Mic size={18} />
+          <Mic className="h-[18px] w-[18px]" />
         ) : state === "error" ? (
-          <MicOff size={18} />
+          <MicOff className="h-[18px] w-[18px]" />
         ) : (
-          <Mic size={18} />
+          <Mic className="h-[18px] w-[18px]" />
         )}
       </button>
 

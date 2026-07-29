@@ -39,4 +39,15 @@ declare module "lucide-react" {
   export const Filter: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Loader: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const CarFront: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Info: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Hash: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Sparkles: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const SearchX: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const RotateCcw: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const RefreshCw: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const GitCompareArrows: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Loader2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Mic: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const MicOff: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Tag: FC<SVGProps<SVGSVGElement> & { className?: string }>;
 }

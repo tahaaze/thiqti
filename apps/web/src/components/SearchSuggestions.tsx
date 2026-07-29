@@ -1,17 +1,23 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-// @ts-expect-error - lucide-react 0.400 lacks type declarations
 import { Sparkles } from "lucide-react";
 
 const PREDEFINED_SUGGESTIONS = [
-  "SUV hybride",
-  "Citadine économique",
-  "Berline familiale",
-  "SUV 7 places",
-  "Voiture électrique",
-  "Pick-up diesel",
-  "Crossover automatique",
+  "SUV hybride autour de 350 000 DH, confortable pour la famille",
+  "SUV هجين ف 350 000 درهم, راحة للعائلة",
+  "Citadine économique essence",
+  "Berline familiale automatique",
+  "SUV 7 places diesel",
+  "Voiture électrique moins de 300 000 DH",
+  "Pick-up diesel utilitaire",
+  "Crossover automatique essence",
+  "Toyota RAV4 hybride",
+  "Dacia Sandero pas cher",
+  "Renault Clio citadine",
+  "SUV 4x4 tout-terrain",
+  "Voiture confortable pour longs trajets",
+  "Petite voiture ville parking",
 ];
 
 interface SearchSuggestionsProps {
@@ -43,7 +49,7 @@ export default function SearchSuggestions({ query, onSelect }: SearchSuggestions
   return (
     <div className="flex flex-wrap items-center gap-2 mt-2">
       <Sparkles className="h-4 w-4 text-amber-400/70 shrink-0" />
-      {filtered.map((suggestion) => (
+      {filtered.slice(0, 5).map((suggestion) => (
         <button
           key={suggestion}
           onClick={() => onSelect(suggestion)}
