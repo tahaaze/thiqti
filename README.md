@@ -1,8 +1,6 @@
-# SLEIPNIR
+# Thiqti
 
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-
-Plateforme IA d'achat et de vente automobile au Maroc. Moteur de recherche en langage naturel (français et darija), matching multicritère TOPSIS, baromètre d'e-réputation.
+Plateforme de recommandation automobile intelligente au Maroc. Moteur de recherche en langage naturel (francais et darija) avec matching multicritere TOPSIS.
 
 ## Quick Start
 
@@ -10,60 +8,56 @@ Plateforme IA d'achat et de vente automobile au Maroc. Moteur de recherche en la
 git clone https://github.com/your-org/thiqti.git
 cd thiqti
 npm install
+cp .env.example .env  # editer avec vos secrets
 npm run dev
 ```
 
-Ouvrir `http://localhost:3000`. Aucune inscription requise.
+Ouvrir `http://localhost:3000`.
 
-## Architecture
+## Architecture (Phase 1)
 
 ```
-Requête utilisateur ──▶ NLP Parser ──▶ Data Aggregator ──▶ TOPSIS Ranker ──▶ Résultats
-(français/darija)     (critères)      (sources multiples)  (poids contextualisés)
-
-Baromètre d'e-réputation ──▶ Pipeline sentiment ──▶ Score /10 + Tags + Fiabilité
+Requete utilisateur --> NLP Parser --> Moteur Matching TOPSIS --> Resultats classes
+(francais/darija)     (criteres)     (196 vehicules neufs)
 ```
 
-- **NLP Engine**: Rule-based + dictionnaires français/darija/arabizi (carrosserie, motorisation, budget, marque, ville, intention)
-- **Matching Engine**: TOPSIS avec pondération contextuelle (économique, familial, confort, sportif) + explicabilité
-- **Baromètre**: Score /10, tags positifs/négatifs, intervalle de fiabilité, seuil de publication à 30 avis
-- **Collecte**: Multi-sources (Auto24.ma, Avito.ma, SoeezAuto), déduplication, cache 5min
+- **NLP**: Rule-based + dictionnaires francais/arabe (marque, budget, type, carburant)
+- **Matching**: TOPSIS avec ponderation contextuelle + score d'explication
+- **Catalogue**: Dataset statique de 196 vehicules neufs disponibles au Maroc
+- **Auth**: Admin unique via JWT + bcrypt (cookie httpOnly)
 
-## Stack Technique
+## Stack
 
 | Couche | Technologie |
-|--------|-----------|
+|--------|------------|
 | Frontend | Next.js 15 (App Router) + React 19 + TypeScript |
 | Styling | Tailwind CSS 3.4 |
 | API | Next.js API Routes |
-| Matching | TOPSIS multi-critère |
-| NLP | Regex + dictionnaires FR/Darija |
-| Data | Playwright, sources Auto24/Avito |
+| Matching | TOPSIS multicritere |
+| NLP | Regex + dictionnaires FR/AR |
+| Auth | jose + bcryptjs |
+| Cache | In-memory (Map + TTL 5min) |
 | Icons | lucide-react |
-| Infra | Docker, PostgreSQL 16 + pgvector |
 
 ## Structure
 
 ```
 thiqti/
-├── apps/
-│   ├── web/          # Next.js 15 (frontend + API routes)
-│   ├── api/          # NestJS API (Phase 2)
-│   └── ai/           # Python FastAPI (reputation, Phase 2)
-├── packages/
-│   └── database/     # Schéma PostgreSQL + seeds
-├── docs/
-│   ├── ADRs/         # Architecture Decision Records
-│   └── architecture/ # Modèles C4, déploiement, sécurité
+ apps/
+   web/        Next.js 15 (frontend + API routes)
+   api/        NestJS API (Phase 2)
+ packages/
+   database/   Schema PostgreSQL + seeds (Phase 2)
+ docs/
+   ADRs/       Architecture Decision Records (MADR)
+   architecture/  C4, deploiement, securite, registre donnees
 ```
 
-## Périmètre MVP
+## Administration
 
-- Barre de recherche unique en langage naturel (texte + vocal)
-- Compréhension français et darija
-- Matching multicritère avec explication
-- Fiche véhicule complète
-- Baromètre d'e-réputation avec seuil de fiabilité
-- Comparateur côte à côte (3 véhicules)
-- Favoris (stockage local)
-- Responsive mobile/desktop
+- **Login**: `/login` — email + mot de passe admin
+- **Generer hash**: `npx tsx apps/web/scripts/generate-password-hash.ts`
+
+## Licence
+
+Projet de stage — ENSIAS 2026

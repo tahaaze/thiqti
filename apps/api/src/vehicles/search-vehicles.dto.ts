@@ -4,8 +4,13 @@ import {
   IsNumber,
   Min,
   Max,
+  IsIn,
 } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
+
+const BODY_TYPES = ["suv", "berline", "citadine", "pick-up", "monospace", "crossover"] as const;
+const FUEL_TYPES = ["hybride", "electrique", "diesel", "essence", "plug-in-hybride"] as const;
+const TRANSMISSIONS = ["automatique", "manuelle"] as const;
 
 export class SearchVehiclesDto {
   @ApiPropertyOptional()
@@ -18,15 +23,23 @@ export class SearchVehiclesDto {
   @IsString()
   model?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: "suv", enum: BODY_TYPES })
   @IsOptional()
   @IsString()
-  fuel?: string;
+  @IsIn(BODY_TYPES)
+  body_type?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: "diesel", enum: FUEL_TYPES })
   @IsOptional()
   @IsString()
-  city?: string;
+  @IsIn(FUEL_TYPES)
+  fuel_type?: string;
+
+  @ApiPropertyOptional({ example: "automatique", enum: TRANSMISSIONS })
+  @IsOptional()
+  @IsString()
+  @IsIn(TRANSMISSIONS)
+  transmission?: string;
 
   @ApiPropertyOptional({ minimum: 0 })
   @IsOptional()
@@ -34,42 +47,25 @@ export class SearchVehiclesDto {
   @Min(0)
   min_price?: number;
 
-  @ApiPropertyOptional({ maximum: 1000000 })
+  @ApiPropertyOptional({ maximum: 10000000 })
   @IsOptional()
   @IsNumber()
-  @Max(1000000)
+  @Max(10000000)
   max_price?: number;
 
-  @ApiPropertyOptional({ minimum: 0 })
+  @ApiPropertyOptional({ minimum: 2020, maximum: 2030 })
   @IsOptional()
   @IsNumber()
-  @Min(0)
-  min_km?: number;
-
-  @ApiPropertyOptional({ maximum: 500000 })
-  @IsOptional()
-  @IsNumber()
-  @Max(500000)
-  max_km?: number;
-
-  @ApiPropertyOptional({ minimum: 1950 })
-  @IsOptional()
-  @IsNumber()
-  @Min(1950)
+  @Min(2020)
+  @Max(2030)
   min_year?: number;
 
-  @ApiPropertyOptional({ maximum: 2030 })
+  @ApiPropertyOptional({ minimum: 2020, maximum: 2030 })
   @IsOptional()
   @IsNumber()
+  @Min(2020)
   @Max(2030)
   max_year?: number;
-
-  @ApiPropertyOptional({ minimum: 0, maximum: 100 })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  min_score?: number;
 
   @ApiPropertyOptional({ default: 20 })
   @IsOptional()

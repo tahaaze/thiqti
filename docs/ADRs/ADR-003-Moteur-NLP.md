@@ -1,59 +1,41 @@
-# ADR-003: Moteur NLP (Analyse de Requêtes)
+# ADR-003: Moteur NLP
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Adam Chouikh, Younes Boumalek
-**Réf**: VV-SLP-2026-001, §3.4
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-L'utilisateur tape une requête en langage naturel (ex: "SUV hybride autour de 350 000 DH"). Le moteur doit extraire des critères structurés de cette requête.
+Le moteur NLP doit analyser des avis consommateurs en arabe, francais, anglais et extraire des entites (marque, modele, probleme) avec un score de sentiment.
 
-## Décision
+## Options Considerees
 
-### Approche: Rule-based NLP (regex + dictionnaires)
+### Option A (rejetee): API LLM externe (OpenAI / Claude)
 
-Le moteur `src/lib/nlp.ts` utilise:
-1. **Normalisation**: lowercasing, suppression diacritiques (NFD), nettoyage
-2. **Extraction par dictionnaire**: carrosseries (9 types), motorisations (5 types), marques (30+), villes (15)
-3. **Extraction par regex**: budget ("autour de X", "sous X", "entre X et Y"), année ("depuis 2022"), kilométrage ("moins de 50 000 km")
-4. **Détection d'intention**: familial, sportif, économique, confort, ville, route, tout-terrain
+- **Avantages**: Precision elevee, comprehension multilingue native, extraction d'entites fiable
+- **Inconvenients**: Cout par requete, latence (>1s), dependance externe, donnees envoyees a un tiers
+- **Motif du rejet**: Cout recurrent non budgetise; latence incompatible avec le budget <500ms; donnees utilisateurs exposees
 
-### Sortie: `SearchCriteria`
+### Option B (rejetee): Modele local Python (HuggingFace + FastAPI)
 
-```typescript
-interface SearchCriteria {
-  carrosserie: string | null;      // "SUV", "Berline", ...
-  motorisation: string | null;     // "Hybride", "Diesel", ...
-  transmission: string | null;     // "Automatique", "Manuelle"
-  marque: string | null;           // "Toyota", "Dacia", ...
-  budgetMin: number | null;
-  budgetMax: number | null;
-  budgetTolerance: number;         // 0.15 ou 0.20 pour "autour de"
-  ville: string | null;
-  anneeMin: number | null;
-  anneeMax: number | null;
-  kmMax: number | null;
-  intent: string[];                // ["familial", "economique"]
-}
-```
+- **Avantages**: Performance, controle des donnees, pas de cout recurrent
+- **Inconvenients**: Necessite un serveur Python separe, modele lourd (>2Go RAM), cold start lent
+- **Motif du rejet**: Complexite d'infrastructure injustifiee pour Phase 1; le volume d'avis estime (< 1000/mois) ne justifie pas un microservice dedie
 
-### Tolérance budget
+### Option C (retenue): NLP rule-based en TypeScript (regex + dictionnaires)
 
-- "autour de 350 000" → min=280K, max=420K (tolérance ±20%)
-- "sous 300 000" → max=300K (tolérance 15%)
-- "entre 200K et 400K" → min=200K, max=400K (tolérance 0%)
+- **Tokenization**: Decoupage par espaces et ponctuation
+- **Stemming**: Dictionnaire racines arabes/francais (fichier JSON)
+- **Sentiment**: Lexique de termes positifs/negatifs multilingue
+- **Entites**: Regex patterns pour marques, modeles, annees
 
-## Alternatives considérées
+## Decision
 
-| Option | Avantage | Inconvénient | Choix |
-|--------|----------|-------------|-------|
-| Regex/dictionnaires | Rapide, pas de dépendance | Limité au vocabulaire défini | **Retenu** |
-| LLM (GPT/Claude) | Compréhension riche | Coût API, latence, dépendance externe | Rejeté Phase 1 |
-| Modèle local (spaCy/fr_core_news) | Bonne qualité | Poids modèle, setup complexe | Reporté Phase 2 |
+Moteur NLP rule-based en TypeScript avec regex, dictionnaires de stems, et lexiques de sentiment.
 
-## Conséquences
+## Consequences
 
-- **Positif**: Aucune dépendance externe, latence < 10ms, debug facile
-- **Négatif**: Ne comprend pas les formulations non prévues (ex: "je veux un truc spacieux pour la famille")
-- **Évolution Phase 2**: Remplacer par fine-tuning d'un modèle NLP ou intégration LLM pour la compréhension contextuelle
+- **Positif**: Zero cout d'infrastructure, execution dans le meme processus Node.js, latence < 10ms
+- **Negatif**: Couverture linguistique limitee aux termes dans les dictionnaires; pas de comprehension contextuelle
+- **Risque**: Les avis en arabe dialectal (Darija) auront une precision reduite; mitigation: enrichir les dictionnaires avec des termes collectes lors des tests utilisateur

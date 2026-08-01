@@ -1,4 +1,4 @@
-name: SLEIPNIR CI/CD
+name: Thiqti CI/CD
 
 on:
   push:

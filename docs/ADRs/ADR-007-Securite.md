@@ -1,42 +1,46 @@
-# ADR-007: Sécurité
+# ADR-007: Securite
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Younes Boumalek, Adam Chouikh
-**Réf**: VV-SLP-2026-001
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-La plateforme collecte des données publiques et n'exige pas d'authentification en Phase 1. Les risques de sécurité sont limités mais doivent être documentés.
+Thiqti doit proteger les donnees utilisateurs, les secrets d'infrastructure, et prevenir les attaques OWASP Top 10. Le projet manipule des donnees personnelles (email admin) et des cles API.
 
-## Décision
+## Options Considerees
 
-### Phase 1 (aucune authentification)
+### Option A (rejetee): Auth via Supabase Auth (magic link + OAuth)
 
-| Mesure | Implémentation |
-|--------|---------------|
-| HTTPS | Obligatoire en production (Let's Encrypt) |
-| Headers sécurité | Next.js Security Headers (CSP, X-Frame-Options) |
-| Input validation | Validation des paramètres de requête (longueur max, chars interdits) |
-| Rate limiting | Non implémenté (MVP) |
-| CORS | Same-origin par défaut |
-| Secrets | Variables d'environnement (.env.local, jamais commitées) |
-| Données utilisateur | LocalStorage uniquement (favoris) |
+- **Avantages**: Pret a l'emploi, MFA integre, passwordless
+- **Inconvenients**: Dependance Supabase, cout, pas de controle sur le flux d'auth
+- **Motif du rejet**: Supabase non utilise en Phase 1 (pas de DB); dependance externe pour un simple admin
 
-### Données sensibles
+### Option B (rejetee): Auth via NextAuth.js (Auth.js v5)
 
-- Aucune donnée personnelle collectée en Phase 1
-- Favoris stockés localement (pas de serveur)
-- Pas de cookies de tracking
+- **Avantages**: Standard, nombreux providers, securite eprouvee
+- **Inconvenients**: Configuration complexe pour un seul utilisateur admin, surcharge fonctionnelle
+- **Motif du rejet**: Trop de fonctionnalites pour un besoin simple (admin unique); dependance supplementaire
 
-### Phase 2 (prévu)
+### Option C (retenue): JWT + bcrypt + cookie httpOnly
 
-- Supabase Auth pour l'authentification
-- RLS (Row Level Security) pour les favoris
-- Rate limiting sur les endpoints publics
-- CSP strict
+- **Implementation**: `jose` pour JWT, `bcryptjs` pour hash, cookie httpOnly secure sameSite strict
+- **Endpoints**: POST `/api/auth/login`, POST `/api/auth/logout`, GET `/api/auth/me`
+- **Protections**: Rate limiting (5 tentatives/min), validation email, headers de securite HSTS/CSP/XSS
 
-## Conséquences
+### Protection des secrets
 
-- Le MVP est fonctionnel sans auth (acceptable pour une démo)
-- Le passage à Phase 2 nécessitera migration favoris → serveur
+- `.env.example` commite sans valeurs reelles
+- `GOOGLE_API_KEY` injectee via variable d'environnement, jamais dans le code
+- `JWT_SECRET` genere par `openssl rand -hex 32`
+
+## Decision
+
+Auth JWT + bcrypt avec cookie httpOnly, secrets via variables d'environnement.
+
+## Consequences
+
+- **Positif**: Simple, auditable, zero cout, pas de dependance externe
+- **Negatif**: Pas de MFA, pas de reset password automatique, admin unique uniquement
+- **Risque**: Si JWT_SECRET est faible, les tokens peuvent etre forges; mitigation: utiliser une cle de 256 bits generee par `openssl rand -hex 32`

@@ -2,11 +2,15 @@ import {
   IsString,
   IsNumber,
   IsOptional,
-  IsBoolean,
   Min,
   Max,
+  IsIn,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+
+const BODY_TYPES = ["suv", "berline", "citadine", "pick-up", "monospace", "crossover"] as const;
+const FUEL_TYPES = ["hybride", "electrique", "diesel", "essence", "plug-in-hybride"] as const;
+const TRANSMISSIONS = ["automatique", "manuelle"] as const;
 
 export class CreateVehicleDto {
   @ApiProperty({ example: "Dacia" })
@@ -17,68 +21,105 @@ export class CreateVehicleDto {
   @IsString()
   model!: string;
 
-  @ApiProperty({ example: 2022 })
+  @ApiProperty({ example: 2026 })
   @IsNumber()
-  @Min(1950)
+  @Min(2020)
   @Max(2030)
   year!: number;
 
-  @ApiProperty({ example: 185000 })
+  @ApiProperty({ example: "Essential" })
+  @IsString()
+  trim!: string;
+
+  @ApiProperty({ example: "suv", enum: BODY_TYPES })
+  @IsString()
+  @IsIn(BODY_TYPES)
+  body_type!: string;
+
+  @ApiProperty({ example: "diesel", enum: FUEL_TYPES })
+  @IsString()
+  @IsIn(FUEL_TYPES)
+  fuel_type!: string;
+
+  @ApiProperty({ example: "automatique", enum: TRANSMISSIONS })
+  @IsString()
+  @IsIn(TRANSMISSIONS)
+  transmission!: string;
+
+  @ApiPropertyOptional({ example: 5 })
+  @IsOptional()
+  @IsNumber()
+  @Min(2)
+  @Max(9)
+  seats?: number;
+
+  @ApiProperty({ example: 219000 })
   @IsNumber()
   @Min(0)
-  price!: number;
+  price_mad!: number;
 
-  @ApiProperty({ example: 35000 })
+  @ApiPropertyOptional({ example: 245000 })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  km!: number;
+  price_old_mad?: number;
 
-  @ApiProperty({ example: "Diesel" })
-  @IsString()
-  fuel!: string;
-
-  @ApiPropertyOptional({ example: "Manuelle" })
-  @IsOptional()
-  @IsString()
-  transmission?: string;
-
-  @ApiPropertyOptional({ example: 110 })
+  @ApiPropertyOptional({ example: 130 })
   @IsOptional()
   @IsNumber()
-  hp?: number;
+  @Min(0)
+  power_ch?: number;
 
-  @ApiPropertyOptional({ example: "Gris Artique" })
+  @ApiPropertyOptional({ example: 5.2 })
   @IsOptional()
-  @IsString()
-  color?: string;
+  @IsNumber()
+  @Min(0)
+  consumption_l100?: number;
 
-  @ApiPropertyOptional({ example: "Casablanca" })
+  @ApiPropertyOptional({ example: 136 })
   @IsOptional()
-  @IsString()
-  city?: string;
+  @IsNumber()
+  @Min(0)
+  co2_gkm?: number;
+
+  @ApiPropertyOptional({ example: 9.5 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  accel_0_100?: number;
+
+  @ApiPropertyOptional({ example: 450 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  trunk_liters?: number;
+
+  @ApiPropertyOptional({ example: 4340 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  length_mm?: number;
+
+  @ApiPropertyOptional({ example: 1820 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  width_mm?: number;
+
+  @ApiPropertyOptional({ example: 1660 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  height_mm?: number;
+
+  @ApiPropertyOptional({ example: 2670 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  wheelbase_mm?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   image_url?: string;
-
-  @ApiPropertyOptional({ example: 1.5 })
-  @IsOptional()
-  @IsNumber()
-  engine?: number;
-
-  @ApiPropertyOptional({ example: 5 })
-  @IsOptional()
-  @IsNumber()
-  doors?: number;
-
-  @ApiPropertyOptional({ example: 5 })
-  @IsOptional()
-  @IsNumber()
-  seats?: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  dealer_id?: string;
 }

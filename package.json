@@ -1,9 +1,12 @@
 {
   "name": "thiqti",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/api\" \"npm run dev -w apps/ai\"",
+    "dev": "npm run dev -w apps/web",
     "dev:api": "npm run start:dev -w apps/api",
     "build": "npm run build -w apps/web && node copy-static.js",
     "start": "node apps/web/.next/standalone/server.js",

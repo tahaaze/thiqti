@@ -1,190 +1,105 @@
-# SLEIPNIR Runbook
+# Thiqti — Runbook
 
-## Service Overview
+## Vue d'Ensemble du Service
 
-SLEIPNIR is an AI-powered vehicle search engine for Morocco. It aggregates listings from Auto24.ma, SoeezAuto.ma, Avito.ma, and a fallback dataset, then ranks results using NLP parsing + TOPSIS multi-criteria matching. An e-reputation barometer provides sentiment scores per vehicle model.
+Thiqti est un moteur de recommandation automobile pour le Maroc. Il utilise un dataset statique de 196 vehicules neufs, les analyse via NLP rule-based, et les classe via matching TOPSIS multicritere.
 
-**Key components:**
-- **Next.js 15 app** — Frontend + API routes (search, reputation)
-- **NestJS API** — Vehicle CRUD, reputation service (Phase 2)
-- **Python AI** — FastAPI for reputation analysis (Phase 2)
-- **PostgreSQL** — Vehicle storage + pgvector (Phase 2)
+**Composants cles (Phase 1):**
+- **Next.js 15** — Frontend + API routes (search, auth)
+- **Dataset statique** — 196 vehicules neufs (fichier TypeScript)
+- **Cache** — In-memory (Map + TTL 5min)
 
-## Architecture Diagram
+## Architecture
 
-See `docs/architecture/deployment.md` for the full Mermaid diagram.
+Voir `docs/architecture/deployment.md` pour le diagramme Mermaid.
 
 ```
-Browser → Next.js (Vercel) → API Routes → In-Memory Cache
-                ↓                              ↓
-        SSR Pages                     Aggregator → Sources
-                                          ↓
-                                   [Auto24 | SoeezAuto | Avito | Fallback]
+Browser -> Next.js (Vercel) -> API Routes -> Cache -> Dataset statique
+                                                        |
+                                                 196 vehicules neufs
 ```
 
-## Common Issues and Fixes
-
-### Dev Server Won't Start
-
-**Symptom:** `npm run dev` fails or port 3000 in use.
+## Demarrage Rapide
 
 ```bash
-# Kill process on port 3000
-netstat -ano | findstr :3000
-taskkill /PID <pid> /F
-
-# Reinstall dependencies
-rm -rf node_modules
+git clone https://github.com/your-org/thiqti.git
+cd thiqti
 npm install
-
-# Try again
+cp .env.example .env
 npm run dev
 ```
 
-### Build Errors
+## Problemes Courants
 
-**Symptom:** `npm run build` fails with TypeScript errors.
+### Le serveur Dev ne demarre pas
+
+**Symptome:** `npm run dev` echoue ou port 3000 occupe.
 
 ```bash
-# Check types first
-npx tsc --noEmit -p apps/web/tsconfig.json
-
-# Fix lint issues
-npm run lint
-
-# Then rebuild
-npm run build
+netstat -ano | findstr :3000
+taskkill /PID <pid> /F
+npm run dev
 ```
 
-### Data Collection Failures
+### La compilation TypeScript echoue
 
-**Symptom:** Search returns only fallback data, no live scraping results.
+**Symptome:** Erreurs TypeScript lors du build.
+
+```bash
+npm run typecheck
+```
+
+Corriger les erreurs avant de commit.
+
+### Le login admin ne fonctionne pas
+
+**Symptome:** 401 sur `/api/auth/login`.
 
 **Causes:**
-- Source websites changed HTML structure (selector breakage)
-- Rate limiting / IP blocking
-- Network timeout
+- `JWT_SECRET` non defini dans `.env`
+- `ADMIN_PASSWORD_HASH` non defini ou invalide
+- Mot de passe incorrect
 
-**Fixes:**
-1. Check source site manually — verify pages load
-2. Run Playwright scraper in debug mode:
-   ```bash
-   npx playwright test --headed
-   ```
-3. If blocked, increase delay between requests in collector files
-4. Fallback dataset always works — users still get results
-
-### TOPSIS Returns NaN Scores
-
-**Symptom:** Match percentages show as NaN or 0.
-
-**Cause:** All vehicles have identical values in a dimension (division by zero in normalization).
-
-**Fix:** Already handled — `normalize()` returns 0.5 when min equals max. If recursing, check that the vehicle array is not empty before ranking.
-
-### Memory Leak in Production
-
-**Symptom:** Vercel function memory usage climbs steadily.
-
-**Cause:** In-memory cache (`cachedAllCars`) never clears in long-running functions.
-
-**Fix:** Vercel serverless functions restart automatically. For persistent issues, add a `MAX_CACHE_SIZE` limit or switch to Redis (Phase 2).
-
-## Health Checks
-
-### Quick Check
+**Solution:** Verifier les variables dans `.env`. Regenerer le hash:
 
 ```bash
-# API responds
-curl http://localhost:3000/api/search?q=test
-
-# Reputation endpoint
-curl http://localhost:3000/api/reputation?make=Toyota&model=Corolla
+npx tsx apps/web/scripts/generate-password-hash.ts
 ```
 
-### Vercel Production
+### Pas de resultats de recherche
 
-```
-GET https://thiqti.vercel.app/api/search?q=SUV
-```
+**Symptome:** Page de resultats vide.
 
-Expected: JSON with `results` array, `total` count, `sources` breakdown.
+**Causes:**
+- Filtres trop restrictifs
+- Dataset non charge
 
-### Docker Services
+**Solution:** Le dataset a 196 vehicules couvrant tous les segments. Si la requete est specifique, essayer une recherche plus large (ex: "Toyota" au lieu de "Toyota Corolla 2022 essence").
 
-```bash
-docker-compose ps
+## Maintenance
 
-# Expected: postgres (healthy), redis (healthy), meilisearch (running)
-```
+### Mettre a jour le catalogue
 
-## Scaling Notes
+1. Editer `apps/web/src/lib/sources/fallback.ts`
+2. Ajouter/modifier les entrees vehicles
+3. Verifier le format (tous les champs requis)
+4. Commiter avec message descriptif
 
-| Load | Action |
-|------|--------|
-| < 100 searches/day | Free tier, no changes needed |
-| ~1,000 searches/day | Upgrade Vercel to Pro ($20/mo) |
-| ~10,000 searches/day | Add Supabase Pro ($25/mo), CDN caching |
-| 50,000+ searches/day | Edge functions, Redis cache, DB read replicas |
+### Ajouter un admin
 
-**Current capacity:** In-memory cache handles ~500 concurrent users comfortably.
+1. Generer le hash: `npx tsx apps/web/scripts/generate-password-hash.ts`
+2. Ajouter `ADMIN_EMAIL` et `ADMIN_PASSWORD_HASH` dans `.env`
 
-## Rollback Procedure
+## Monitoring
 
-### Vercel (Primary)
+| Aspect | Methode |
+|--------|---------|
+| Sante | `GET /api/health` (status, uptime, version, count) |
+| Erreurs | Vercel Function Logs |
+| Performance | Timing dans les logs |
 
-1. Go to Vercel Dashboard → Deployments
-2. Find the last working deployment
-3. Click "Promote to Production"
-4. Instant rollback, zero downtime
+## Securite
 
-### Database (Phase 2)
-
-```bash
-# Restore from Supabase backup
-# Dashboard → Database → Backups → Restore to point-in-time
-```
-
-### Scraper Failure
-
-1. Disable broken collector by commenting it out in `apps/web/src/lib/sources/aggregator.ts`
-2. Fallback dataset continues to serve results
-3. Fix the collector and redeploy
-
-## Emergency Contacts
-
-| Role | Name | Contact |
-|------|------|---------|
-| Lead Developer | Adam Chouikh | [Insert contact] |
-| Backend Engineer | Mohamed Taha Ait Ouahammi | [Insert contact] |
-| Frontend Engineer | Younes Boumalek | [Insert contact] |
-| Supervisor | [Insert name] | [Insert contact] |
-
-## On-Call Playbook
-
-### P1: Site Down
-
-1. Check Vercel status: `https://vercel-status.com`
-2. Check deployment logs in Vercel Dashboard
-3. If Vercel is down — wait (out of our control)
-4. If our code broke — rollback to previous deployment
-
-### P2: Search Returns Empty Results
-
-1. Test API directly: `curl /api/search?q=SUV`
-2. Check server logs for `[Sources]` errors
-3. If all sources failed, fallback dataset should still work
-4. If fallback is missing, check `apps/web/src/lib/sources/fallback.ts`
-
-### P3: Slow Response Times
-
-1. Check if cache is warm (first request after cold start is slower)
-2. Monitor `/api/metrics` endpoint if available
-3. If persistent, check for N+1 queries or unbounded data fetching
-
-### P4: Wrong Rankings
-
-1. Test with a simple query: `curl /api/search?q=SUV diesel`
-2. Check NLP parsing: verify `criteria` in response
-3. Check TOPSIS weights in `apps/web/src/lib/matching.ts`
-4. Verify vehicle data quality in fallback dataset
+- Ne jamais commit `.env`
+- Faire tourner `JWT_SECRET` si compromis
+- La `GOOGLE_API_KEY` est visible dans l'historique git — REVOQUER dans Google Cloud Console

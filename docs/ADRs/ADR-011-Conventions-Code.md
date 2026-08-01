@@ -1,84 +1,43 @@
 # ADR-011: Conventions de Code
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Adam Chouikh, Mohamed Taha Ait Ouahammi
-**Réf**: VV-SLP-2026-001
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-Deux développeurs travaillent sur le même codebase. Des conventions claires évitent les conflits et maintiennent la lisibilité.
+Thiqti est developpe par une equipe de 3 personnes. Des conventions claires sont necessaires pour maintenir la coherence du code et permettre les revues croisees.
 
-## Décision
+## Options Considerees
 
-### Formatage
+### Option A (rejetee): ESLint + Prettier + Biome (outillage multiple)
 
-| Règle | Outil |
-|-------|-------|
-| Indentation | 2 espaces |
-| Quotes | Guillemets simples (') |
-| Semicolons | Non |
-| Trailing commas | Toujours |
-| Line width | 100 chars |
+- **Avantages**: Couverture large, formatage automatique, regles personnalisees
+- **Inconvenients**: Outils multiples, conflits de regles, configuration complexe
+- **Motif du rejet**: Trop d'outils pour une equipe de 3; chaque outil ajoute de la friction sans gain proportionnel
 
-### Structure fichiers
+### Option B (rejetee): Aucune convention (libere totale)
 
-```
-apps/web/src/
-  app/
-    page.tsx              -- Page racine
-    layout.tsx            -- Layout global (Navbar)
-    results/page.tsx      -- Page résultats
-    vehicle/[slug]/page.tsx -- Fiche véhicule
-    api/
-      search/route.ts     -- API recherche
-      reputation/route.ts -- API réputation
-  components/
-    CarImage.tsx          -- Composant image véhicule
-    Toast.tsx             -- Système de toast
-    Modal.tsx             -- Composant modal
-  lib/
-    nlp.ts                -- Moteur NLP
-    matching.ts           -- Moteur matching
-    car-search.ts         -- Recherche legacy
-    sources/
-      types.ts            -- Types unifiés
-      aggregator.ts       -- Agrégateur multi-sources
-      auto24.ts           -- Source Auto24
-      soeezauto.ts        -- Source SoeezAuto
-      fallback.ts         -- Dataset fallback
-      moteur.ts           -- Source Moteur (inactive)
-      ovoiture.ts         -- Source O'Voiture (inactive)
-```
+- **Avantages**: Zero friction, zero configuration
+- **Inconvenients**: Code incoherent, revues difficiles, dette technique
+- **Motif du rejet**: Impossible pour une equipe de 3 personnes de maintenir la coherence sans regles explicites; les revues de code deviennent un enfer
 
-### Naming
+### Option C (retenue): Conventions explicites + ESLint minimal
 
-| Élément | Convention |
-|---------|-----------|
-| Composants React | PascalCase (`CarImage`) |
-| Fonctions | camelCase (`parseQuery`) |
-| Types/Interfaces | PascalCase (`SearchCriteria`) |
-| Constantes | UPPER_SNAKE (`MOROCCAN_CARS`) |
-| Fichiers | kebab-case (`car-search.ts`) |
-| CSS classes | Tailwind utility-first |
+- **TypeScript**: Strict mode, pas de `any`, pas de `@ts-ignore`
+- **Imports**: Tri alphabetique, pas de `*` wildcard
+- **Noms**: camelCase variables/fonctions, PascalCase classes/types, kebab-case fichiers
+- **Tests**: Pas de tests unitaires obligatoires en Phase 1 (projet en exploration)
+- **Commits**: Pas de convention stricte (pas de commitlint en Phase 1)
+- **Lint**: ESLint avec regles minimales (no-unused-vars, no-console interdit sauf `console.log` explicite)
 
-### Règles TypeScript
+## Decision
 
-- `strict: true` obligatoire
-- Pas de `any` sauf casts explicites `(car as any).bodyType`
-- Toutes les fonctions exportées ont des types de retour explicites
-- Interfaces préférées aux types pour les objets
+Conventions explicites documentees + ESLint minimal, sans outillage lourd.
 
-### Git
+## Consequences
 
-| Règle | Valeur |
-|-------|--------|
-| Branches | `feature/`, `fix/`, `chore/` |
-| Commits | Conventionnels: `feat:`, `fix:`, `chore:` |
-| Pas de tiret cadratin (--) | Vérifié par recherche automatisée |
-
-## Conséquences
-
-- Le lint automatique (ESLint) applique ces règles
-- Le `typecheck` TypeScript vérifie la cohérence des types
-- Les deux développeurs peuvent contribuer sans conflits de style
+- **Positif**: Zero friction outillage, conventions claires, revues rapides
+- **Negatif**: Pas d'enforcement automatique pour les conventions de nommage (revue manuelle)
+- **Risque**: Les conventions peuvent etre ignorees si pas rappelees en revue; mitigation: ajouter un fichier CONTRIBUTING.md

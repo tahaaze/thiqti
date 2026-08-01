@@ -1,33 +1,42 @@
 # ADR-001: Stack Technique
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Adam Chouikh, Mohamed Taha Ait Ouahammi, Younes Boumalek
-**Réf**: VV-SLP-2026-001
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-Le projet SLEIPNIR nécessite une stack technique capable de:
-- Servir une interface web réactive (SPA/SSR)
-- Exécuter des algorithmes NLP et de matching multicritère en temps réel
-- Intégrer des sources de données multiples (scraping, API)
-- Respecter le budget infrastructure d'un projet de stage (pas de services cloud coûteux)
+Thiqti necessite une stack technique capable de servir une interface web reactive, executer des algorithmes NLP et matching multicritere en temps reel, et respecter un budget infrastructure de projet de stage.
 
-## Décision
+## Options Considerees
 
-| Couche | Technologie | Justification |
-|--------|------------|---------------|
-| Frontend | Next.js 15 (App Router) + TypeScript strict + Tailwind CSS | SSR pour SEO, React 19, routing file-system, CSS utility-first |
-| Backend API | Next.js API Routes (route handlers) | Monolithe simplifié, pas de service NestJS séparé pour Phase 1 |
-| Backend AI | Python / FastAPI (optionnel, si modèle local requis) | NLP/statistiques en Python natif |
-| Base de données | PostgreSQL 16 + pgvector | Recherche vectorielle + FTS natif, extension pgvector pour embeddings |
-| Recherche texte | PostgreSQL FTS (pg_trgm + tsvector) | Évite dépendance MeiliSearch en Phase 1 |
-| Cache | Mémoire en Node.js (Map + TTL 5min) | Suffisant pour MVP, évite Redis |
-| Auth | LocalStorage (Phase 1) | Pas d'auth Supabase en Phase 1 |
-| UI Components | lucide-react | Icônes légères, tree-shakeable |
+### Option A (rejetee): Monolithe Python (Django + DRF)
 
-## Conséquences
+- **Avantages**: NLP natif, ORM integre, ecosysteme mature
+- **Inconvenients**: Performances SSR limitees, cout serveur, pas de separation front/back native
+- **Motif du rejet**: Mauvaise experience developpeur pour le frontend, pas de SSR performant, surcout d'hebergement
 
-- **Positif**: Déploiement simple (un seul runtime Node.js), pas de coordination inter-services, debug facile
-- **Négatif**: Le moteur NLP sera rule-based (regex) plutôt qu'un modèle LLM; la recherche vectorielle est prête (pgvector installé) mais pas encore utilisée
-- **Risque**: Le scraping côté serveur peut être bloqué par les sites targets; mitigé par le dataset fallback
+### Option B (rejetee): Stack separee (FastAPI back + React front)
+
+- **Avantages**: Separation claire, scaling independant
+- **Inconvenients**: Deux deploiements, coordination CORS, complexite de CI/CD pour un MVP
+- **Motif du rejet**: Complexite inutile pour Phase 1; le trafic estime ne justifie pas la separation
+
+### Option C (retenue): Next.js 15 (App Router) monolythique
+
+- **Frontend**: React 19 + Tailwind CSS + TypeScript strict
+- **Backend**: Next.js API Routes (route handlers)
+- **Base de donnees**: Fallback integre en Phase 1 (dataset statique)
+- **Cache**: In-memory (Map + TTL 5min)
+- **Auth**: JWT + bcrypt (cote serveur, cookie httpOnly)
+
+## Decision
+
+Next.js 15 App Router monolythique avec TypeScript strict.
+
+## Consequences
+
+- **Positif**: Un seul runtime Node.js, deploiement simple (Vercel), pas de CORS, debug facile
+- **Negatif**: NLP rule-based (regex) plutot que LLM; pas de separation back/front pour Phase 1
+- **Risque**: Si le trafic depasse 10K req/jour, le monolythique devra etre decompose; mitige par le cache in-memory
