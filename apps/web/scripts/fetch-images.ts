@@ -1,8 +1,13 @@
 import { writeFileSync } from "fs";
 import { join } from "path";
 
-const API_KEY = "AIzaSyAdlPEXkhqIHhQBxvqYu5_pHxMa6hPjcjY";
-const CX = "e0af8e4e17f5a4e65";
+const API_KEY = process.env.GOOGLE_API_KEY || "";
+const CX = process.env.GOOGLE_CX || "";
+
+if (!API_KEY || !CX) {
+  console.error("Missing GOOGLE_API_KEY or GOOGLE_CX environment variables");
+  process.exit(1);
+}
 
 interface CarEntry {
   make: string;
