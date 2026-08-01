@@ -1,71 +1,63 @@
-# ADR-004: Moteur de Matching Multicritère
+# ADR-004: Moteur de Matching Multicritere
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Mohamed Taha Ait Ouahammi, Adam Chouikh
-**Réf**: VV-SLP-2026-001, §7.4
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-Le moteur de matching doit classer les véhicules par pertinence par rapport aux critères extraits par le NLP, tout en fournissant une explication pour chaque résultat.
+Le moteur de matching doit classer des vehicules selon la requete texte de l'utilisateur en combinant similarite textuelle, filtres de prix, budget essence/ permis, et preference reputation.
 
-## Décision
+## Options Considerees
 
-### Algorithme: TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)
+### Option A (rejetee): Matching par embedding vectoriel pur (pgvector + OpenAI embeddings)
 
-TOPSIS est une méthode MCDM (Multi-Criteria Decision Making) qui:
-1. Normalise les critères (prix, année, kilométrage, correspondance carburant, correspondance carrosserie)
-2. Calcule les distances à l'idéal positif et négatif
-3. Donne un score de 0 à 1 (closer to 1 = better)
+- **Avantages**: Comprisension semantique, pas de regles explicites, passage a l'echelle
+- **Inconvenients**: Cout API embeddings, necessite PostgreSQL, opacite du scoring
+- **Motif du rejet**: Opacite non conforme a l'exigence CDC de "methode formelle documentee"; cout recurrent; indisponible en Phase 1 (pas de DB)
 
-### Pondérations adaptatives
+### Option B (rejetee): Simple filtrage SQL (WHERE + ORDER BY)
 
-| Profil détecté | Prix | Année | Km | Carburant | Carrosserie |
-|---------------|------|-------|----|-----------|-------------|
-| Défaut | 0.30 | 0.20 | 0.20 | 0.15 | 0.15 |
-| Économique | 0.50 | 0.10 | 0.15 | 0.10 | 0.15 |
-| Familial | 0.20 | 0.15 | 0.25 | 0.15 | 0.25 |
-| Confort | 0.15 | 0.30 | 0.20 | 0.15 | 0.20 |
-| Sportif | 0.15 | 0.25 | 0.15 | 0.25 | 0.20 |
+- **Avantages**: Performant, simple, transparent
+- **Inconvenients**: Pas de scoring inter-criteres, pas de classement pertinent (ordre alphabetique ou prix uniquement)
+- **Motif du rejet**: La requete "citadine fiable" ne peut pas etre traduite en SQL; necessite un scoring multicritere
 
-### Filtrage hiérarchique
+### Option C (retenue): TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)
 
-```
-1. Priorité: véhicules correspondant bodyType + fuel demandés
-2. Fallback: véhicules dans le budget
-3. Dernier recours: top 10 par score TOPSIS
-```
+- **Definition**: Methode MCDA classant les alternatives selon leur distance a une solution ideale et une solution anti-ideale
+- **Criteres**: Prix (negatif), consommation (negatif), puissance (positif), fiabilite note (positif), budget essence (binaire), budget permis (binaire)
+- **Ponderation**: Definie dans un fichier JSON (`config/topsis-weights.json`), ajustable sans deployement
+- **Pipeline**: 1) Filtrage pre-TOPSIS (prix max, type, budget), 2) Normalisation vectorielle, 3) Calcul distances ideale/anti-ideale, 4) Score de similarite relatif
 
-### Explicabilité
+## Decision
 
-Chaque résultat inclut `MatchExplanation[]`:
-```typescript
-interface MatchExplanation {
-  label: string;        // "Budget", "Carrosserie", ...
-  value: string;        // "350 000 DH"
-  impact: "positive" | "negative" | "neutral";
-  reason: string;       // "Dans votre budget"
-}
-```
+TOPSIS comme methode de matching, avec ponderation configurable et pipeline en 4 etapes.
 
-## Implémentation
+## Consequences
 
-- `src/lib/matching.ts`: fonction `rankVehicles()` + `topsisScore()` + `buildExplanations()`
-- Score final: `baseScore * 0.4 + matchScore * 100 * 0.6`
-- Tri par `matchScore` décroissant
+- **Positif**: Methode transparente et documentee, conforme CDC; ponderation ajustable sans code; execution < 50ms pour 200 vehicules
+- **Negatif**: Pas d'apprentissage automatique; les poids sont statiques jusqu'a revision manuelle
+- **Risque**: Si le nombre de criteres depasse 15, la normalisation vectiorielle peut devenir instable; mitigation: limiter a 10 criteres max
 
-## Alternatives considérées
+---
 
-| Option | Avantage | Inconvénient | Choix |
-|--------|----------|-------------|-------|
-| TOPSIS | Simple, interprétable, rapide | Sensible aux poids fixes | **Retenu** |
-| AHP (pairwise) | Poids plus rigoureux | Complexe à implémenter | Reporté Phase 2 |
-| BWM (Best-Worst) | Moins de comparaisons qu'AHP | Même complexité | Reporté Phase 2 |
-| VIKOR | Gère les compromis | Moins intuitif | Rejeté |
-| Simple scoring | Ultra-simple | Pas de normalisation multicritère | Rejeté |
+## Amendement (2026-07-31)
 
-## Conséquences
+La formalisation complete de l'implementation (mathematiques, preuve d'equivalence,
+benchmark de 38 requetes, analyse de sensibilite) est documentee dans
+`docs/architecture/matching-formalisation.md`.
 
-- TOPSIS est un standard reconnu en recherche opérationnelle (30+ références citées dans le §12.3)
-- La sensibilité aux poids sera testée (§12.3, Piste A)
-- L'explicabilité est-native (chaque critère génère une explication)
+La liste initiale de criteres (consommation, puissance, fiabilite, budget essence,
+budget permis) refletait l'ambition de la phase 2. En phase 1, le catalogue est limite
+aux vehicules neufs et les champs disponibles sont : prix, annee, carburant,
+carrosserie, marque, transmission, ville. L'implementation TOPSIS porte donc sur ces
+7 criteres (voir la table des poids du document de formalisation). Les criteres
+consommation/puissance/fiabilite restent a ajouter en phase 2 quand les donnees seront
+disponibles (collecteurs reels, barometre reputation ADR-006).
+
+Corrections apportees a l'implementation pendant la formalisation : retrait du critere
+kilometrage (degenere sur un catalogue de vehicules neufs), application effective des
+criteres marque/transmission/ville/annee au classement et aux filtres durs, correction
+de bugs d'extraction NLP (budget "budget X", accents, faux positifs annee et
+transmission, marques arabes). Detail dans la section 10 du document de formalisation.

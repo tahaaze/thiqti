@@ -28,6 +28,9 @@ export interface ScoredCar {
   meetsBudget: boolean;
   meetsBody: boolean;
   meetsFuel: boolean;
+  meetsBrand: boolean;
+  meetsTransmission: boolean;
+  meetsYear: boolean;
 }
 
 interface NormalizedVehicle {
@@ -40,6 +43,8 @@ interface NormalizedVehicle {
   priceFormatted: string;
   km: number;
   fuel: string;
+  transmission: string;
+  bodyType: string;
   city: string;
   image: string;
   source: string;
@@ -47,47 +52,23 @@ interface NormalizedVehicle {
   score: number;
 }
 
-const WEIGHTS_DEFAULT = {
-  price: 0.30,
-  year: 0.20,
-  km: 0.20,
-  fuelMatch: 0.15,
-  bodyMatch: 0.15,
-};
+export interface CriterionWeights {
+  price: number;
+  year: number;
+  fuelMatch: number;
+  bodyMatch: number;
+  brandMatch: number;
+  transmissionMatch: number;
+  cityMatch: number;
+}
 
-const WEIGHTS_ECONOMIQUE = {
-  price: 0.50,
-  year: 0.10,
-  km: 0.15,
-  fuelMatch: 0.10,
-  bodyMatch: 0.15,
-};
+const WEIGHTS_DEFAULT: CriterionWeights = { price: 0.3, year: 0.2, fuelMatch: 0.15, bodyMatch: 0.15, brandMatch: 0.1, transmissionMatch: 0.05, cityMatch: 0.05 };
+const WEIGHTS_ECONOMIQUE: CriterionWeights = { price: 0.5, year: 0.1, fuelMatch: 0.1, bodyMatch: 0.1, brandMatch: 0.1, transmissionMatch: 0.05, cityMatch: 0.05 };
+const WEIGHTS_FAMILIAL: CriterionWeights = { price: 0.15, year: 0.15, fuelMatch: 0.15, bodyMatch: 0.3, brandMatch: 0.05, transmissionMatch: 0.1, cityMatch: 0.1 };
+const WEIGHTS_CONFORT: CriterionWeights = { price: 0.1, year: 0.25, fuelMatch: 0.1, bodyMatch: 0.2, brandMatch: 0.15, transmissionMatch: 0.1, cityMatch: 0.1 };
+const WEIGHTS_SPORTIF: CriterionWeights = { price: 0.1, year: 0.2, fuelMatch: 0.25, bodyMatch: 0.1, brandMatch: 0.2, transmissionMatch: 0.1, cityMatch: 0.05 };
 
-const WEIGHTS_FAMILIAL = {
-  price: 0.20,
-  year: 0.15,
-  km: 0.25,
-  fuelMatch: 0.15,
-  bodyMatch: 0.25,
-};
-
-const WEIGHTS_CONFORT = {
-  price: 0.15,
-  year: 0.30,
-  km: 0.20,
-  fuelMatch: 0.15,
-  bodyMatch: 0.20,
-};
-
-const WEIGHTS_SPORTIF = {
-  price: 0.15,
-  year: 0.25,
-  km: 0.15,
-  fuelMatch: 0.25,
-  bodyMatch: 0.20,
-};
-
-function getWeights(criteria: SearchCriteria) {
+function getWeights(criteria: SearchCriteria): CriterionWeights {
   if (criteria.intent.includes("economique")) return WEIGHTS_ECONOMIQUE;
   if (criteria.intent.includes("familial")) return WEIGHTS_FAMILIAL;
   if (criteria.intent.includes("confort")) return WEIGHTS_CONFORT;
@@ -218,6 +199,18 @@ function buildExplanations(
     });
   }
 
+  if (criteria.transmission) {
+    const match = car.transmission.toLowerCase() === criteria.transmission.toLowerCase();
+    explanations.push({
+      label: "Transmission",
+      value: car.transmission,
+      impact: match ? "positive" : "neutral",
+      reason: match
+        ? `Transmission demandée : ${criteria.transmission}`
+        : `Transmission ${car.transmission} différente de ${criteria.transmission}`,
+    });
+  }
+
   if (criteria.ville) {
     const match = car.city.toLowerCase() === criteria.ville.toLowerCase();
     explanations.push({
@@ -257,21 +250,53 @@ function buildExplanations(
   return explanations;
 }
 
+function bodyMatches(car: NormalizedVehicle, carrosserie: string): boolean {
+  const needle = carrosserie.toLowerCase();
+  return car.bodyType.toLowerCase().includes(needle) || car.title.toLowerCase().includes(needle);
+}
+
 export function rankVehicles<T extends NormalizedVehicle>(
   vehicles: T[],
   criteria: SearchCriteria
 ): ScoredCar[] {
-  const weights = getWeights(criteria);
-  const w = [weights.price, weights.year, weights.km, weights.fuelMatch, weights.bodyMatch];
-  const beneficial = [true, true, true, true, true];
+  return rankVehiclesWithWeights(vehicles, criteria);
+}
+
+export function rankVehiclesWithWeights<T extends NormalizedVehicle>(
+  vehicles: T[],
+  criteria: SearchCriteria,
+  overrides: Partial<CriterionWeights> = {}
+): ScoredCar[] {
+  const baseWeights = getWeights(criteria);
+  const mergedWeights = { ...baseWeights, ...overrides };
+  const weightSum =
+    mergedWeights.price +
+    mergedWeights.year +
+    mergedWeights.fuelMatch +
+    mergedWeights.bodyMatch +
+    mergedWeights.brandMatch +
+    mergedWeights.transmissionMatch +
+    mergedWeights.cityMatch;
+  const w = [
+    mergedWeights.price / weightSum,
+    mergedWeights.year / weightSum,
+    mergedWeights.fuelMatch / weightSum,
+    mergedWeights.bodyMatch / weightSum,
+    mergedWeights.brandMatch / weightSum,
+    mergedWeights.transmissionMatch / weightSum,
+    mergedWeights.cityMatch / weightSum,
+  ];
+  const beneficial = [true, true, true, true, true, true, true];
   const allPrices = vehicles.map((v) => v.price);
-  const allKms = vehicles.map((v) => v.km);
   const allYears = vehicles.map((v) => v.year);
+  const priceMin = Math.min(...allPrices);
+  const priceMax = Math.max(...allPrices);
+  const yearMin = Math.min(...allYears);
+  const yearMax = Math.max(...allYears);
 
   const vectors = vehicles.map((car) => {
-    const priceScore = 1 - normalize(car.price, Math.min(...allPrices), Math.max(...allPrices));
-    const yearScore = normalize(car.year, Math.min(...allYears), Math.max(...allYears));
-    const kmScore = 1 - normalize(car.km, Math.min(...allKms), Math.max(...allKms));
+    const priceScore = 1 - normalize(car.price, priceMin, priceMax);
+    const yearScore = normalize(car.year, yearMin, yearMax);
 
     let fuelMatchScore = 1;
     if (criteria.motorisation) {
@@ -280,10 +305,34 @@ export function rankVehicles<T extends NormalizedVehicle>(
 
     let bodyMatchScore = 1;
     if (criteria.carrosserie) {
-      bodyMatchScore = car.title.toLowerCase().includes(criteria.carrosserie.toLowerCase()) ? 1 : 0.5;
+      bodyMatchScore = bodyMatches(car, criteria.carrosserie) ? 1 : 0.5;
     }
 
-    const vector = [priceScore, yearScore, kmScore, fuelMatchScore, bodyMatchScore];
+    let brandMatchScore = 1;
+    if (criteria.marque) {
+      brandMatchScore = car.make.toLowerCase() === criteria.marque.toLowerCase() ? 1 : 0;
+    }
+
+    let transmissionMatchScore = 1;
+    if (criteria.transmission) {
+      transmissionMatchScore =
+        car.transmission.toLowerCase() === criteria.transmission.toLowerCase() ? 1 : 0;
+    }
+
+    let cityMatchScore = 1;
+    if (criteria.ville) {
+      cityMatchScore = car.city.toLowerCase() === criteria.ville.toLowerCase() ? 1 : 0;
+    }
+
+    const vector = [
+      priceScore,
+      yearScore,
+      fuelMatchScore,
+      bodyMatchScore,
+      brandMatchScore,
+      transmissionMatchScore,
+      cityMatchScore,
+    ];
 
     return { car, vector };
   });
@@ -303,9 +352,7 @@ export function rankVehicles<T extends NormalizedVehicle>(
 
     let meetsBody = true;
     if (criteria.carrosserie) {
-      const bodyType = (car as any).bodyType as string | undefined;
-      meetsBody = bodyType?.toLowerCase().includes(criteria.carrosserie.toLowerCase()) ||
-        car.title.toLowerCase().includes(criteria.carrosserie.toLowerCase());
+      meetsBody = bodyMatches(car, criteria.carrosserie);
     }
 
     let meetsFuel = true;
@@ -313,9 +360,24 @@ export function rankVehicles<T extends NormalizedVehicle>(
       meetsFuel = car.fuel === criteria.motorisation;
     }
 
+    let meetsBrand = true;
+    if (criteria.marque) {
+      meetsBrand = car.make.toLowerCase() === criteria.marque.toLowerCase();
+    }
+
+    let meetsTransmission = true;
+    if (criteria.transmission) {
+      meetsTransmission =
+        car.transmission.toLowerCase() === criteria.transmission.toLowerCase();
+    }
+
+    let meetsYear = true;
+    if (criteria.anneeMin) meetsYear = car.year >= criteria.anneeMin;
+    if (criteria.anneeMax) meetsYear = meetsYear && car.year <= criteria.anneeMax;
+
     const explanations = buildExplanations(car, criteria, matchScore);
 
-    const baseScore = (car as any).score || 80;
+    const baseScore = car.score || 80;
     const finalScore = Math.round(baseScore * 0.4 + matchScore * 100 * 0.6);
 
     return {
@@ -326,17 +388,26 @@ export function rankVehicles<T extends NormalizedVehicle>(
       meetsBudget,
       meetsBody,
       meetsFuel,
+      meetsBrand,
+      meetsTransmission,
+      meetsYear,
       score: finalScore,
     };
   });
 
   scored.sort((a, b) => b.matchScore - a.matchScore);
 
-  const mustMatch = scored.filter(
-    (c) => c.meetsBody && c.meetsFuel
+  const exact = scored.filter(
+    (c) => c.meetsBody && c.meetsFuel && c.meetsBrand && c.meetsTransmission && c.meetsYear && c.meetsBudget
   );
 
-  if (mustMatch.length > 0) return mustMatch;
+  if (exact.length > 0) return exact;
+
+  const hard = scored.filter(
+    (c) => c.meetsBody && c.meetsFuel && c.meetsBrand && c.meetsTransmission && c.meetsYear
+  );
+
+  if (hard.length > 0) return hard;
 
   const withBudget = scored.filter(
     (c) => c.meetsBudget

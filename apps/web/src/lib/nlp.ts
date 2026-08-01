@@ -27,6 +27,7 @@ const CARROSSERIES: Record<string, string> = {
   monospace: "Monospace",
   pickup: "Utilitaire",
   van: "Utilitaire",
+  coupe: "Coupé",
   // Darija
   "ربع": "SUV",
   "كاروسة": "Berline",
@@ -96,14 +97,33 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   tout_terrain: ["tout-terrain", "tout terrain", "piste", "chemin", "offroad", "boue", "وعر"],
 };
 
+const CANONICAL_BRANDS: Record<string, string> = {
+  "تويوتا": "Toyota",
+  "هيونداي": "Hyundai",
+  "كيا": "Kia",
+  "رونو": "Renault",
+  "رينو": "Renault",
+  "بيجو": "Peugeot",
+  "مرسيدس": "Mercedes",
+  "بي ام": "BMW",
+  "بي إم": "BMW",
+  "فولكس": "Volkswagen",
+  "دacia": "Dacia",
+};
+
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, " ")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^\w\s\d\u0600-\u06FF\u0400-\u04FF]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function hasKeyword(text: string, key: string): boolean {
+  if (key.includes(" ")) return text.includes(key);
+  return new RegExp(`(^|[^a-z0-9])${key}([^a-z0-9]|$)`).test(text);
 }
 
 function extractBudget(text: string): { min: number | null; max: number | null; tolerance: number } {
@@ -143,6 +163,17 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
     if (aboveMatch) {
       const val = parseInt(aboveMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) min = val;
+    }
+  }
+
+  if (min === null && max === null) {
+    const budgetWordMatch = text.match(/(?:budget|ميزانية)\s+(\d[\d\s]*\d)/i);
+    if (budgetWordMatch) {
+      const val = parseInt(budgetWordMatch[1].replace(/\s/g, ""));
+      if (val >= 10000 && val <= 5000000) {
+        max = Math.round(val * 1.15);
+        min = Math.round(val * 0.85);
+      }
     }
   }
 
@@ -191,7 +222,7 @@ function extractYear(text: string): { min: number | null; max: number | null } {
   }
 
   if (min === null && max === null) {
-    const yearMatch = text.match(/(20[0-2]\d)/g);
+    const yearMatch = text.match(/(?<!\d)(20[0-2]\d)(?!\d)/g);
     if (yearMatch) {
       const years = yearMatch.map(Number).filter((y) => y >= 2000 && y <= 2026);
       if (years.length === 1) { min = years[0]; max = years[0] + 1; }
@@ -231,13 +262,13 @@ export function parseQuery(query: string): SearchCriteria {
 
   let transmission: string | null = null;
   for (const [key, value] of Object.entries(TRANSMISSIONS)) {
-    if (normalized.includes(key)) { transmission = value; break; }
+    if (hasKeyword(normalized, key)) { transmission = value; break; }
   }
 
   let marque: string | null = null;
   for (const brand of BRANDS) {
     const b = brand.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    if (normalized.includes(b)) { marque = brand; break; }
+    if (normalized.includes(b)) { marque = CANONICAL_BRANDS[brand] ?? brand; break; }
   }
 
   let ville: string | null = null;
