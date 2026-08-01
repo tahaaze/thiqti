@@ -1,293 +1,212 @@
-# SLEIPNIR — Testing Strategy
+# Thiqti — Strategie de Tests
 
-**Ref**: VV-SLP-2026-001  
-**Date**: 2026-07-17  
-**Status**: Active
-
----
-
-## 1. Testing Pyramid
-
-```
-          ┌─────────┐
-          │  E2E    │  ← Playwright (full user journey)
-          │  (5%)   │
-         ┌┴─────────┴┐
-         │ Integration │  ← API endpoints, data collection
-         │   (25%)     │
-        ┌┴─────────────┴┐
-        │    Unit Tests   │  ← NLP, matching, utilities
-        │     (70%)       │
-        └─────────────────┘
-```
+**Ref**: VV-SLP-2026-001
+**Date**: 2026-07-29
+**Statut**: Active
 
 ---
 
-## 2. Unit Tests (70%)
+## 1. Pyramide de Tests
 
-### 2.1 NLP Extraction (`src/lib/nlp.ts`)
+```
+          +-----------+
+          |   E2E     |  Playwright (Phase 2)
+          |   (10%)   |
+         ++-----------++
+         | Integration |  API endpoints, matching pipeline
+         |    (30%)    |
+        ++-------------++
+        |    Unit Tests   |  NLP, matching, utilitaires
+        |     (60%)       |
+        +-----------------+
+```
 
-| Test Case | Input | Expected Output |
-|-----------|-------|-----------------|
-| Make extraction | "je cherche une Toyota Corolla" | `{ make: "Toyota", model: "Corolla" }` |
-| Budget extraction | "budget 300000 DH" | `{ budget: 300000 }` |
-| Year extraction | "année 2020 ou plus récent" | `{ yearMin: 2020 }` |
-| Fuel extraction | "diesel" | `{ fuel: "diesel" }` |
-| Body type extraction | "SUV familial" | `{ bodyType: "SUV" }` |
-| Combined extraction | "Toyota SUV diesel 2020 budget 400k" | Full criteria object |
-| Arabic input | " toyota سيفيك" | `{ make: "Toyota" }` |
+---
+
+## 2. Tests Unitaires (60%)
+
+### 2.1 Extraction NLP
+
+| Cas de Test | Entree | Sortie Attendue |
+|-------------|--------|-----------------|
+| Extraction marque | "je cherche une Toyota Corolla" | `{ make: "Toyota", model: "Corolla" }` |
+| Extraction budget | "budget 300000 DH" | `{ budget: 300000 }` |
+| Extraction carburant | "diesel" | `{ fuel: "diesel" }` |
+| Extraction type | "SUV familial" | `{ bodyType: "SUV" }` |
+| Input arabe | " toyota سيفيك" | `{ make: "Toyota" }` |
 | Fuzzy matching | "toyta" (typo) | `{ make: "Toyota" }` |
-| Empty input | "" | `{}` (no criteria) |
-| Special chars | `<script>alert(1)</script>` | `{}` (sanitized) |
+| Input vide | "" | `{}` |
+| Caracteres speciaux | `<script>alert(1)</script>` | `{}` (sanitized) |
 
-```typescript
-// Example test structure
-describe('extractCriteria', () => {
-  it('should extract make and model', () => {
-    const result = extractCriteria('je cherche une Toyota Corolla');
-    expect(result.make).toBe('Toyota');
-    expect(result.model).toBe('Corolla');
-  });
+### 2.2 Moteur Matching (TOPSIS)
 
-  it('should extract budget from DH format', () => {
-    const result = extractCriteria('budget 300000 DH');
-    expect(result.budget).toBe(300000);
-  });
-
-  it('should handle Arabic input', () => {
-    const result = extractCriteria(' toyota');
-    expect(result.make).toBe('Toyota');
-  });
-
-  it('should sanitize XSS in input', () => {
-    const result = extractCriteria('<script>alert(1)</script>');
-    expect(result).toEqual({});
-  });
-});
-```
-
-### 2.2 Matching Engine (`src/lib/matching.ts`)
-
-| Test Case | Input | Expected Output |
-|-----------|-------|-----------------|
-| TOPSIS score | 5 vehicles, 3 criteria | Scores between 0-1 |
-| Best match first | Ranked list | Top score at index 0 |
-| Budget filtering | Budget 300k, vehicles at 200k-500k | Only ≤300k in results |
-| Body type filtering | SUV request, mixed list | Only SUVs (or fallback) |
-| Fuel matching | Diesel request, petrol+diesel list | Diesel preferred |
-| Explanation generation | Vehicle + criteria | `MatchExplanation[]` with impact labels |
-| Empty vehicle list | 0 vehicles | Empty results |
-| Single vehicle | 1 vehicle | Returns that vehicle with score |
-| Weight adaptation | "économique" profile | Higher price weight |
-
-```typescript
-describe('rankVehicles', () => {
-  it('should rank vehicles by TOPSIS score', () => {
-    const vehicles = mockVehicles(5);
-    const criteria = { budget: 300000, fuel: 'diesel' };
-    const ranked = rankVehicles(vehicles, criteria);
-    expect(ranked[0].matchScore).toBeGreaterThanOrEqual(ranked[1].matchScore);
-  });
-
-  it('should filter by budget', () => {
-    const vehicles = [{ price: 200000 }, { price: 400000 }];
-    const criteria = { budget: 300000 };
-    const ranked = rankVehicles(vehicles, criteria);
-    expect(ranked).toHaveLength(1);
-  });
-
-  it('should generate explanations', () => {
-    const ranked = rankVehicles(mockVehicles(1), { budget: 300000 });
-    expect(ranked[0].explanations).toBeDefined();
-    expect(ranked[0].explanations.length).toBeGreaterThan(0);
-  });
-});
-```
-
-### 2.3 Utility Functions
-
-| Module | Tests |
-|--------|-------|
-| `src/lib/normalize.ts` | Price normalization, string lowercase, accent removal |
-| `src/lib/dedup.ts` | Vehicle deduplication by key, merge images |
-| `src/lib/fallback.ts` | Dataset loading, filtering, search |
+| Cas de Test | Entree | Sortie Attendue |
+|-------------|--------|-----------------|
+| Score TOPSIS | 5 vehicules, 3 criteres | Scores entre 0-1 |
+| Meilleur score en premier | Liste rankee | Top score a l'index 0 |
+| Filtrage budget | Budget 300k | Seulement <= 300k dans les resultats |
+| Filtrage type | SUV request, liste mixte | SUVs preferes (ou fallback) |
+| Filtrage carburant | Diesel request | Diesel preferes |
+| Generation explications | Vehicule + criteres | `MatchExplanation[]` avec labels |
+| Liste vide | 0 vehicules | Resultats vides |
+| Vehicule unique | 1 vehicule | Retourne avec score |
 
 ---
 
-## 3. Integration Tests (25%)
+## 3. Tests d'Integration (30%)
 
-### 3.1 API Endpoints
+### 3.1 Endpoints API
 
-| Endpoint | Method | Test Case | Expected |
-|----------|--------|-----------|----------|
-| `/api/search?q=Toyota+diesel` | GET | Valid query | 200 + vehicle array |
-| `/api/search?q=` | GET | Empty query | 400 + error |
+| Endpoint | Methode | Cas de Test | Attendu |
+|----------|---------|-------------|---------|
+| `/api/search?q=Toyota+diesel` | GET | Requete valide | 200 + vehicle array |
+| `/api/search?q=` | GET | Requete vide | 400 + error |
 | `/api/search?q=<script>` | GET | XSS attempt | 400 + sanitized |
-| `/api/reputation?make=Toyota` | GET | Valid make | 200 + reputation data |
-| `/api/reputation?make=` | GET | Missing param | 400 + error |
-| `/api/metrics` | GET | Any time | 200 + metrics object |
+| `/api/auth/login` | POST | Credentials valides | 200 + cookie set |
+| `/api/auth/login` | POST | Mauvais mot de passe | 401 |
+| `/api/auth/me` | GET | Cookie valide | 200 + email |
+| `/api/auth/me` | GET | Pas de cookie | 401 |
 
-### 3.2 Data Collection
+### 3.2 Pipeline Matching
 
-| Test Case | Expected |
-|-----------|----------|
-| Auto24 API fetch | Returns vehicle array |
-| Auto24 API down | Falls back to dataset |
-| SoeezAuto scraping | Returns price data |
-| SoeezAuto blocked | Logs warning, continues |
-| Deduplication | Merged vehicles, no duplicates |
-
-### 3.3 Database Operations (Phase 2)
-
-| Test Case | Expected |
-|-----------|----------|
-| Insert vehicle | Row created |
-| Query by make | Filtered results |
-| Full-text search | Ranked results |
-| Vector similarity | pgvector results |
+| Cas de Test | Attendu |
+|-------------|---------|
+| NLP -> TOPSIS pipeline | Criteres correctement extraits et appliques |
+| Cache hit | Reponse < 5ms |
+| Cache miss | Reponse < 100ms (premier appel) |
 
 ---
 
-## 4. E2E Tests (5%) — Playwright
+## 4. Tests E2E (10% — Phase 2)
 
-### 4.1 Full User Journey
+### 4.1 Parcours Utilisateur
 
 ```typescript
-test.describe('Search Journey', () => {
-  test('should complete a full search flow', async ({ page }) => {
-    // 1. Landing page loads
-    await page.goto('/');
-    await expect(page.locator('h1')).toContainText('SLEIPNIR');
-
-    // 2. Type query
-    await page.fill('[data-testid="search-input"]', 'Toyota SUV diesel budget 300000');
-
-    // 3. Submit search
-    await page.click('[data-testid="search-button"]');
-
-    // 4. Results page loads
-    await expect(page).toHaveURL(/\/results/);
-    await expect(page.locator('[data-testid="vehicle-card"]')).toHaveCount({ minimum: 1 });
-
-    // 5. Click vehicle
-    await page.click('[data-testid="vehicle-card"]:first-child');
-
-    // 6. Vehicle detail page
-    await expect(page).toHaveURL(/\/vehicle\//);
-    await expect(page.locator('[data-testid="vehicle-price"]')).toBeVisible();
-  });
+test('recherche complete', async ({ page }) => {
+  await page.goto('/');
+  await page.fill('[data-testid="search-input"]', 'Toyota SUV diesel budget 300000');
+  await page.click('[data-testid="search-button"]');
+  await expect(page.locator('[data-testid="vehicle-card"]')).toHaveCount({ minimum: 1 });
 });
 ```
 
-### 4.2 Test Scenarios
+### 4.2 Scenarios
 
-| Scenario | Steps |
-|----------|-------|
-| Happy path | Search → Results → Vehicle detail |
-| Empty results | Search nonsense → "no results" message |
-| Fallback | Search unavailable make → fallback data shown |
-| Mobile responsive | 375px viewport → layout adapts |
-| Favorites (Phase 2) | Add favorite → persist → view favorites |
+| Scenario | Etapes |
+|----------|--------|
+| Parcours normal | Search > Results > Detail |
+| Aucun resultat | Search nonsense > message "aucun resultat" |
+| Mobile responsive | 375px > layout adapte |
 
 ---
 
-## 5. Coverage Targets
+## 5. Cibles de Couverture
 
-| Area | Target | Measurement |
-|------|--------|-------------|
-| Business logic (NLP, matching) | ≥ 70% | Vitest coverage |
-| API endpoints | 100% | Integration tests |
-| Components | ≥ 50% | Render tests |
-| E2E critical paths | 100% | Playwright |
+| Zone | Cible | Outil |
+|------|-------|-------|
+| Logique metier (NLP, matching) | >= 70% | Vitest coverage |
+| Endpoints API | 100% | Tests integration |
+| Composants | >= 50% | Render tests |
 
 ---
 
-## 6. CI Pipeline
+## 5.1 Etat des Lieux (2026-07-31)
+
+**Exigence CDC 7.6**: couverture minimale de 70% sur la logique metier.
+
+Resultats `npm run test:coverage` (branche `fix/cdc-compliance`):
+
+| Workspace | Perimetre | % Stmts | % Branch | % Funcs | % Lines |
+|-----------|-----------|---------|----------|---------|---------|
+| apps/web | `src/lib/**` (NLP, matching, sources) | 93.31 | 88.01 | 84.44 | 93.43 |
+| apps/api | `src/**/*.service.ts` (vehicles, reputation) | 100 | 92.1 | 100 | 100 |
+
+Toutes les metriques de la logique metier sont au-dessus de 70%.
+
+**Inventaire des tests** (125 tests au total):
+
+| Fichier | Zone | Nombre |
+|---------|------|--------|
+| `apps/web/tests/matching.test.ts` | Invariants TOPSIS | 7 |
+| `apps/web/tests/benchmark.test.ts` | Benchmark 38 requetes + sensibilite | 43 |
+| `apps/web/tests/nlp.test.ts` | Extraction NLP FR/AR/Darija | 39 |
+| `apps/web/tests/sources.test.ts` | Normalisation, score, catalogue | 17 |
+| `apps/api/test/reputation.service.test.ts` | Service reputation (repos mocks) | 6 |
+| `apps/api/test/vehicles.service.test.ts` | Service vehicles (query builder mock) | 13 |
+
+**Limites connues**:
+- Les tests API mockent les repositories TypeORM (aucune base de donnees requise). Les endpoints HTTP complets (`/api/search`, `/api/reputation`, `/api/auth/*`) ne sont pas testes bout en bout : cela necessite PostgreSQL (Docker) et le module NestJS de test.
+- Les composants React et les pages ne sont pas couverts (pas de render tests).
+
+---
+
+## 6. Pipeline CI
 
 ```mermaid
 graph LR
     A[Git Push] --> B[Lint]
     B --> C[Typecheck]
-    C --> D[Unit Tests]
-    D --> E[Integration Tests]
+    C --> D[Tests Unitaires]
+    D --> E[Tests Integration]
     E --> F[Build]
     F --> G{PR?}
-    G -->|Yes| H[Preview Deploy]
-    G -->|No - main| I[Production Deploy]
+    G -->|Oui| H[Preview Deploy]
+    G -->|Non - main| I[Production Deploy]
 ```
 
-### Pipeline Commands
+### Commandes
 
 ```bash
-# Step 1: Lint
-npm run lint
-
-# Step 2: Typecheck
-npm run typecheck
-
-# Step 3: Unit + Integration Tests
-npm run test
-
-# Step 4: Build
-npm run build
-```
-
-### CI Configuration (`.github/workflows/ci.yml`)
-
-```yaml
-name: CI
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run test -- --coverage
-      - run: npm run build
+npm run lint          # Etape 1
+npm run typecheck     # Etape 2
+npm run test          # Etape 3
+npm run build         # Etape 4
 ```
 
 ---
 
-## 7. Test Data Management
+## 7. Donnees de Test
 
-| Data Type | Strategy |
-|-----------|----------|
-| Mock vehicles | `tests/__mocks__/vehicles.ts` — 10 sample vehicles |
-| Mock API responses | MSW (Mock Service Worker) for integration tests |
-| Snapshot testing | UI components for visual regression |
-| Seed data | `packages/database/seed.sql` for DB tests |
-
----
-
-## 8. Testing Tools
-
-| Tool | Purpose | Version |
-|------|---------|---------|
-| Vitest | Unit + integration tests | ^1.0.0 |
-| Playwright | E2E tests | ^1.61.1 |
-| MSW | API mocking | ^2.0.0 |
-| @testing-library/react | Component tests | ^14.0.0 |
-| c8 | Code coverage | ^8.0.0 |
+| Type | Strategie |
+|------|-----------|
+| Vehicules mock | `tests/__mocks__/vehicles.ts` — 10 echantillons |
+| Reponses API mock | Mock inline dans les tests |
+| Dataset fallback | Utilise les vraies donnees (196 vehicules) |
 
 ---
 
-## 9. Test Execution
+## 8. Outils
 
-| Command | Scope |
-|---------|-------|
-| `npm run test` | All unit + integration tests |
-| `npm run test:watch` | Watch mode for development |
-| `npm run test:e2e` | Playwright E2E tests |
-| `npm run test:coverage` | Coverage report |
+| Outil | Usage |
+|-------|-------|
+| Vitest | Tests unitaires + integration |
+| TypeScript strict | Verification statique |
+| ESLint | Linting |
+
+---
+
+## 9. Execution
+
+| Commande | Perimetre |
+|----------|-----------|
+| `npm run test` | Tous les tests (web + api) |
+| `npm run test:watch` | Mode watch |
+| `npm run test:coverage` | Rapport couverture (web + api) |
+
+---
+
+## 10. Plan vers 70% (exigence CDC 7.6)
+
+Objectif : maintenir et etendre la couverture de la logique metier au-dessus de 70%, puis renforcer les couches integration et composants.
+
+| Etape | Action | Impact | Blocage |
+|-------|--------|--------|---------|
+| 1 (fait) | Tests unitaires NLP (francais, arabe, darija, XSS, cas limites) | `nlp.ts` couvert, 39 tests | Aucun |
+| 2 (fait) | Tests services API avec repositories mocks (query builder + CRUD + reputation) | `*.service.ts` a 100%, 19 tests | Aucun |
+| 3 (fait) | Tests sources (normalisation, generateId, computeScore, catalogue, cache) | `src/lib/sources` a 98%, 17 tests | Aucun |
+| 4 | Seuil CI : ajouter `coverage` avec seuil de blocage (threshold 70%) dans les configs Vitest des workspaces | Protege contre les regressions | A definir avec le pipeline CI |
+| 5 | Tests d'integration API : `@nestjs/testing` + PostgreSQL (Docker) pour `/api/search`, `/api/reputation`, `/api/auth/*` | Couvre les endpoints (objectif 100%) | Docker non installe sur la machine actuelle |
+| 6 | Render tests React (Vitest + Testing Library ou Playwright component) sur les composants critiques (CarImage, ReputationSummary, recherche) | Composants >= 50% | A definir le choix d'outil |
+| 7 | E2E Playwright (Phase 2) : parcours recherche > resultats > detail | E2E 10% | Phase 2 |
+
+Priorisation : l'exigence 7.6 porte sur la logique metier, deja au-dessus du seuil. Les etapes 4 a 7 consolident les couches superieures de la pyramide et protegent le seuil dans le temps.
