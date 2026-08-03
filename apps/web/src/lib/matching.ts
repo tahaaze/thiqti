@@ -126,9 +126,7 @@ function buildExplanations(
   const explanations: MatchExplanation[] = [];
 
   if (criteria.carrosserie) {
-    const carBody = car.fuel.toLowerCase();
-    const match = carBody === criteria.carrosserie.toLowerCase() ||
-      (criteria.carrosserie === "SUV" && (car.fuel.includes("SUV") || car.title.toLowerCase().includes("suv")));
+    const match = bodyMatches(car, criteria.carrosserie);
     explanations.push({
       label: "Carrosserie",
       value: criteria.carrosserie,
@@ -150,19 +148,17 @@ function buildExplanations(
   if (criteria.budgetMax || criteria.budgetMin) {
     const min = criteria.budgetMin || 0;
     const max = criteria.budgetMax || Infinity;
-    const inBudget = car.price >= min && car.price <= max;
     const tolerance = criteria.budgetTolerance || 0.15;
-    const toleranceMax = max * (1 + tolerance);
-    const inTolerance = car.price >= min && car.price <= toleranceMax;
+    const tolMin = min * (1 - tolerance);
+    const tolMax = max * (1 + tolerance);
+    const inBudget = car.price >= tolMin && car.price <= tolMax;
 
     explanations.push({
       label: "Budget",
       value: car.price.toLocaleString("fr-FR") + " DH",
-      impact: inBudget ? "positive" : inTolerance ? "neutral" : "negative",
+      impact: inBudget ? "positive" : "negative",
       reason: inBudget
-        ? "Dans votre budget"
-        : inTolerance
-        ? `Proche du budget (écart: ${Math.abs(car.price - max).toLocaleString("fr-FR")} DH)`
+        ? `Dans votre budget (fenêtre de ${tolerance * 100}%)`
         : `Hors budget`,
     });
   }

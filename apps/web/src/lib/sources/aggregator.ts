@@ -17,22 +17,48 @@ export async function fetchAllSources() {
   return getCars();
 }
 
+const STOP_WORDS = new Set([
+  "je", "cherche", "chercher", "trouver", "veux", "vouloir", "souhaite",
+  "aimerais", "un", "une", "des", "du", "de", "la", "le", "les", "au", "aux",
+  "pour", "avec", "sans", "et", "ou", "dans", "sur", "en", "que", "qui",
+  "quoi", "dont", "est", "suis", "sont", "il", "elle", "on", "mon", "ma",
+  "mes", "ton", "ta", "tes", "son", "sa", "ses", "ne", "pas", "plus",
+  "moins", "autour", "environ", "type", "genre", "voiture", "auto", "marque",
+  "modele", "modèle", "budget", "prix", "dirhams", "dirham", "dh", "mad",
+  "confortable", "confort", "famille", "familial", "familiale", "boite",
+  "boîte", "neuf", "neuve", "occasion", "cher", "chere",
+  "the", "a", "an", "of", "to", "for", "and", "or", "i", "we", "you",
+]);
+
+function carMatches(car: ReturnType<typeof getFallbackCars>[number], word: string): boolean {
+  return (
+    car.make.toLowerCase().includes(word) ||
+    car.model.toLowerCase().includes(word) ||
+    car.title.toLowerCase().includes(word) ||
+    car.fuel.toLowerCase().includes(word) ||
+    car.bodyType.toLowerCase().includes(word) ||
+    car.transmission.toLowerCase().includes(word) ||
+    car.city.toLowerCase().includes(word) ||
+    car.year.toString().includes(word) ||
+    car.source.toLowerCase().includes(word)
+  );
+}
+
 export async function searchAllSources(query: string) {
   const allCars = getCars();
   if (!query) return allCars;
 
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  return allCars.filter((car) =>
-    words.every((w) =>
-      car.make.toLowerCase().includes(w) ||
-      car.model.toLowerCase().includes(w) ||
-      car.title.toLowerCase().includes(w) ||
-      car.fuel.toLowerCase().includes(w) ||
-      car.bodyType.toLowerCase().includes(w) ||
-      car.transmission.toLowerCase().includes(w) ||
-      car.city.toLowerCase().includes(w) ||
-      car.year.toString().includes(w) ||
-      car.source.toLowerCase().includes(w)
-    )
-  );
+  const words = query
+    .toLowerCase()
+    .replace(/['\u2019]/g, " ")
+    .split(/\s+/)
+    .map((w) => w.replace(/^[^\p{L}\p{N}]+/u, "").replace(/[^\p{L}\p{N}]+$/u, ""))
+    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+
+  const searchable = words.filter((w) => allCars.some((car) => carMatches(car, w)));
+
+  if (words.length === 0) return allCars;
+  if (searchable.length === 0) return [];
+
+  return allCars.filter((car) => searchable.every((w) => carMatches(car, w)));
 }
