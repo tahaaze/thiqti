@@ -9,7 +9,7 @@
     "dev": "npm run dev -w apps/web",
     "dev:api": "npm run start:dev -w apps/api",
     "build": "npm run build -w apps/web && node copy-static.js",
-    "start": "node apps/web/.next/standalone/server.js",
+    "start": "node apps/web/.next/standalone/apps/web/server.js",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/api",
     "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/api",
     "test": "npm run test -w apps/web && npm run test -w apps/api",
