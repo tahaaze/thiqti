@@ -136,7 +136,7 @@ export default function ComparePage() {
     return (
       <div className="min-h-screen px-6 py-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8"><h1 className="text-3xl font-bold">Comparaison</h1><p className="mt-2 text-gray-400">Comparez jusqu'à {MAX_COMPARE} véhicules côte à côte</p></div>
+          <div className="mb-8"><h1 className="text-3xl font-bold">Comparaison</h1><p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
           <div className="glass-card p-12 text-center"><Loader className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" /><p className="text-gray-400">Chargement des véhicules...</p></div>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function ComparePage() {
               <Link href="/results" className="rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-white"><ChevronLeft className="h-5 w-5" /></Link>
               <h1 className="text-3xl font-bold">Comparaison</h1>
             </div>
-            <p className="mt-2 text-gray-400">Comparez jusqu'à {MAX_COMPARE} véhicules côte à côte</p>
+            <p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p>
           </div>
         </div>
 
@@ -250,7 +250,7 @@ export default function ComparePage() {
             {bestCar && (
               <div className="mt-4 rounded-xl border border-green-500/20 bg-green-500/5 p-4">
                 <div className="flex items-center gap-2"><BadgeCheck className="h-5 w-5 text-green-400" /><p className="font-semibold text-green-400">Recommandation : {bestCar.make} {bestCar.model}</p></div>
-                <p className="mt-1 text-sm text-gray-400">Avec un score de {bestCar.score}/100 et un prix de {bestCar.priceFormatted}, c'est le meilleur choix parmi vos sélectionnés.</p>
+                <p className="mt-1 text-sm text-gray-400">Avec un score de {bestCar.score}/100 et un prix de {bestCar.priceFormatted}, c&apos;est le meilleur choix parmi vos sélectionnés.</p>
               </div>
             )}
           </div>
