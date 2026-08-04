@@ -99,4 +99,39 @@ Remplacement de tous les placeholders `url: "#"` / `sourceUrl: "#"` par des vale
 
 ## P5 — npm audit par workspace
 
-État : PAS ENCORE TRAITE.
+### Résultat `npm audit --workspace=apps/web` — **6 vulnérabilités (1 moderate, 5 high)**
+| Paquet | Sévérité | Corrigé par |
+|---|---|---|
+| `brace-expansion` (transitif) | high | `npm audit fix` |
+| `picomatch` (transitif) | high | `npm audit fix` |
+| `esbuild` (transitif) | moderate | `npm audit fix` |
+| `postcss` (via `next`) | high | `npm audit fix --force` → **next@16 (breaking)** |
+| `sharp` (via `next`) | high | `npm audit fix --force` → **next@16 (breaking)** |
+
+Aucun correctif appliqué : les fixes `--force` exigent `next@16.3.0`, une montée majeure (breaking). Les `npm audit fix` sans force concernent uniquement des dépendances transitives (brace-expansion, picomatch, esbuild) et pourraient être appliqués plus tard.
+
+### Résultat `npm audit --workspace=apps/api` — **32 vulnérabilités (2 low, 18 moderate, 10 high, 2 critical)**
+Principales : `@nestjs/core`/`platform-express` (moderate), `multer` (high, DoS), `glob` (high), `js-yaml` (high), `lodash` (high), `tmp` (high), `picomatch` (high), `body-parser`/`qs` (moderate), `ajv` (moderate), `uuid` (moderate), `file-type` (moderate), `brace-expansion` (high).
+
+Aucun correctif appliqué : la quasi-totalité exige `npm audit fix --force` avec des montées majeures (ex. `@nestjs/core@11.1.28`, `@nestjs/cli@11.0.24`, `@nestjs/typeorm@11.0.3`, `vitest@4`). À planifier hors de cette passe (ne pas casser ce qui fonctionne).
+
+### Suite proposée (hors périmètre P5)
+- Monter `next` (16.x) et la pile `@nestjs` (11.1.x) dans un chantier dédié avec vérification complète typecheck/test/build.
+- Idéalement un `npm audit` en CI pour suivre la dette.
+
+---
+
+# SYNTHÈSE FINALE
+
+FAIT:
+- P1 — `/login` → `/admin` corrigé : dashboard admin minimal créé (`apps/web/src/app/admin/page.tsx`), lien « Admin » dans la nav. Commit `ea972b1`.
+- P3 — Lint `apps/api` réparé : `eslint.config.mjs` + devDeps ajoutées, lint racine vert. Commit `9ab271d`.
+- P4 — Placeholders `url: "#"` supprimés (196 entrées → chaîne vide), plus aucun lien mort. Commit `be6b98b`.
+- P5 — Audit npm réalisé sur les deux workspaces : **web 6 vulns** (1 moderate, 5 high), **api 32 vulns** (2 low, 18 moderate, 10 high, 2 critical). Aucun correctif appliqué (fixes = montées majeures cassantes).
+
+PARTIELLEMENT FAIT:
+- P2 — Données réelles de réputation depuis PostgreSQL : code livré et vérifié (typecheck/tests/build web + api verts), mais **non testé en intégration** : aucun PostgreSQL/Docker local. Retombe proprement sur « Données insuffisantes » sans base. Commit `7e194fc`.
+
+PAS FAIT:
+- Aucun correctif de vulnérabilités (`npm audit fix --force` refusé : montées majeures `next@16`, pile `@nestjs` — hors périmètre, ne pas casser ce qui fonctionne).
+- Push des 4 commits locaux (`ea972b1`, `7e194fc`, `9ab271d`, `be6b98b`) sur `origin` : **volontairement différé**, à faire sur demande explicite.
