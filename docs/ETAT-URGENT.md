@@ -68,9 +68,13 @@ Rien pour P1. Le reste des priorités (P2-P5) est traité ci-dessous.
 
 ---
 
-## P3 — Lint apps/api
+## P3 — Lint apps/api : FAIT
 
-État : PAS ENCORE TRAITE.
+- `apps/api/eslint.config.mjs` créé (flat config : `@eslint/js` recommended + `typescript-eslint` recommended,
+  `no-unused-vars` en warning, ignores `dist`/`node_modules`/`coverage`).
+- DevDeps ajoutées à `apps/api` : `@eslint/js`, `typescript-eslint` (lockfile mis à jour).
+- `npm run lint --workspace=apps/api` : 0 erreur (3 warnings préexistants d'imports inutilisés).
+- `npm run lint` racine (web + api) : **vert** (0 erreur, warnings seulement).
 
 ---
 
