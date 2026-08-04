@@ -134,4 +134,4 @@ PARTIELLEMENT FAIT:
 
 PAS FAIT:
 - Aucun correctif de vulnérabilités (`npm audit fix --force` refusé : montées majeures `next@16`, pile `@nestjs` — hors périmètre, ne pas casser ce qui fonctionne).
-- Push des 4 commits locaux (`ea972b1`, `7e194fc`, `9ab271d`, `be6b98b`) sur `origin` : **volontairement différé**, à faire sur demande explicite.
+- Push des 5 commits locaux (`ea972b1`, `7e194fc`, `9ab271d`, `be6b98b`, `f828ecc`) sur `origin` : **volontairement différé**, à faire sur demande explicite.
