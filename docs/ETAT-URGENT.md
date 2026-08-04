@@ -80,7 +80,20 @@ Rien pour P1. Le reste des priorités (P2-P5) est traité ci-dessous.
 
 ## P4 — Placeholders url: "#"
 
-État : PAS ENCORE TRAITE.
+### Décision
+Remplacement de tous les placeholders `url: "#"` / `sourceUrl: "#"` par des valeurs honnêtes : chaîne vide `""` (aucun lien). L'interface `UnifiedCar` type déjà ces champs en `string` ; aucun composant de l'UI ne rend `url` (seuls `href`/`Link` existent), donc aucun `#` mort ne subsiste.
+
+### Changements
+- `apps/web/src/lib/sources/fallback.ts` : les 196 entrées passent de `sourceUrl: "#", url: "#"` à `sourceUrl: "", url: ""`.
+- `git grep` : plus aucune occurrence de `url: "#"`, `sourceUrl: "#"` ou `href="#"` dans `apps/web/src` ni `apps/web/tests`.
+
+### Vérifications (web)
+- `npm run typecheck --workspace=apps/web` : 0 erreur.
+- `npm run test --workspace=apps/web` : 106/106 OK.
+- `npm run build --workspace=apps/web` : OK.
+- `npm run typecheck --workspace=apps/api` : 0 erreur.
+- `npm run test --workspace=apps/api` : 19/19 OK.
+- `npm run build --workspace=apps/api` : OK.
 
 ---
 
