@@ -1,3 +1,29 @@
+// ============================================================================
+// AGREGATEUR DE SOURCES — REFRAICHISSEMENT QUOTIDIEN (PAS ACTIF, Phase 2)
+// ============================================================================
+//
+// Comportement actuel (INCHANGE) :
+//   - Dataset statique fallback (fallback.ts) charge en memoire avec un TTL de
+//     5 minutes (getCars). Aucune source externe n'est appelee.
+//
+// Mecanisme prevu (a activer plus tard, uniquement apres validation PAR ECRIT
+// des sources — cahier des charges section 7.3, voir collector.ts) :
+//   1. Un job quotidien (ex. Vercel Cron ou node-cron) appellerait une fonction
+//      `refreshCatalogue()`.
+//   2. `refreshCatalogue()` lirait AUTHORIZED_SOURCES (collector.ts) et, pour
+//      chaque entree `licityStatus === "valide"`, declencherait son collecteur.
+//   3. Les donnees recoltees remplaceraient / fusionneraient le cache de
+//      getCars().
+//   4. Le dataset statique fallback resterait le SECOURS : sans source active
+//      ou en cas d'echec, getCars() retomberait sur le fallback, conservant
+//      exactement le comportement actuel.
+//
+// Activation (a ne PAS faire maintenant) : definir COLLECTION_ENABLED=true ET
+// disposer d'au moins une entree "valide" dans AUTHORIZED_SOURCES. Tant que
+// ces conditions ne sont pas reunies, ce fichier ne fait rien de plus que ce
+// qu'il fait aujourd'hui.
+// ============================================================================
+
 import { getFallbackCars } from "./fallback";
 
 let cachedCars: ReturnType<typeof getFallbackCars> | null = null;
