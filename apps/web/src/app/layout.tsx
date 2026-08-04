@@ -29,6 +29,7 @@ export default function RootLayout({
                 <Link href="/results" className="text-sm text-gray-400 transition hover:text-white">Rechercher</Link>
                 <Link href="/compare" className="text-sm text-gray-400 transition hover:text-white">Comparer</Link>
                 <Link href="/favorites" className="text-sm text-gray-400 transition hover:text-white">Favoris</Link>
+                <Link href="/login" className="text-sm text-gray-400 transition hover:text-white">Admin</Link>
               </div>
               <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-lg p-2 text-gray-400 hover:text-white md:hidden">
                 {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -40,6 +41,7 @@ export default function RootLayout({
                   <Link href="/results" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Rechercher</Link>
                   <Link href="/compare" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Comparer</Link>
                   <Link href="/favorites" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Favoris</Link>
+                  <Link href="/login" onClick={() => setMenuOpen(false)} className="text-sm text-gray-400 hover:text-white">Admin</Link>
                 </div>
               </div>
             )}
