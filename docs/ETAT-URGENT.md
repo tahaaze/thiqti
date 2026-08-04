@@ -31,9 +31,40 @@ Rien pour P1. Le reste des priorités (P2-P5) est traité ci-dessous.
 
 ---
 
-## P2 — Baromètre de réputation : données réelles
+## P2 — Baromètre de réputation : données réelles : FAIT
 
-État : EN COURS (section en cours de traitement).
+### Ce qui a été fait
+1. **Route web `/api/reputation` branchée sur PostgreSQL** (`apps/web/src/app/api/reputation/route.ts` réécrit) :
+   - Lit la table `reviews` (+ `reputation_scores`) via `pg`, en joignant sur `vehicles` par make/model en minuscules.
+   - Les 6 véhicules seedés (RAV4, Tucson, Sportage, Qashqai, Outlander, Kuga) renvoient un **vrai score** calculé
+     depuis les 10 avis réels : `avgScore` (0-10), tags (top pros/cons de `reputation_scores` ou dérivés des avis),
+     catégories dérivées des mots-clés pros/cons, extraits d'avis, volume, fiabilité (fiable/moyen de la base).
+   - Les 190 autres véhicules (et tout véhicule sans avis en base) renvoient **« Données insuffisantes »**
+     (`dataAvailable: false`, `totalReviews: 0`), plus aucun faux score généré.
+   - DB injoignable : la route dégrade proprement en « Données insuffisantes » (aucun crash).
+   - `POST` : insère un vrai avis dans `reviews` (plus d'ajout dans un cache simulé).
+2. **Suppression du `seededRandom`** : plus aucune génération pseudo-aléatoire côté web.
+3. **Suppression du `Math.random()` NestJS** (`apps/api/src/reputation/reputation.service.ts`) :
+   `computeScore` calcule désormais le score UNIQUEMENT à partir des avis réels (`overall = moyenne des scores × 10`) ;
+   les composantes sans source de données (`history`, `mechanical`, `price_value`) passent à `null`
+   (colonnes déjà nullable dans l'entité). Tests api mis à jour en conséquence (19/19 verts).
+4. **Frontend** (`apps/web/src/app/vehicle/[slug]/page.tsx`) : le baromètre s'affiche quand
+   `reputation.dataAvailable === true` (données réelles en base), sinon l'état « Données insuffisantes »
+   (le compteur de collecte X/30 reste affiché, honnête).
+5. **Vérification** : aucun appel au service Python (`:8000`/`/ai/`) ni `random` restant dans `apps/web/src` et `apps/api/src`.
+
+### Dépendance ajoutée
+- `pg` + `@types/pg` dans `apps/web` (package.json + lockfile mis à jour).
+
+### Vérifications passées
+- web : typecheck 0, test 106/106, lint 0 (warnings préexistants), build OK
+- api : typecheck 0, test 19/19, build OK
+
+### Reste (à documenter pour la réunion)
+- **Non testé en intégration réelle** : aucun PostgreSQL ne tourne sur cette machine (Docker absent).
+  Le chemin réel sera activé par `docker-compose up` + variables `DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME`
+  (défauts alignés sur docker-compose : localhost:5432, user `thiqti`, db `thiqti`, password défaut `thiqti_secret`).
+- `apps/ai` (Python) : laissé en l'état (Phase 2 documentée), plus rien ne le consomme côté web/API.
 
 ---
 

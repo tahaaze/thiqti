@@ -25,6 +25,7 @@ interface CarListing {
 
 interface ReputationData {
   modelKey: string;
+  dataAvailable: boolean;
   totalReviews: number;
   avgScore: number | null;
   windowMonths: number;
@@ -116,7 +117,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
       </div>
     );
 
-  const hasEnoughReviews = reputation && reputation.totalReviews >= MIN_REVIEWS;
+  const hasEnoughReviews = reputation && reputation.dataAvailable === true;
 
   return (
     <div className="min-h-screen px-6 py-8">

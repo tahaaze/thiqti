@@ -31,39 +31,36 @@ export class ReputationService {
     const avgReviewScore =
       reviews.length > 0
         ? reviews.reduce((sum, r) => sum + (Number(r.score) || 0), 0) / reviews.length
-        : 50;
+        : 0;
 
-    const historyScore = 80 + Math.random() * 15;
-    const mechanicalScore = 75 + Math.random() * 20;
-    const priceValueScore = 70 + Math.random() * 25;
+    const reviewSubscore = avgReviewScore * 10;
+    const hasReviews = reviews.length > 0;
+    const overall = hasReviews ? Number(reviewSubscore.toFixed(1)) : 0;
 
-    const overall = (
-      historyScore * 0.3 +
-      mechanicalScore * 0.3 +
-      avgReviewScore * 10 * 0.25 +
-      priceValueScore * 0.15
-    ).toFixed(1);
+    const data = {
+      overall,
+      history: null as number | null,
+      mechanical: null as number | null,
+      reviews: hasReviews ? Number(reviewSubscore.toFixed(1)) : null,
+      price_value: null as number | null,
+      analysis: `Based on ${reviews.length} reviews. Review score: ${overall}/100.`,
+    };
 
     const existing = await this.scoreRepo.findOne({ where: { vehicle_id: vehicleId } });
 
     if (existing) {
-      existing.overall = Number(overall);
-      existing.history = Number(historyScore.toFixed(1));
-      existing.mechanical = Number(mechanicalScore.toFixed(1));
-      existing.reviews = Number((avgReviewScore * 10).toFixed(1));
-      existing.price_value = Number(priceValueScore.toFixed(1));
-      existing.analysis = `Based on ${reviews.length} reviews. Overall: ${overall}/100.`;
+      existing.overall = data.overall;
+      existing.history = data.history;
+      existing.mechanical = data.mechanical;
+      existing.reviews = data.reviews;
+      existing.price_value = data.price_value;
+      existing.analysis = data.analysis;
       return this.scoreRepo.save(existing);
     }
 
     const score = this.scoreRepo.create({
       vehicle_id: vehicleId,
-      overall: Number(overall),
-      history: Number(historyScore.toFixed(1)),
-      mechanical: Number(mechanicalScore.toFixed(1)),
-      reviews: Number((avgReviewScore * 10).toFixed(1)),
-      price_value: Number(priceValueScore.toFixed(1)),
-      analysis: `Based on ${reviews.length} reviews. Overall: ${overall}/100.`,
+      ...data,
     });
     return this.scoreRepo.save(score);
   }

@@ -71,8 +71,7 @@ describe("ReputationService", () => {
     });
   });
 
-  it("calcule un score sans avis (subscore reviews = 500)", async () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.5);
+  it("calcule un score sans avis (aucune donnee reelle)", async () => {
     const reviewRepo = makeRepo();
     reviewRepo.find.mockResolvedValue([]);
     const scoreRepo = makeRepo();
@@ -84,17 +83,16 @@ describe("ReputationService", () => {
     const result = await service.computeScore("v1");
 
     expect(result.vehicle_id).toBe("v1");
-    expect(result.reviews).toBe(500);
-    expect(result.history).toBe(87.5);
-    expect(result.mechanical).toBe(85);
-    expect(result.price_value).toBe(82.5);
-    expect(result.overall).toBe(189.1);
+    expect(result.reviews).toBe(null);
+    expect(result.history).toBe(null);
+    expect(result.mechanical).toBe(null);
+    expect(result.price_value).toBe(null);
+    expect(result.overall).toBe(0);
     expect(result.analysis).toContain("0 reviews");
     expect(scoreRepo.create).toHaveBeenCalled();
   });
 
-  it("calcule le score moyen des avis existants", async () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.5);
+  it("calcule le score a partir des avis reels uniquement", async () => {
     const reviewRepo = makeRepo();
     reviewRepo.find.mockResolvedValue([{ score: 10 }, { score: 5 }]);
     const scoreRepo = makeRepo();
@@ -106,12 +104,14 @@ describe("ReputationService", () => {
     const result = await service.computeScore("v1");
 
     expect(result.reviews).toBe(75);
-    expect(result.overall).toBe(82.9);
+    expect(result.history).toBe(null);
+    expect(result.mechanical).toBe(null);
+    expect(result.price_value).toBe(null);
+    expect(result.overall).toBe(75);
     expect(result.analysis).toContain("2 reviews");
   });
 
   it("met a jour le score existant au lieu d'en creer un nouveau", async () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.5);
     const reviewRepo = makeRepo();
     reviewRepo.find.mockResolvedValue([]);
     const scoreRepo = makeRepo();

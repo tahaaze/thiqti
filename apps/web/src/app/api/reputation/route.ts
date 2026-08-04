@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Pool } from "pg";
 
 interface ReputationData {
   modelKey: string;
+  dataAvailable: boolean;
   totalReviews: number;
   avgScore: number | null;
   windowMonths: number;
@@ -15,98 +17,219 @@ interface ReputationData {
   reliabilityLabel: string;
 }
 
-const REPUTATION_DB: Record<string, ReputationData> = {};
+interface ReviewRow {
+  title: string | null;
+  body: string | null;
+  rating: number | null;
+  pros: string[] | null;
+  cons: string[] | null;
+}
+
+interface ScoreRow {
+  avg_rating: number | null;
+  total_reviews: number | null;
+  reliability: string | null;
+  top_pros: string[] | null;
+  top_cons: string[] | null;
+  computed_at: Date | null;
+}
+
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      host: process.env.DB_HOST || "localhost",
+      port: Number(process.env.DB_PORT) || 5432,
+      user: process.env.DB_USER || "thiqti",
+      password: process.env.DB_PASSWORD || "thiqti_secret",
+      database: process.env.DB_NAME || "thiqti",
+      connectionTimeoutMillis: 3000,
+    });
+  }
+  return pool;
+}
+
+const CATEGORY_KEYWORDS: { name: string; keywords: string[] }[] = [
+  { name: "Confort", keywords: ["confort", "suspension", "tenue", "conduite"] },
+  { name: "Consommation", keywords: ["consommation", "économique", "economique", "hybride"] },
+  { name: "Fiabilité", keywords: ["fiabilité", "fiabilite", "fiable", "solide"] },
+  { name: "Rapport qualité-prix", keywords: ["qualité-prix", "qualite-prix", "rapport", "prix"] },
+  { name: "Tenue de route", keywords: ["tenue de route", "route", "conduite"] },
+  { name: "Finition", keywords: ["finition", "design", "intérieur", "interieur"] },
+];
 
 function getModelKey(make: string, model: string): string {
   return `${make.toLowerCase()}_${model.toLowerCase()}`;
 }
 
-function seededRandom(seed: number, i: number): number {
-  const x = Math.sin(seed * 9301 + i * 49297) * 49297;
-  return x - Math.floor(x);
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
-const POSITIVE_TAG_POOL = [
-  "Confort", "Design", "Consommation", "Fiabilité", "Tenue de route",
-  "Finition", "Équipements", "Espace intérieur", "Coffre", "Silence",
-  "Moteur", "Boîte auto", "Rapport qualité-prix", "Suspension", "Vision",
-];
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
+}
 
-const NEGATIVE_TAG_POOL = [
-  "Infodivertissement lent", "Coffre étroit", "Consommation élevée",
-  "Finition perfectible", "Moteur bruyant", "Suspension ferme",
-  "Visibilité arrière", "Places arrière étroites", "Équipements de base",
-  "Prix élevé", "Service après-vente", "Garantie",
-];
+function sentimentFromRating(rating: number): "positive" | "negative" | "neutral" {
+  if (rating >= 7) return "positive";
+  if (rating <= 4) return "negative";
+  return "neutral";
+}
 
-const EXCERPT_POOL = [
-  "Très bon véhicule au quotidien, je recommande.",
-  "Fiable et économique, parfait pour la ville.",
-  "Bon rapport qualité-prix, quelques défauts mineurs.",
-  "Moteur performant, consommation correcte.",
-  "Intérieur bien fini, places arrière spacieuses.",
-  "Après-vente perfectible mais véhicule solide.",
-  "Climatisation efficace, bon équipement de série.",
-  "Véhicule familial par excellence, coffre pratique.",
-  "Quelques problèmes électroniques signalés.",
-  "Direction précise, bon comportement en virage.",
-  "Réservoir un peu petit pour les longs trajets.",
-  "Excellent choix pour un premier achat.",
-];
-
-function buildReputation(make: string, model: string): ReputationData {
-  const key = getModelKey(make, model);
-  const seed = Array.from(`${make}${model}`).reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const rng = (i: number) => seededRandom(seed, i);
-
-  const totalReviews = Math.floor(rng(0) * 55) + 8;
-  const hasEnough = totalReviews >= 30;
-  const baseScore = hasEnough ? Math.round((55 + rng(1) * 40) * 10) / 100 : null;
-
-  const positiveCount = Math.round(totalReviews * (0.4 + rng(8) * 0.3));
-  const negativeCount = Math.round(totalReviews * (0.1 + rng(9) * 0.2));
-  const neutralCount = totalReviews - positiveCount - negativeCount;
-
-  const numPositiveTags = Math.min(2 + Math.floor(rng(10) * 3), positiveCount);
-  const numNegativeTags = Math.min(1 + Math.floor(rng(11) * 2), negativeCount);
-
-  const shuffledPos = [...POSITIVE_TAG_POOL].sort(() => rng(12) - 0.5);
-  const shuffledNeg = [...NEGATIVE_TAG_POOL].sort(() => rng(13) - 0.5);
-
-  const categories = [
-    { name: "Confort", score: hasEnough ? Math.round((50 + rng(2) * 45) * 10) / 100 : null },
-    { name: "Consommation", score: hasEnough ? Math.round((50 + rng(3) * 45) * 10) / 100 : null },
-    { name: "Fiabilité", score: hasEnough ? Math.round((50 + rng(4) * 45) * 10) / 100 : null },
-    { name: "Rapport qualité-prix", score: hasEnough ? Math.round((50 + rng(5) * 45) * 10) / 100 : null },
-    { name: "Tenue de route", score: hasEnough ? Math.round((50 + rng(6) * 45) * 10) / 100 : null },
-    { name: "Finition", score: hasEnough ? Math.round((50 + rng(7) * 40) * 10) / 100 : null },
-  ];
-
-  const excerpts = EXCERPT_POOL.slice(0, Math.min(totalReviews, 6)).map((text, i) => ({
-    text,
-    sentiment: (i < positiveCount ? "positive" : i < positiveCount + negativeCount ? "negative" : "neutral") as "positive" | "negative" | "neutral",
-    score: Math.round((4 + rng(14 + i) * 6) * 10) / 10,
-  }));
-
-  let reliability: "elevee" | "moyenne" | "faible" = "faible";
-  let reliabilityLabel = "Faible";
-  if (totalReviews >= 100) { reliability = "elevee"; reliabilityLabel = "Élevée"; }
-  else if (totalReviews >= 50) { reliability = "moyenne"; reliabilityLabel = "Moyenne"; }
-
+function insufficientData(modelKey: string): ReputationData {
   return {
-    modelKey: key,
-    totalReviews,
-    avgScore: baseScore,
+    modelKey,
+    dataAvailable: false,
+    totalReviews: 0,
+    avgScore: null,
     windowMonths: 18,
     lastUpdated: new Date().toISOString().split("T")[0],
-    positiveTags: shuffledPos.slice(0, numPositiveTags),
-    negativeTags: shuffledNeg.slice(0, numNegativeTags),
+    positiveTags: [],
+    negativeTags: [],
+    categories: [
+      { name: "Confort", score: null },
+      { name: "Consommation", score: null },
+      { name: "Fiabilité", score: null },
+      { name: "Rapport qualité-prix", score: null },
+      { name: "Tenue de route", score: null },
+      { name: "Finition", score: null },
+    ],
+    excerpts: [],
+    volume: { total: 0, positive: 0, negative: 0, neutral: 0 },
+    reliability: "faible",
+    reliabilityLabel: "Faible",
+  };
+}
+
+function reliabilityFromDb(raw: string | null | undefined): { key: "elevee" | "moyenne" | "faible"; label: string } {
+  if (raw === "fiable") return { key: "elevee", label: "Élevée" };
+  if (raw === "moyen") return { key: "moyenne", label: "Moyenne" };
+  return { key: "faible", label: "Faible" };
+}
+
+function topTagsFromReviews(reviews: ReviewRow[], field: "pros" | "cons"): string[] {
+  const counts = new Map<string, number>();
+  for (const review of reviews) {
+    const items = review[field] || [];
+    for (const item of items) {
+      const key = item.trim();
+      if (key) counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([tag]) => tag);
+}
+
+function buildFromDb(modelKey: string, reviews: ReviewRow[], score: ScoreRow | null): ReputationData {
+  const totalReviews = reviews.length;
+  const avgScore =
+    totalReviews > 0
+      ? round1(reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalReviews)
+      : score?.avg_rating != null
+        ? round1(Number(score.avg_rating))
+        : null;
+
+  const prosJoined = reviews
+    .flatMap((r) => r.pros || [])
+    .join(" ")
+    .toLowerCase();
+  const consJoined = reviews
+    .flatMap((r) => r.cons || [])
+    .join(" ")
+    .toLowerCase();
+
+  const categories = CATEGORY_KEYWORDS.map((cat) => {
+    if (avgScore == null) return { name: cat.name, score: null };
+    let value = avgScore;
+    if (cat.keywords.some((k) => prosJoined.includes(k))) value += 0.5;
+    if (cat.keywords.some((k) => consJoined.includes(k))) value -= 0.5;
+    return { name: cat.name, score: round1(clamp(value, 0, 10)) };
+  });
+
+  const positiveTags = score?.top_pros?.length
+    ? score.top_pros
+    : topTagsFromReviews(reviews, "pros");
+  const negativeTags = score?.top_cons?.length
+    ? score.top_cons
+    : topTagsFromReviews(reviews, "cons");
+
+  const excerpts = reviews.slice(0, 6).map((r) => ({
+    text: (r.body || r.title || "Avis sans texte").trim(),
+    sentiment: sentimentFromRating(Number(r.rating) || 0),
+    score: round1(clamp(Number(r.rating) || 0, 0, 10)),
+  }));
+
+  const positive = reviews.filter((r) => (Number(r.rating) || 0) >= 7).length;
+  const negative = reviews.filter((r) => (Number(r.rating) || 0) <= 4).length;
+  const neutral = totalReviews - positive - negative;
+
+  const reliability = reliabilityFromDb(score?.reliability);
+  const lastUpdated = score?.computed_at
+    ? new Date(score.computed_at).toISOString().split("T")[0]
+    : new Date().toISOString().split("T")[0];
+
+  return {
+    modelKey,
+    dataAvailable: true,
+    totalReviews,
+    avgScore,
+    windowMonths: 18,
+    lastUpdated,
+    positiveTags,
+    negativeTags,
     categories,
     excerpts,
-    volume: { total: totalReviews, positive: positiveCount, negative: negativeCount, neutral: neutralCount },
-    reliability,
-    reliabilityLabel,
+    volume: { total: totalReviews, positive, negative, neutral },
+    reliability: reliability.key,
+    reliabilityLabel: reliability.label,
   };
+}
+
+async function loadReputation(make: string, model: string): Promise<ReputationData> {
+  const modelKey = getModelKey(make, model);
+  const client = await getPool().connect();
+  try {
+    const vehicleResult = await client.query(
+      `SELECT id FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2)`,
+      [make, model]
+    );
+    if (vehicleResult.rowCount === 0) {
+      return insufficientData(modelKey);
+    }
+    const vehicleId = vehicleResult.rows[0].id;
+
+    const [reviewsResult, scoreResult] = await Promise.all([
+      client.query(
+        `SELECT title, body, rating, pros, cons FROM reviews WHERE vehicle_id = $1 ORDER BY published_at DESC`,
+        [vehicleId]
+      ),
+      client.query(
+        `SELECT avg_rating, total_reviews, reliability, top_pros, top_cons, computed_at
+         FROM reputation_scores WHERE vehicle_id = $1`,
+        [vehicleId]
+      ),
+    ]);
+
+    const reviews: ReviewRow[] = reviewsResult.rows.map((row) => ({
+      title: row.title,
+      body: row.body,
+      rating: row.rating,
+      pros: row.pros,
+      cons: row.cons,
+    }));
+
+    if (reviews.length === 0) {
+      return insufficientData(modelKey);
+    }
+
+    const score: ScoreRow | null = scoreResult.rowCount ? scoreResult.rows[0] : null;
+    return buildFromDb(modelKey, reviews, score);
+  } finally {
+    client.release();
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -117,12 +240,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "make and model are required" }, { status: 400 });
   }
 
-  const key = getModelKey(make, model);
-  if (!REPUTATION_DB[key]) {
-    REPUTATION_DB[key] = buildReputation(make, model);
+  try {
+    const data = await loadReputation(make, model);
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json(insufficientData(getModelKey(make, model)));
   }
-
-  return NextResponse.json(REPUTATION_DB[key]);
 }
 
 export async function POST(request: NextRequest) {
@@ -133,27 +256,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const key = getModelKey(make, model);
-  if (!REPUTATION_DB[key]) {
-    REPUTATION_DB[key] = buildReputation(make, model);
+  const modelKey = getModelKey(make, model);
+  let client;
+  try {
+    client = await getPool().connect();
+    const vehicleResult = await client.query(
+      `SELECT id FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2)`,
+      [make, model]
+    );
+    if (vehicleResult.rowCount === 0) {
+      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
+    }
+
+    const rating = round1(clamp(Number(score), 0, 10));
+    const title = String(text).slice(0, 300);
+    const bodyText = String(text);
+    const isPositive = sentiment === "positive";
+    const isNegative = sentiment === "negative";
+
+    await client.query(
+      `INSERT INTO reviews (vehicle_id, source, author_name, rating, title, body, pros, cons, verified, published_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+      [
+        vehicleResult.rows[0].id,
+        "web",
+        null,
+        rating,
+        title,
+        bodyText,
+        isPositive ? [] : null,
+        isNegative ? [] : null,
+        false,
+      ]
+    );
+
+    const data = await loadReputation(make, model);
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+  } finally {
+    client?.release();
   }
-
-  const rep = REPUTATION_DB[key];
-  rep.totalReviews++;
-  rep.excerpts.push({ text, sentiment: sentiment || "neutral", score: Math.round(score * 10) / 10 });
-  rep.volume.total = rep.totalReviews;
-
-  if (sentiment === "positive") rep.volume.positive++;
-  else if (sentiment === "negative") rep.volume.negative++;
-  else rep.volume.neutral++;
-
-  if (rep.totalReviews >= 30) {
-    const scores = rep.excerpts.map((e) => e.score);
-    rep.avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
-  }
-
-  if (rep.totalReviews >= 100) { rep.reliability = "elevee"; rep.reliabilityLabel = "Élevée"; }
-  else if (rep.totalReviews >= 50) { rep.reliability = "moyenne"; rep.reliabilityLabel = "Moyenne"; }
-
-  return NextResponse.json(rep);
 }
