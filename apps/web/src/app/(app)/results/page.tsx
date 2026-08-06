@@ -338,7 +338,8 @@ export default function ResultsPage() {
             ) : (
               <div className={view === "grid" ? "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" : "space-y-4"}>
                 {cars.map((v) => (
-                  <Link key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
+                  <div key={v.id} className="glass-card group flex flex-col overflow-hidden">
+                    <Link href={`/vehicle/${v.id}`} className="flex-1">
                     <div className="relative h-44 overflow-hidden">
                       <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
@@ -390,23 +391,6 @@ export default function ResultsPage() {
                         </span>
                       </div>
 
-                      {v.url && (
-                        <a
-                          href={v.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            window.open(v.url, "_blank", "noopener");
-                          }}
-                          className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          Voir sur {v.source || "la source"}
-                        </a>
-                      )}
-
                       {v.explanations && v.explanations.length > 0 && (
                         <div className="mt-3 border-t border-line pt-3">
                           <button
@@ -432,7 +416,21 @@ export default function ResultsPage() {
                         </div>
                       )}
                     </div>
-                  </Link>
+                    </Link>
+                    {v.url && (
+                      <div className="border-t border-line px-4 py-2.5">
+                        <a
+                          href={v.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Voir sur {v.source || "la source"}
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}

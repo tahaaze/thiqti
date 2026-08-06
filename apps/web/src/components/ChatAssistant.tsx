@@ -290,8 +290,9 @@ export default function ChatAssistant({
               <>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {visibleResults?.map((car) => (
-                    <Link key={car.id} href={`/vehicle/${car.id}`} className="group overflow-hidden rounded-2xl border border-line bg-surface transition hover:border-primary/40">
-                      <div className="relative h-32 overflow-hidden">
+                    <div key={car.id} className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface transition hover:border-primary/40">
+                      <Link href={`/vehicle/${car.id}`} className="flex-1">
+                        <div className="relative h-32 overflow-hidden">
                         <CarImage src={car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                         <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/60 to-transparent" />
                         <div className="absolute left-2 top-2">
@@ -324,24 +325,22 @@ export default function ChatAssistant({
                         <div className="mt-2">
                           <SellerContact contact={car.contact} reputation={car.reputation} compact showButtons={false} />
                         </div>
-                        {car.url && (
+                      </div>
+                      </Link>
+                      {car.url && (
+                        <div className="border-t border-line px-3 py-2.5">
                           <a
                             href={car.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              window.open(car.url, "_blank", "noopener");
-                            }}
-                            className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-primary transition hover:text-primary-dark"
+                            className="flex items-center gap-1 text-[11px] font-semibold text-primary transition hover:text-primary-dark"
                           >
                             <ExternalLink className="h-3 w-3" />
                             Voir sur {car.source || "la source"}
                           </a>
-                        )}
-                      </div>
-                    </Link>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
                 {visibleResults && visibleResults.length < results.length && (

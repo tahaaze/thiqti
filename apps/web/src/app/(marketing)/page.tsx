@@ -45,51 +45,50 @@ const POPULAR_BRANDS = ["Dacia", "Renault", "Peugeot", "Toyota", "Hyundai", "Kia
 
 function CarCard({ car }: { car: HomeCar }) {
   return (
-    <Link href={`/vehicle/${car.id}`} className="glass-card group block overflow-hidden">
-      <div className="relative h-40 overflow-hidden">
-        <CarImage src={car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute right-2 top-2 flex items-center gap-1 rounded-lg bg-black/60 px-2 py-1 text-xs font-bold text-primary backdrop-blur">
-          <ZelligeStar className="h-3 w-3 fill-primary" />{car.score}/100
-        </div>
-        {car.reputation?.verified && (
-          <div className="absolute bottom-2 left-2">
-            <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary backdrop-blur">
-              <ThiqtiShield className="h-3 w-3" />
-              Vérifiée
-            </span>
+    <div className="glass-card group flex flex-col overflow-hidden">
+      <Link href={`/vehicle/${car.id}`} className="flex-1">
+        <div className="relative h-40 overflow-hidden">
+          <CarImage src={car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute right-2 top-2 flex items-center gap-1 rounded-lg bg-black/60 px-2 py-1 text-xs font-bold text-primary backdrop-blur">
+            <ZelligeStar className="h-3 w-3 fill-primary" />{car.score}/100
           </div>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="truncate font-semibold">{car.title}</h3>
-        <p className="mt-0.5 text-xs text-muted">{car.year} &middot; {car.km.toLocaleString("fr-FR")} km</p>
-        <p className="mt-1 truncate text-xs text-muted">{[car.bodyType, car.fuel, car.year, car.city].filter(Boolean).join(" · ")}</p>
-        <div className="mt-3 flex items-center justify-between">
-          <span className="text-lg font-bold text-primary">{car.priceFormatted}</span>
-          <span className="flex items-center gap-1 text-xs text-muted"><MapPin className="h-3 w-3" />{car.city}</span>
+          {car.reputation?.verified && (
+            <div className="absolute bottom-2 left-2">
+              <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary backdrop-blur">
+                <ThiqtiShield className="h-3 w-3" />
+                Vérifiée
+              </span>
+            </div>
+          )}
         </div>
-        <div className="mt-2">
-          <SellerContact contact={car.contact} reputation={car.reputation} compact showButtons={false} />
+        <div className="p-4">
+          <h3 className="truncate font-semibold">{car.title}</h3>
+          <p className="mt-0.5 text-xs text-muted">{car.year} &middot; {car.km.toLocaleString("fr-FR")} km</p>
+          <p className="mt-1 truncate text-xs text-muted">{[car.bodyType, car.fuel, car.year, car.city].filter(Boolean).join(" · ")}</p>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-lg font-bold text-primary">{car.priceFormatted}</span>
+            <span className="flex items-center gap-1 text-xs text-muted"><MapPin className="h-3 w-3" />{car.city}</span>
+          </div>
+          <div className="mt-2">
+            <SellerContact contact={car.contact} reputation={car.reputation} compact showButtons={false} />
+          </div>
         </div>
-        {car.url && (
+      </Link>
+      {car.url && (
+        <div className="border-t border-line px-4 py-2.5">
           <a
             href={car.url}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              window.open(car.url!, "_blank", "noopener");
-            }}
-            className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
+            className="flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
           >
             <ExternalLink className="h-3 w-3" />
             Voir sur {car.source || "la source"}
           </a>
-        )}
-      </div>
-    </Link>
+        </div>
+      )}
+    </div>
   );
 }
 
