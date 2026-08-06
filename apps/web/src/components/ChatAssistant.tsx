@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight } from "lucide-react";
+import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight, ExternalLink } from "lucide-react";
 import { ThiqtiShield, ZelligeStar } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SellerContact from "@/components/SellerContact";
@@ -39,6 +39,7 @@ interface ChatCar {
   image: string;
   photos?: string[];
   source: string;
+  url: string;
   score: number;
   inventoryType?: "new" | "used";
   bodyType?: string;
@@ -69,6 +70,10 @@ function InventoryBadge({ type }: { type?: "new" | "used" }) {
       {isNew ? "Neuf" : "Occasion"}
     </span>
   );
+}
+
+function carTagline(car: { bodyType?: string; fuel?: string; year?: number; city?: string }) {
+  return [car.bodyType, car.fuel, car.year, car.city].filter(Boolean).join(" · ");
 }
 
 export default function ChatAssistant({
@@ -293,6 +298,7 @@ export default function ChatAssistant({
                       <div className="p-3">
                         <h4 className="truncate text-sm font-semibold">{car.title}</h4>
                         <p className="mt-0.5 text-xs text-muted">{car.year} &middot; {car.km.toLocaleString("fr-FR")} km</p>
+                        <p className="mt-1 truncate text-[11px] text-muted">{carTagline(car)}</p>
                         <div className="mt-2 flex items-center justify-between">
                           <span className="font-display text-base font-bold text-primary">{car.priceFormatted}</span>
                           <span className="flex items-center gap-2">
@@ -307,6 +313,22 @@ export default function ChatAssistant({
                         <div className="mt-2">
                           <SellerContact contact={car.contact} reputation={car.reputation} compact showButtons={false} />
                         </div>
+                        {car.url && (
+                          <a
+                            href={car.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(car.url, "_blank", "noopener");
+                            }}
+                            className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-primary transition hover:text-primary-dark"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Voir sur {car.source || "la source"}
+                          </a>
+                        )}
                       </div>
                     </Link>
                   ))}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Search, MapPin, Fuel, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows } from "lucide-react";
+import { Search, MapPin, Fuel, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows, ExternalLink } from "lucide-react";
 import { ZelligeStar, FavHeart, ThiqtiShield } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SafetyBadge from "@/components/SafetyBadge";
@@ -365,6 +365,7 @@ export default function ResultsPage() {
                     <div className="p-4">
                       <h3 className="font-semibold">{v.title}</h3>
                       <p className="text-sm text-muted">{v.year} &middot; {v.km.toLocaleString()} km</p>
+                      <p className="mt-1 truncate text-xs text-muted">{[v.bodyType, v.fuel, v.year, v.city].filter(Boolean).join(" · ")}</p>
                       <div className="mt-2 flex items-center gap-3 text-xs text-muted">
                         {v.inventoryType && (
                           <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>
@@ -388,6 +389,23 @@ export default function ResultsPage() {
                           <ZelligeStar className="h-3.5 w-3.5" />{v.score}
                         </span>
                       </div>
+
+                      {v.url && (
+                        <a
+                          href={v.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(v.url, "_blank", "noopener");
+                          }}
+                          className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Voir sur {v.source || "la source"}
+                        </a>
+                      )}
 
                       {v.explanations && v.explanations.length > 0 && (
                         <div className="mt-3 border-t border-line pt-3">

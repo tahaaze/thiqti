@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, CarFront, ArrowRight, Zap, MapPin, BadgeCheck } from "lucide-react";
+import { Sparkles, CarFront, ArrowRight, Zap, MapPin, BadgeCheck, ExternalLink } from "lucide-react";
 import { ZelligeStar, ThiqtiShield } from "@/components/icons";
 import ChatAssistant from "@/components/ChatAssistant";
 import CarImage from "@/components/CarImage";
@@ -22,6 +22,9 @@ interface HomeCar {
   image: string;
   photos?: string[];
   score: number;
+  fuel?: string;
+  source?: string;
+  url?: string;
   bodyType?: string;
   contact?: {
     name?: string;
@@ -61,6 +64,7 @@ function CarCard({ car }: { car: HomeCar }) {
       <div className="p-4">
         <h3 className="truncate font-semibold">{car.title}</h3>
         <p className="mt-0.5 text-xs text-muted">{car.year} &middot; {car.km.toLocaleString("fr-FR")} km</p>
+        <p className="mt-1 truncate text-xs text-muted">{[car.bodyType, car.fuel, car.year, car.city].filter(Boolean).join(" · ")}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-lg font-bold text-primary">{car.priceFormatted}</span>
           <span className="flex items-center gap-1 text-xs text-muted"><MapPin className="h-3 w-3" />{car.city}</span>
@@ -68,6 +72,22 @@ function CarCard({ car }: { car: HomeCar }) {
         <div className="mt-2">
           <SellerContact contact={car.contact} reputation={car.reputation} compact showButtons={false} />
         </div>
+        {car.url && (
+          <a
+            href={car.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.open(car.url!, "_blank", "noopener");
+            }}
+            className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
+          >
+            <ExternalLink className="h-3 w-3" />
+            Voir sur {car.source || "la source"}
+          </a>
+        )}
       </div>
     </Link>
   );
