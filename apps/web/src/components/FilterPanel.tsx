@@ -80,7 +80,7 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-2.5 py-1 text-xs font-medium transition ${
+      className={`border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition ${
         active
           ? "border-primary bg-primary/15 text-primary"
           : "border-line text-muted hover:border-primary/40 hover:text-ink"
@@ -128,11 +128,11 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
   return (
     <div className="glass-card p-5">
       <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold">
+        <div className="flex items-center gap-2 font-display text-lg font-bold text-ink">
           <SlidersHorizontal className="h-4 w-4 text-primary" />
           Filtres
           {activeCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-white">
+            <span className="flex h-5 min-w-5 items-center justify-center border border-primary bg-primary px-1.5 text-[11px] font-bold text-white">
               {activeCount}
             </span>
           )}

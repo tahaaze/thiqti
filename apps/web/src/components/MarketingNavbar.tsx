@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CarFront, Menu, MessageCircle, X } from "lucide-react";
+import { CarFront, Menu, ShieldCheck, X } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Assistant" },
@@ -19,16 +19,16 @@ export default function MarketingNavbar() {
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-line bg-surface/85 backdrop-blur-lg shadow-[0_1px_0_rgba(28,30,34,0.04),0_6px_16px_-12px_rgba(28,30,34,0.12)]">
-      <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+    <nav className="sticky top-0 z-50 px-4 pt-4">
+      <div className="glass mx-auto flex max-w-7xl items-center justify-between rounded-full py-2 pl-3 pr-3">
         <Link href="/" className="group flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-primary/40 bg-gradient-to-br from-[#f3d9a3] to-[#d4a94a] shadow-[0_0_16px_rgba(196,128,46,0.25)] transition group-hover:shadow-[0_0_24px_rgba(196,128,46,0.4)]">
-            <CarFront className="h-5 w-5 text-[#241505]" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#6d5dfc] to-[#22a9f0] text-white shadow-[0_4px_16px_rgba(109,93,252,0.45)]">
+            <CarFront className="h-5 w-5" />
           </div>
-          <span className="font-display text-2xl tracking-wide text-ink">
-            Thiqti<span className="text-primary">.</span>
+          <span className="font-display text-2xl font-bold leading-none text-ink">
+            Thiqti<span className="gradient-text">.</span>
           </span>
-          <span className="hidden rounded-full border border-primary/40 bg-primary-tint px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-dark sm:inline">
+          <span className="hidden rounded-full border border-line bg-white/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-muted sm:inline">
             Maroc
           </span>
         </Link>
@@ -37,43 +37,39 @@ export default function MarketingNavbar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`relative rounded-lg px-3.5 py-2 text-sm font-medium uppercase tracking-widest transition ${
-                isActive(link.href) ? "text-primary-dark" : "text-muted hover:text-ink"
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                isActive(link.href) ? "bg-brand-tint text-primary" : "text-muted hover:bg-white/60 hover:text-ink"
               }`}
             >
               {link.label}
-              {isActive(link.href) && (
-                <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-gradient-to-r from-transparent via-primary to-transparent" />
-              )}
             </Link>
           ))}
           <Link
             href="/login"
-            className="ml-2 flex items-center gap-1.5 rounded-xl border border-primary/40 bg-primary-tint px-4 py-2 text-sm font-semibold text-primary-dark transition hover:bg-primary/15 hover:shadow-[0_0_16px_rgba(196,128,46,0.2)]"
+            className="ml-2 flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-primary"
           >
-            <MessageCircle className="h-4 w-4" />
+            <ShieldCheck className="h-3.5 w-3.5" />
             Admin
           </Link>
         </div>
-        <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-lg p-2 text-muted hover:text-ink md:hidden">
-          {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-full border border-line bg-white/50 p-2 text-muted hover:text-ink md:hidden">
+          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
-      <div className="gold-hairline" />
       {menuOpen && (
-        <div className="border-t border-line px-6 py-4 md:hidden">
-          <div className="flex flex-col gap-4">
+        <div className="glass mt-2 rounded-2xl p-4 md:hidden">
+          <div className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className={`text-sm uppercase tracking-widest ${isActive(link.href) ? "font-semibold text-primary-dark" : "text-muted hover:text-ink"}`}
+                className={`rounded-full px-4 py-2 text-sm font-semibold ${isActive(link.href) ? "bg-brand-tint text-primary" : "text-muted hover:text-ink"}`}
               >
                 {link.label}
               </Link>
             ))}
-            <Link href="/login" onClick={() => setMenuOpen(false)} className="text-sm uppercase tracking-widest text-primary-dark">Admin</Link>
+            <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full px-4 py-2 text-sm font-semibold text-primary">Admin</Link>
           </div>
         </div>
       )}

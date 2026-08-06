@@ -10,6 +10,7 @@ const config: Config = {
         accent: "var(--brand)",
         "accent-dark": "var(--brand-strong)",
         "primary-tint": "var(--brand-tint)",
+        "brand-tint": "var(--brand-tint)",
         canvas: "var(--canvas)",
         surface: "var(--surface)",
         ink: "var(--ink)",
@@ -18,6 +19,8 @@ const config: Config = {
         success: "var(--success)",
         warning: "#F59E0B",
         error: "#DC2626",
+        gold: "#f5b04b",
+        accent2: "var(--cyan)",
         sidebar: {
           bg: "var(--sidebar-bg)",
           surface: "var(--sidebar-surface)",
@@ -39,7 +42,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "Manrope", "system-ui", "sans-serif"],
-        display: ["var(--font-kufam)", "Kufam", "Inter", "serif"],
+        display: ["var(--font-grotesk)", "Space Grotesk", "system-ui", "sans-serif"],
+        serif: ["Georgia", "serif"],
       },
     },
   },

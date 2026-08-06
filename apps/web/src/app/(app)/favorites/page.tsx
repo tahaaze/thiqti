@@ -78,12 +78,11 @@ export default function FavoritesPage() {
     <div className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-ink flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/40 bg-primary/10">
-              <FavHeart className="h-5 w-5 text-red-600 fill-red-600" />
-            </span>
-            Mes favoris
-          </h1>
+          <div className="flex items-center gap-3">
+            <span className="font-display text-sm font-bold text-primary">Sélection</span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+          <h1 className="font-display mt-4 text-4xl font-bold text-ink">Mes favoris</h1>
           <p className="mt-2 text-muted">{loadedRef.current ? `${favorites.length} véhicule(s) sauvegardé(s)` : "Chargement..."}</p>
         </div>
 

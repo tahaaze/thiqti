@@ -218,11 +218,11 @@ export default function ResultsPage() {
     <div className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
-            <Search className="h-3.5 w-3.5" />
-            Catalogue marocain réel
-          </span>
-          <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-ink">Résultats de recherche</h1>
+          <div className="flex items-center gap-3">
+            <span className="font-display text-sm font-bold text-primary">Recherche</span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+          <h1 className="font-display mt-4 text-4xl font-bold text-ink">Résultats de recherche</h1>
           <p className="mt-2 text-muted">{loading ? "Analyse en cours..." : `${cars.length} véhicules trouvés`}</p>
         </div>
 

@@ -42,11 +42,15 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="glass-card p-8">
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/40 bg-gradient-to-br from-[#f3d9a3] to-[#d4a94a] shadow-[0_0_28px_rgba(196,128,46,0.25)]">
-              <ThiqtiShield className="h-8 w-8 text-[#241505]" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center border border-ink bg-ink text-canvas">
+              <ThiqtiShield className="h-8 w-8" />
             </div>
             <h1 className="font-display text-4xl font-bold text-ink">Thiqti<span className="text-primary">.</span></h1>
-            <p className="text-muted mt-2 uppercase tracking-widest text-xs font-semibold">Administration</p>
+            <div className="mx-auto mt-3 flex items-center gap-3">
+              <span className="h-px w-8 bg-line" />
+              <p className="uppercase tracking-widest text-xs font-bold text-muted">Administration</p>
+              <span className="h-px w-8 bg-line" />
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -82,7 +86,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="bg-red-500/10 text-red-600 text-sm px-4 py-2.5 rounded-lg border border-red-500/20">
+              <div className="border border-red-500/20 bg-red-500/10 text-red-600 text-sm px-4 py-2.5">
                 {error}
               </div>
             )}

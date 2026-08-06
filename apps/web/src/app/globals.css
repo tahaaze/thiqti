@@ -1,26 +1,28 @@
-@import url("https://fonts.googleapis.com/css2?family=Kufam:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --canvas: #f6f7f9;
+  /* Verre clair futuriste — accents indigo → cyan sur fond lumineux */
+  --canvas: #eef1fb;
   --surface: #ffffff;
-  --ink: #1c1e22;
-  --muted: #6b7280;
-  --line: #e5e7eb;
-  --brand: #c4802e;
-  --brand-strong: #a86318;
-  --brand-tint: #fbf3e4;
+  --ink: #0d1230;
+  --muted: #5d6690;
+  --line: rgba(13, 18, 48, 0.1);
+  --brand: #6d5dfc;
+  --brand-strong: #4b39f5;
+  --brand-tint: rgba(109, 93, 252, 0.1);
+  --cyan: #22a9f0;
   --success: #16a34a;
-  /* Sidebar sombre de l'espace app */
-  --sidebar-bg: #17130e;
-  --sidebar-surface: #221c14;
-  --sidebar-ink: #f2ebdd;
-  --sidebar-muted: #a79c87;
-  --sidebar-line: rgba(196, 128, 46, 0.18);
-  --sidebar-hover: rgba(196, 128, 46, 0.12);
-  --sidebar-accent: #e8c178;
+  /* Volet latéral — verre clair */
+  --sidebar-bg: rgba(240, 243, 252, 0.72);
+  --sidebar-surface: rgba(255, 255, 255, 0.6);
+  --sidebar-ink: #0d1230;
+  --sidebar-muted: #5d6690;
+  --sidebar-line: rgba(13, 18, 48, 0.08);
+  --sidebar-hover: rgba(109, 93, 252, 0.1);
+  --sidebar-accent: #6d5dfc;
 }
 
 * {
@@ -37,107 +39,143 @@ body {
 }
 
 ::selection {
-  background: rgba(196, 128, 46, 0.22);
+  background: rgba(109, 93, 252, 0.2);
   color: var(--ink);
-}
-
-/* Motif zellige marocain très léger (décoration de fond) */
-.zellige-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23C4802E' stroke-opacity='0.5' stroke-width='1'%3E%3Cpath d='M36 8 L44 28 L64 36 L44 44 L36 64 L28 44 L8 36 L28 28 Z'/%3E%3Ccircle cx='36' cy='36' r='4'/%3E%3Cpath d='M0 0 L72 72 M72 0 L0 72'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 @layer components {
   .font-display {
-    font-family: "Kufam", "Inter", serif;
-    letter-spacing: 0.01em;
+    font-family: "Space Grotesk", "Manrope", system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  /* Surtitre minimal : label uppercase + tiret dégradé */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brand-strong);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--brand), var(--cyan));
+  }
+  .rule {
+    height: 1px;
+    background: rgba(13, 18, 48, 0.08);
+    border: none;
   }
   .glass {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--line);
-    box-shadow: 0 1px 2px rgba(28, 30, 34, 0.04), 0 8px 24px -12px rgba(28, 30, 34, 0.12);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px rgba(13, 18, 48, 0.08);
   }
   .glass-card {
     position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    box-shadow: 0 1px 2px rgba(28, 30, 34, 0.05), 0 4px 12px rgba(28, 30, 34, 0.04);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(13, 18, 48, 0.08);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   }
   .glass-card:hover {
-    border-color: rgba(196, 128, 46, 0.35);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(28, 30, 34, 0.09), 0 0 0 1px rgba(196, 128, 46, 0.05);
+    border-color: rgba(109, 93, 252, 0.45);
+    box-shadow: 0 12px 40px rgba(109, 93, 252, 0.14);
+    transform: translateY(-2px);
   }
   .gold-hairline {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(196, 128, 46, 0.45), transparent);
+    background: linear-gradient(90deg, transparent, rgba(109, 93, 252, 0.5), transparent);
   }
   .gradient-text {
-    background: linear-gradient(120deg, #b57322 0%, #c98d3a 45%, #9a5c14 70%, #b57322 100%);
-    background-size: 200% auto;
+    background: linear-gradient(120deg, #6d5dfc 0%, #22a9f0 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: shimmer 4s linear infinite;
   }
   .btn-primary,
   .btn-accent {
-    background: var(--brand);
-    color: #241505;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #6d5dfc, #4b39f5);
+    color: #ffffff;
     font-weight: 700;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
+    font-size: 0.85rem;
+    padding: 0.8rem 1.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 24px rgba(109, 93, 252, 0.35);
     transition: all 0.2s ease;
-    border: none;
     cursor: pointer;
-    font-size: 0.95rem;
-    box-shadow: 0 2px 10px rgba(196, 128, 46, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
   .btn-primary:hover,
   .btn-accent:hover {
-    background: var(--brand-strong);
+    filter: brightness(1.08);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(196, 128, 46, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    box-shadow: 0 10px 30px rgba(109, 93, 252, 0.45);
   }
   .btn-secondary {
-    background: var(--surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.6);
     color: var(--ink);
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.8rem 1.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(13, 18, 48, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     transition: all 0.2s ease;
-    font-size: 0.95rem;
-    box-shadow: 0 1px 2px rgba(28, 30, 34, 0.04);
+    cursor: pointer;
   }
   .btn-secondary:hover {
-    background: var(--brand-tint);
     border-color: var(--brand);
     color: var(--brand-strong);
-    transform: translateY(-1px);
   }
   .btn-gold {
-    background: var(--brand);
-    color: #241505;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #f5b04b, #ff8a5c);
+    color: #ffffff;
     font-weight: 700;
-    border: none;
-    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.8rem 1.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(245, 176, 75, 0.35);
     transition: all 0.2s ease;
-    box-shadow: 0 2px 10px rgba(196, 128, 46, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    cursor: pointer;
   }
   .btn-gold:hover {
-    background: var(--brand-strong);
+    filter: brightness(1.05);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(196, 128, 46, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.28);
   }
   .chip {
-    background: var(--surface);
-    border: 1px solid rgba(196, 128, 46, 0.22);
-    color: var(--brand);
-    padding: 0.5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(13, 18, 48, 0.08);
+    color: var(--ink);
+    padding: 0.55rem 1.05rem;
     border-radius: 999px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -145,20 +183,22 @@ body {
     cursor: pointer;
   }
   .chip:hover {
-    background: var(--brand-tint);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(109, 93, 252, 0.5);
     color: var(--brand-strong);
-    border-color: var(--brand);
   }
   .segmented {
     display: inline-flex;
-    background: #eef0f3;
-    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(13, 18, 48, 0.1);
     border-radius: 999px;
     padding: 4px;
     gap: 2px;
   }
   .segmented-item {
-    padding: 0.5rem 1.25rem;
+    padding: 0.5rem 1.15rem;
     border-radius: 999px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -172,27 +212,27 @@ body {
     color: var(--ink);
   }
   .segmented-item.active {
-    background: var(--surface);
-    color: var(--brand-strong);
-    font-weight: 700;
-    border: 1px solid var(--line);
-    box-shadow: 0 1px 4px rgba(28, 30, 34, 0.1);
+    background: linear-gradient(135deg, #6d5dfc, #4b39f5);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(109, 93, 252, 0.35);
   }
   .badge-new {
-    background: rgba(22, 163, 74, 0.1);
-    border: 1px solid rgba(22, 163, 74, 0.3);
+    background: rgba(22, 163, 74, 0.12);
+    border: 1px solid rgba(22, 163, 74, 0.35);
     color: #15803d;
   }
   .badge-used {
-    background: var(--brand-tint);
-    border: 1px solid rgba(196, 128, 46, 0.35);
+    background: rgba(109, 93, 252, 0.12);
+    border: 1px solid rgba(109, 93, 252, 0.4);
     color: var(--brand-strong);
   }
   .input-field {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(13, 18, 48, 0.1);
+    border-radius: 999px;
+    padding: 0.8rem 1.1rem;
     color: var(--ink);
     font-size: 0.95rem;
     transition: all 0.2s ease;
@@ -201,46 +241,42 @@ body {
   }
   .input-field:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(196, 128, 46, 0.15);
+    box-shadow: 0 0 0 4px rgba(109, 93, 252, 0.12);
   }
   .input-field::placeholder {
-    color: #9ca3af;
+    color: #8a91b8;
   }
   /* Utilitaires alpha sur jetons CSS (Tailwind 3.4 ne calcule pas l'opacité sur var()) */
-  .bg-primary\/5 { background-color: rgba(196, 128, 46, 0.05); }
-  .bg-primary\/10 { background-color: rgba(196, 128, 46, 0.1); }
-  .bg-primary\/15 { background-color: rgba(196, 128, 46, 0.15); }
-  .bg-primary\/20 { background-color: rgba(196, 128, 46, 0.2); }
-  .hover\:bg-primary\/10:hover { background-color: rgba(196, 128, 46, 0.1); }
-  .hover\:bg-primary\/15:hover { background-color: rgba(196, 128, 46, 0.15); }
-  .hover\:bg-primary\/20:hover { background-color: rgba(196, 128, 46, 0.2); }
-  .bg-line\/60 { background-color: rgba(229, 231, 235, 0.6); }
-  .bg-muted\/10 { background-color: rgba(107, 114, 128, 0.1); }
-  .bg-muted\/20 { background-color: rgba(107, 114, 128, 0.2); }
-  .hover\:bg-muted\/10:hover { background-color: rgba(107, 114, 128, 0.1); }
-  .hover\:bg-muted\/20:hover { background-color: rgba(107, 114, 128, 0.2); }
+  .bg-primary\/5 { background-color: rgba(109, 93, 252, 0.05); }
+  .bg-primary\/10 { background-color: rgba(109, 93, 252, 0.1); }
+  .bg-primary\/15 { background-color: rgba(109, 93, 252, 0.15); }
+  .bg-primary\/20 { background-color: rgba(109, 93, 252, 0.2); }
+  .hover\:bg-primary\/10:hover { background-color: rgba(109, 93, 252, 0.1); }
+  .hover\:bg-primary\/15:hover { background-color: rgba(109, 93, 252, 0.15); }
+  .hover\:bg-primary\/20:hover { background-color: rgba(109, 93, 252, 0.2); }
+  .bg-line\/60 { background-color: rgba(13, 18, 48, 0.06); }
+  .bg-muted\/10 { background-color: rgba(93, 102, 144, 0.1); }
+  .bg-muted\/20 { background-color: rgba(93, 102, 144, 0.18); }
+  .hover\:bg-muted\/10:hover { background-color: rgba(93, 102, 144, 0.1); }
+  .hover\:bg-muted\/20:hover { background-color: rgba(93, 102, 144, 0.18); }
   .bg-surface\/85 { background-color: rgba(255, 255, 255, 0.85); }
-  .text-muted\/10 { color: rgba(107, 114, 128, 0.1); }
-  .border-primary\/20 { border-color: rgba(196, 128, 46, 0.2); }
-  .border-primary\/30 { border-color: rgba(196, 128, 46, 0.3); }
-  .border-primary\/40 { border-color: rgba(196, 128, 46, 0.4); }
-  .border-primary\/50 { border-color: rgba(196, 128, 46, 0.5); }
-  .hover\:border-primary\/40:hover { border-color: rgba(196, 128, 46, 0.4); }
+  .text-muted\/10 { color: rgba(93, 102, 144, 0.1); }
+  .border-primary\/20 { border-color: rgba(109, 93, 252, 0.2); }
+  .border-primary\/30 { border-color: rgba(109, 93, 252, 0.3); }
+  .border-primary\/40 { border-color: rgba(109, 93, 252, 0.4); }
+  .border-primary\/50 { border-color: rgba(109, 93, 252, 0.5); }
+  .hover\:border-primary\/40:hover { border-color: rgba(109, 93, 252, 0.4); }
 }
 
 /* Règles hors @layer : certains variants disparaissaient dans le minifier (lightningcss) */
-.hover\:bg-ink\/5:hover { background-color: rgba(28, 30, 34, 0.05); }
-.focus\:ring-primary\/50:focus { --tw-ring-color: rgba(196, 128, 46, 0.5); }
+.hover\:bg-ink\/5:hover { background-color: rgba(13, 18, 48, 0.05); }
+.focus\:ring-primary\/50:focus { --tw-ring-color: rgba(109, 93, 252, 0.5); }
 
 /* Icônes Lucide : un seul poids de trait, cohérent avec les SVG maison */
 svg {
   stroke-width: 1.5;
 }
 
-@keyframes shimmer {
-  0%, 100% { background-position: 0% center; }
-  50% { background-position: 200% center; }
-}
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -260,6 +296,6 @@ svg {
 .animate-float-slow { animation: float-slow 7s ease-in-out infinite; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--canvas); }
-::-webkit-scrollbar-thumb { background: #cbd2dc; border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(109, 93, 252, 0.35); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--brand); }

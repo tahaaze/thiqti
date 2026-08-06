@@ -5,7 +5,6 @@ import Link from "next/link";
 import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight, ExternalLink } from "lucide-react";
 import { ThiqtiShield, ZelligeStar } from "@/components/icons";
 import CarImage from "@/components/CarImage";
-import SellerContact from "@/components/SellerContact";
 import VoiceInput from "@/components/VoiceInput";
 import { addHistory } from "@/lib/history";
 import {
@@ -64,17 +63,13 @@ function InventoryBadge({ type }: { type?: "new" | "used" }) {
   const isNew = type === "new";
   return (
     <span
-      className={`rounded-md px-2 py-1 text-xs font-semibold backdrop-blur ${
-        isNew ? "bg-green-500/20 text-green-800" : "bg-amber-500/20 text-amber-800"
+      className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur ${
+        isNew ? "bg-green-500/80 text-white" : "bg-amber-500/80 text-white"
       }`}
     >
       {isNew ? "Neuf" : "Occasion"}
     </span>
   );
-}
-
-function carTagline(car: { bodyType?: string; fuel?: string; year?: number; city?: string }) {
-  return [car.bodyType, car.fuel, car.year, car.city].filter(Boolean).join(" · ");
 }
 
 export default function ChatAssistant({
@@ -200,16 +195,16 @@ export default function ChatAssistant({
 
   return (
     <div className="w-full">
-      <div className={`glass flex ${heightClassName} flex-col overflow-hidden rounded-3xl shadow-2xl shadow-primary/10`}>
+      <div className={`glass flex ${heightClassName} flex-col overflow-hidden`}>
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-line px-5 py-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/50 bg-gradient-to-br from-[#eed9a1] to-[#c2923d] shadow-[0_0_18px_rgba(196,128,46,0.3)]">
-            <CarFront className="h-5 w-5 text-[#1b1406]" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#6d5dfc] to-[#22a9f0] text-white shadow-[0_4px_16px_rgba(109,93,252,0.4)]">
+            <CarFront className="h-5 w-5" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="font-display text-lg font-bold leading-tight tracking-tight text-ink">
-                Assistant <span className="text-primary">Thiqti</span>
+              <h2 className="font-display text-xl font-bold leading-tight text-ink">
+                Assistant <span className="gradient-text">Thiqti</span>
               </h2>
               <span className="flex h-2 w-2 items-center justify-center">
                 <span className="absolute h-2 w-2 animate-ping rounded-full bg-green-400 opacity-75" />
@@ -218,7 +213,7 @@ export default function ChatAssistant({
             </div>
             <p className="text-xs text-muted">Votre conseiller auto — décrivez votre envie</p>
           </div>
-          <button onClick={reset} className="flex items-center gap-1 rounded-lg border border-line px-3 py-1.5 text-xs text-muted transition hover:text-ink" title="Recommencer">
+          <button onClick={reset} className="btn-secondary flex items-center gap-1.5" title="Recommencer">
             <RefreshCw className="h-3.5 w-3.5" />
             Nouvelle recherche
           </button>
@@ -226,14 +221,10 @@ export default function ChatAssistant({
 
         {/* Recommandations contextualisées */}
         <div className="border-b border-line px-5 py-3">
-          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
-            <Sparkles className="h-3 w-3 text-primary" />
-            Recommandations
-          </div>
           {chips.length > 0 ? (
             <>
-              <p className="mt-1 text-xs text-primary">
-                D&apos;après vos critères : {criteriaLine(botState)}
+              <p className="text-xs text-muted">
+                D&apos;après vos critères : <span className="text-primary">{criteriaLine(botState)}</span>
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {chips.map((chip) => (
@@ -242,7 +233,7 @@ export default function ChatAssistant({
               </div>
             </>
           ) : (
-            <p className="mt-1 text-xs text-muted">Aucun critère pour l&apos;instant — décrivez votre envie.</p>
+            <p className="text-xs text-muted">Aucun critère pour l&apos;instant — décrivez votre envie.</p>
           )}
         </div>
 
@@ -251,16 +242,16 @@ export default function ChatAssistant({
         {messages.map((m) =>
           m.role === "bot" ? (
             <div key={m.id} className="flex gap-2.5 animate-fade-in">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#eed9a1] to-[#c2923d] text-[#1b1406]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6d5dfc]/15 to-[#22a9f0]/15 text-primary">
                 <Sparkles className="h-4 w-4" />
               </div>
-              <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-line bg-surface px-4 py-3 text-sm leading-relaxed whitespace-pre-line text-ink">
+              <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-white/70 bg-white/70 px-4 py-3 text-sm leading-relaxed whitespace-pre-line text-ink shadow-[0_2px_12px_rgba(13,18,48,0.06)] backdrop-blur">
                 {m.text}
               </div>
             </div>
           ) : (
             <div key={m.id} className="flex justify-end animate-fade-in">
-              <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-[#eed9a1] to-[#c2923d] px-4 py-3 text-sm leading-relaxed text-[#1b1406] shadow-[0_2px_16px_rgba(212,169,74,0.35)]">
+              <div className="max-w-[85%] rounded-2xl rounded-tr-md bg-gradient-to-br from-[#6d5dfc] to-[#22a9f0] px-4 py-3 text-sm leading-relaxed text-white shadow-[0_4px_16px_rgba(109,93,252,0.35)]">
                 {m.text}
               </div>
             </div>
@@ -269,10 +260,10 @@ export default function ChatAssistant({
 
         {searching && (
           <div className="flex gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#eed9a1] to-[#c2923d] text-[#1b1406]">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6d5dfc]/15 to-[#22a9f0]/15 text-primary">
               <Sparkles className="h-4 w-4" />
             </div>
-            <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm border border-line bg-surface px-4 py-3">
+            <div className="flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-3 backdrop-blur">
               <span className="h-2 w-2 animate-bounce rounded-full bg-primary" />
               <span className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:150ms]" />
               <span className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:300ms]" />
@@ -290,7 +281,7 @@ export default function ChatAssistant({
               <>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {visibleResults?.map((car) => (
-                    <div key={car.id} className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface transition hover:border-primary/40">
+                    <div key={car.id} className="group flex flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-[0_2px_12px_rgba(13,18,48,0.06)] backdrop-blur transition hover:shadow-[0_8px_24px_rgba(109,93,252,0.15)]">
                       <Link href={`/vehicle/${car.id}`} className="flex-1">
                         <div className="relative h-32 overflow-hidden">
                         <CarImage src={car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
@@ -300,7 +291,7 @@ export default function ChatAssistant({
                         </div>
                         {car.reputation?.verified && (
                           <div className="absolute bottom-2 left-2">
-                            <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-black/60 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary backdrop-blur">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur">
                               <ThiqtiShield className="h-2.5 w-2.5" />
                               Vérifiée
                             </span>
@@ -310,7 +301,6 @@ export default function ChatAssistant({
                       <div className="p-3">
                         <h4 className="truncate text-sm font-semibold">{car.title}</h4>
                         <p className="mt-0.5 text-xs text-muted">{car.year} &middot; {car.km.toLocaleString("fr-FR")} km</p>
-                        <p className="mt-1 truncate text-[11px] text-muted">{carTagline(car)}</p>
                         <div className="mt-2 flex items-center justify-between">
                           <span className="font-display text-base font-bold text-primary">{car.priceFormatted}</span>
                           <span className="flex items-center gap-2">
@@ -321,9 +311,6 @@ export default function ChatAssistant({
                               <MapPin className="h-3 w-3" />{car.city}
                             </span>
                           </span>
-                        </div>
-                        <div className="mt-2">
-                          <SellerContact contact={car.contact} reputation={car.reputation} compact showButtons={false} />
                         </div>
                       </div>
                       </Link>
@@ -346,7 +333,7 @@ export default function ChatAssistant({
                 {visibleResults && visibleResults.length < results.length && (
                   <button
                     onClick={() => handleSend("Voir plus")}
-                    className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-primary/40 hover:text-ink"
+                    className="btn-secondary mt-3 flex w-full items-center justify-center gap-2"
                   >
                     Voir plus d&apos;options
                     <ArrowRight className="h-4 w-4" />
@@ -354,12 +341,12 @@ export default function ChatAssistant({
                 )}
               </>
             ) : (
-              <p className="rounded-2xl border border-line bg-surface p-4 text-sm text-muted">
+              <p className="rounded-2xl border border-white/70 bg-white/60 p-4 text-sm text-muted backdrop-blur">
                 Aucune correspondance exacte. Essayez d&apos;élargir le budget ou la carrosserie.
               </p>
             )}
             {results.length > 0 && (
-              <Link href={resultsUrl} className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/20">
+              <Link href={resultsUrl} className="btn-primary mt-3 flex items-center justify-center gap-2">
                 Voir tous les résultats
                 <ArrowRight className="h-4 w-4" />
               </Link>

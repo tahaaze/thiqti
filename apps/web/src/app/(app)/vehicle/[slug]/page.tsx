@@ -274,17 +274,17 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                     <p className="text-muted">{car.year} &middot; {car.km.toLocaleString()} km &middot; {car.fuel}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => setFav(!fav)} className="rounded-lg border border-line p-2 text-muted hover:text-red-600"><FavHeart className={`h-5 w-5 ${fav ? "fill-red-400 text-red-600" : ""}`} /></button>
-                    <button onClick={() => { navigator.clipboard.writeText(window.location.href); showToast("Lien copié !", "success"); }} className="rounded-lg border border-line p-2 text-muted hover:text-primary"><Share2 className="h-5 w-5" /></button>
+                    <button onClick={() => setFav(!fav)} className="border border-line p-2 text-muted hover:border-red-500 hover:text-red-600"><FavHeart className={`h-5 w-5 ${fav ? "fill-red-400 text-red-600" : ""}`} /></button>
+                    <button onClick={() => { navigator.clipboard.writeText(window.location.href); showToast("Lien copié !", "success"); }} className="border border-line p-2 text-muted hover:border-primary hover:text-primary"><Share2 className="h-5 w-5" /></button>
                   </div>
                 </div>
                 <p className="font-display mt-4 text-3xl font-bold text-primary">{car.priceFormatted}</p>
               </div>
             </div>
 
-            <div className="mt-6 flex gap-1 glass-card p-1">
+            <div className="mt-6 flex gap-1 border border-line bg-canvas p-1">
               {(["specs", "reputation", "offers"] as const).map((tab) => (
-                <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition ${activeTab === tab ? "btn-gold" : "text-muted hover:text-ink"}`}>
+                <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition ${activeTab === tab ? "bg-ink text-canvas" : "text-muted hover:text-ink"}`}>
                   {tab === "specs" ? "Caractéristiques" : tab === "reputation" ? "Réputation" : "Offres & Financement"}
                 </button>
               ))}
@@ -323,7 +323,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
               {activeTab === "reputation" && (
                 <div className="glass-card p-6">
                   {/* Réputation réelle de l'annonce (données lues sur la source) */}
-                  <div className="rounded-2xl border border-primary/20 bg-line/60 p-5">
+                  <div className="border border-line bg-line/60 p-5">
                     <h2 className="mb-3 flex items-center gap-2 text-base font-bold">
                       <ThiqtiShield className="h-5 w-5 text-primary" />
                       Réputation réelle de l&apos;annonce

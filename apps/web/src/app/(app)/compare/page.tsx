@@ -155,7 +155,7 @@ export default function ComparePage() {
     return (
       <div className="min-h-screen px-6 py-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8"><h1 className="font-display text-4xl font-bold tracking-tight text-ink">Comparaison</h1><p className="mt-2 text-muted">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
+          <div className="mb-8"><div className="flex items-center gap-3"><span className="font-display text-sm font-bold text-primary">Comparatif</span><span className="h-px flex-1 bg-line" /></div><h1 className="font-display mt-4 text-4xl font-bold text-ink">Comparaison</h1><p className="mt-2 text-muted">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
           <div className="glass-card p-12 text-center"><Loader className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" /><p className="text-muted">Chargement des véhicules...</p></div>
         </div>
       </div>
@@ -168,9 +168,10 @@ export default function ComparePage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <Link href="/results" className="rounded-lg p-2 text-muted hover:bg-ink/5 hover:text-ink"><ChevronLeft className="h-5 w-5" /></Link>
-              <h1 className="font-display text-4xl font-bold tracking-tight text-ink">Comparaison</h1>
+              <Link href="/results" className="border border-line p-2 text-muted hover:border-ink hover:text-ink"><ChevronLeft className="h-5 w-5" /></Link>
+              <span className="font-display text-sm font-bold text-primary">Comparatif</span>
             </div>
+            <h1 className="font-display mt-3 text-4xl font-bold text-ink">Comparaison</h1>
             <p className="mt-2 text-muted">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p>
           </div>
         </div>

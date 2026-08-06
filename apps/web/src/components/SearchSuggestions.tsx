@@ -53,7 +53,7 @@ export default function SearchSuggestions({ query, onSelect }: SearchSuggestions
         <button
           key={suggestion}
           onClick={() => onSelect(suggestion)}
-          className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+          className="border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
         >
           {suggestion}
         </button>
