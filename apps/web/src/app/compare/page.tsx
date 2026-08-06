@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { X, Star, Loader, BadgeCheck, AlertTriangle, ThumbsUp, Wallet, Gauge, Calendar, Brain, ChevronLeft, Heart, Fuel, MapPin, CarFront, SlidersHorizontal, Hash } from "lucide-react";
+import { X, Star, Loader, BadgeCheck, AlertTriangle, ThumbsUp, Wallet, Gauge, Calendar, Brain, ChevronLeft, Heart, Fuel, MapPin, CarFront, SlidersHorizontal, Hash, ShieldCheck } from "lucide-react";
 import CarImage from "@/components/CarImage";
+import SellerContact from "@/components/SellerContact";
 
 interface CarListing {
   id: string;
@@ -19,10 +20,26 @@ interface CarListing {
   bodyType?: string;
   city: string;
   image: string;
+  photos?: string[];
   score: number;
   source: string;
   url: string;
   matchPercent?: number;
+  inventoryType?: "new" | "used";
+  safety?: { stars: number; ratingYear?: number; source?: string } | null;
+  contact?: {
+    name?: string;
+    phone?: string;
+    phoneHref?: string;
+    whatsappHref?: string;
+    url?: string;
+  };
+  reputation?: {
+    verified?: boolean;
+    trustBadge?: boolean;
+    views?: number;
+    label?: string;
+  };
 }
 
 const MAX_COMPARE = 3;
@@ -36,6 +53,7 @@ const SPECS: { label: string; format: (v: CarListing) => string; icon: React.Com
   { label: "Carrosserie", format: (v) => v.bodyType || "—", icon: CarFront, compare: "higher" },
   { label: "Ville", format: (v) => v.city, icon: MapPin, compare: "higher" },
   { label: "Score IA", format: (v) => `${v.score}/100`, icon: Star, compare: "higher" },
+  { label: "Sécurité", format: (v) => v.safety ? `${v.safety.stars}★` : "Non évalué", icon: ShieldCheck, compare: "higher" },
   { label: "Match %", format: (v) => v.matchPercent !== undefined ? `${v.matchPercent}%` : "—", icon: Hash, compare: "higher" },
 ];
 
@@ -136,7 +154,7 @@ export default function ComparePage() {
     return (
       <div className="min-h-screen px-6 py-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8"><h1 className="text-3xl font-bold">Comparaison</h1><p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
+          <div className="mb-8"><h1 className="font-display text-4xl font-bold tracking-tight text-white">Comparaison</h1><p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
           <div className="glass-card p-12 text-center"><Loader className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" /><p className="text-gray-400">Chargement des véhicules...</p></div>
         </div>
       </div>
@@ -150,7 +168,7 @@ export default function ComparePage() {
           <div>
             <div className="flex items-center gap-3">
               <Link href="/results" className="rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-white"><ChevronLeft className="h-5 w-5" /></Link>
-              <h1 className="text-3xl font-bold">Comparaison</h1>
+              <h1 className="font-display text-4xl font-bold tracking-tight text-white">Comparaison</h1>
             </div>
             <p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p>
           </div>
@@ -172,9 +190,12 @@ export default function ComparePage() {
                 {selected.map((v) => (
                   <th key={v.id} className="relative p-4 text-center min-w-[200px]">
                     <button onClick={() => removeCar(v.id)} className="absolute right-2 top-2 rounded-lg p-1 text-gray-500 hover:bg-red-500/10 hover:text-red-400"><X className="h-4 w-4" /></button>
-                    <CarImage src={v.image} alt={v.title} make={v.make} model={v.model} className="mx-auto h-24 w-40 rounded-lg object-cover" />
+                    <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="mx-auto h-24 w-40 rounded-lg object-cover" />
                     <p className="mt-2 font-semibold text-sm">{v.title}</p>
-                    <Link href={`/vehicle/${v.id}`} className="mt-1 inline-block text-xs text-primary hover:underline">Voir détails</Link>
+                    <div className="mt-1 flex items-center justify-center gap-2">{v.inventoryType && <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>{v.inventoryType === "new" ? "Neuf" : "Occasion"}</span>}<Link href={`/vehicle/${v.id}`} className="inline-block text-xs text-primary hover:underline">Voir détails</Link></div>
+                    <div className="mt-1 flex justify-center">
+                      <SellerContact contact={v.contact} reputation={v.reputation} compact />
+                    </div>
                   </th>
                 ))}
                 {Array.from({ length: MAX_COMPARE - selected.length }).map((_, i) => (

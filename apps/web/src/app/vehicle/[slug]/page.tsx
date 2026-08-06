@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, FormEvent } from "react";
 import Link from "next/link";
-import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Clock, TrendingUp, TrendingDown, Brain, BadgeCheck, Info } from "lucide-react";
+import { Star, MapPin, Fuel, Gauge, Calendar, Shield, ChevronLeft, Heart, Share2, CheckCircle2, MessageSquare, AlertTriangle, Clock, TrendingUp, TrendingDown, Brain, BadgeCheck, Info, Globe, ExternalLink, Facebook, Instagram, Newspaper, Store, ShieldCheck } from "lucide-react";
 import CarImage from "@/components/CarImage";
+import SafetyBadge, { safetyLabelOf } from "@/components/SafetyBadge";
+import SellerContact from "@/components/SellerContact";
 import { useToast } from "@/components/Toast";
 
 interface CarListing {
@@ -17,10 +19,28 @@ interface CarListing {
   km: number;
   fuel: string;
   city: string;
+  transmission?: string;
   image: string;
   score: number;
   source: string;
   url: string;
+  inventoryType?: "new" | "used";
+  bodyType?: string;
+  photos?: string[];
+  safety?: { stars: number; ratingYear?: number; source?: string; className?: string } | null;
+  contact?: {
+    name?: string;
+    phone?: string;
+    phoneHref?: string;
+    whatsappHref?: string;
+    url?: string;
+  };
+  reputation?: {
+    verified?: boolean;
+    trustBadge?: boolean;
+    views?: number;
+    label?: string;
+  };
 }
 
 interface ReputationData {
@@ -37,6 +57,45 @@ interface ReputationData {
   volume: { total: number; positive: number; negative: number; neutral: number };
   reliability: "elevee" | "moyenne" | "faible";
   reliabilityLabel: string;
+  maroc: MarocReputationData | null;
+}
+
+interface MarocSourceData {
+  label: string;
+  url: string;
+  note?: string;
+  verifiedAt?: string;
+}
+
+interface MarocSocialData {
+  network: string;
+  label: string;
+  url: string;
+  followers?: number;
+  verifiedAt?: string;
+}
+
+interface MarocTestData {
+  model: string;
+  title: string;
+  url: string;
+  verdict?: string;
+  verifiedAt?: string;
+}
+
+interface MarocBrandData {
+  make: string;
+  distributor?: string;
+  officialSite?: MarocSourceData | null;
+  resellers?: MarocSourceData | null;
+  socials: MarocSocialData[];
+  tests: MarocTestData[];
+  verifiedAt: string;
+}
+
+interface MarocReputationData {
+  brand: MarocBrandData | null;
+  tests: MarocTestData[];
 }
 
 const MIN_REVIEWS = 30;
@@ -54,6 +113,11 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   const [error, setError] = useState(false);
   const [reputation, setReputation] = useState<ReputationData | null>(null);
   const [loadingRep, setLoadingRep] = useState(false);
+  const [mainImg, setMainImg] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [reviewScore, setReviewScore] = useState(8);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
   const { showToast } = useToast();
   const favLoadedRef = useRef(false);
 
@@ -68,6 +132,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
           const found = data.results.find((c: CarListing) => c.id === slug);
           if (found) {
             setCar(found);
+            setMainImg(found.image);
           } else {
             setError(true);
           }
@@ -101,6 +166,42 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
     localStorage.setItem("thiqti_favorites", JSON.stringify(updated));
   }, [fav, car]);
 
+  async function submitReview(e: FormEvent) {
+    e.preventDefault();
+    if (!car || reviewText.trim().length < 5) {
+      setReviewError("Merci d'écrire un avis d'au moins 5 caractères.");
+      return;
+    }
+    setReviewSubmitting(true);
+    setReviewError(null);
+    try {
+      const res = await fetch("/api/reputation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          make: car.make,
+          model: car.model,
+          year: car.year,
+          fuel: car.fuel,
+          bodyType: car.bodyType,
+          transmission: car.transmission,
+          text: reviewText.trim(),
+          score: reviewScore,
+          sentiment: reviewScore >= 7 ? "positive" : reviewScore <= 4 ? "negative" : "neutral",
+        }),
+      });
+      if (!res.ok) throw new Error("Envoi impossible");
+      const data = await res.json();
+      setReputation(data);
+      setReviewText("");
+      showToast("Merci, votre avis a été enregistré !", "success");
+    } catch {
+      setReviewError("Impossible d'enregistrer l'avis. Réessayez plus tard.");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }
+
   if (error)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
@@ -130,13 +231,42 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
           <div className="flex-1">
             <div className="glass-card overflow-hidden">
               <div className="relative h-72">
-                <CarImage src={car.image} alt={car.title} make={car.make} model={car.model} className="h-full w-full object-cover" />
-                <div className="absolute left-3 top-3"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{car.source}</span></div>
+                <CarImage src={mainImg || car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute left-3 top-3 flex gap-2">
+                  <span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{car.source}</span>
+                  {car.inventoryType && (
+                    <span className={`rounded-lg px-2 py-1 text-xs font-semibold backdrop-blur ${car.inventoryType === "new" ? "badge-new" : "badge-used"}`}>
+                      {car.inventoryType === "new" ? "Neuf" : "Occasion"}
+                    </span>
+                  )}
+                </div>
+                {car.reputation?.verified && (
+                  <div className="absolute bottom-3 left-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/50 bg-black/70 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary backdrop-blur">
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Annonce vérifiée
+                    </span>
+                  </div>
+                )}
               </div>
+              {car.photos && car.photos.length > 1 && (
+                <div className="flex gap-2 border-t border-white/5 p-3">
+                  {car.photos.slice(0, 5).map((photo, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setMainImg(photo)}
+                      className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg transition ${photo === mainImg ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100"}`}
+                    >
+                      <CarImage src={photo} sources={car.photos} alt={`${car.title} ${i + 1}`} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="p-6">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold">{car.title}</h1>
+                    <h1 className="font-display text-2xl font-bold text-white md:text-3xl">{car.title}</h1>
                     <p className="text-gray-400">{car.year} &middot; {car.km.toLocaleString()} km &middot; {car.fuel}</p>
                   </div>
                   <div className="flex gap-2">
@@ -144,13 +274,13 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                     <button onClick={() => { navigator.clipboard.writeText(window.location.href); showToast("Lien copié !", "success"); }} className="rounded-lg border border-white/10 p-2 text-gray-400 hover:text-primary"><Share2 className="h-5 w-5" /></button>
                   </div>
                 </div>
-                <p className="mt-4 text-3xl font-extrabold text-primary">{car.priceFormatted}</p>
+                <p className="font-display mt-4 text-3xl font-bold text-primary">{car.priceFormatted}</p>
               </div>
             </div>
 
             <div className="mt-6 flex gap-1 glass-card p-1">
               {(["specs", "reputation", "offers"] as const).map((tab) => (
-                <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 rounded-xl py-2.5 text-sm font-medium transition ${activeTab === tab ? "bg-primary text-white" : "text-gray-400 hover:text-white"}`}>
+                <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition ${activeTab === tab ? "btn-gold" : "text-gray-400 hover:text-white"}`}>
                   {tab === "specs" ? "Caractéristiques" : tab === "reputation" ? "Réputation" : "Offres & Financement"}
                 </button>
               ))}
@@ -173,6 +303,15 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                         <p className="font-semibold">{s.value}</p>
                       </div>
                     ))}
+                  </div>
+
+                  <div className="mt-4 rounded-xl bg-dark-800/50 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs text-gray-500">Sécurité au crash test</p>
+                      <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">{car.safety?.className || ""}</span>
+                    </div>
+                    <SafetyBadge safety={car.safety} full size={16} />
+                    <p className="mt-2 text-xs text-gray-500">{safetyLabelOf(car.safety)}</p>
                   </div>
                 </div>
               )}
@@ -197,6 +336,57 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                   ) : (
                     <ReputationSummary reputation={reputation} />
                   )}
+
+                  <div className="mt-6 border-t border-white/5 pt-6">
+                    <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                      Donner votre avis
+                    </h3>
+                    <form onSubmit={submitReview} className="space-y-3">
+                      <div>
+                        <p className="mb-2 text-xs text-gray-500">Votre note sur 10</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => setReviewScore(n)}
+                              className={`h-9 w-9 rounded-lg text-xs font-bold transition ${reviewScore === n ? "btn-gold" : "bg-dark-800/50 text-gray-400 hover:text-white"}`}
+                            >
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <textarea
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        rows={3}
+                        maxLength={1000}
+                        placeholder="Votre expérience avec ce modèle (fiabilité, consommation, confort, points forts/faibles...)"
+                        className="w-full rounded-xl bg-dark-800/50 px-3 py-2.5 text-sm outline-none ring-1 ring-white/5 focus:ring-primary/50"
+                      />
+                      {reviewError && <p className="text-xs text-red-400">{reviewError}</p>}
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="submit"
+                          disabled={reviewSubmitting}
+                          className="btn-gold rounded-xl px-4 py-2.5 text-sm"
+                        >
+                          {reviewSubmitting ? "Envoi en cours..." : "Publier mon avis"}
+                        </button>
+                        {reputation && (
+                          <span className="text-[11px] text-gray-500">
+                            Aujourd&apos;hui : {reputation.volume.total} avis collectés sur {MIN_REVIEWS}
+                          </span>
+                        )}
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="mt-6 border-t border-white/5 pt-6">
+                    <MarocReputationBlock maroc={reputation?.maroc ?? null} make={car.make} />
+                  </div>
                 </div>
               )}
 
@@ -247,10 +437,127 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                 <Heart className={`h-4 w-4 ${fav ? "fill-red-400 text-red-400" : ""}`} />
                 {fav ? "Retirer des favoris" : "Ajouter aux favoris"}
               </button>
+
+              {(car.contact && (car.contact.phoneHref || car.contact.whatsappHref || car.contact.url)) || (car.reputation && (car.reputation.verified || car.reputation.trustBadge || car.reputation.label)) ? (
+                <div className="glass-card p-5 border-primary/30">
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/30">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                    </div>
+                    <h3 className="font-display text-base font-bold text-white">Contacter le vendeur</h3>
+                  </div>
+                  {car.reputation?.verified && (
+                    <p className="mb-2 inline-flex items-center gap-1 rounded-full border border-green-500/40 bg-green-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-green-400">
+                      <ShieldCheck className="h-3 w-3" />
+                      {car.reputation.label || "Annonce vérifiée"}
+                    </p>
+                  )}
+                  {car.contact?.name && (
+                    <p className="mb-3 text-xs text-gray-500">Vendeur : <span className="text-gray-300">{car.contact.name}</span></p>
+                  )}
+                  {car.contact?.phone && (
+                    <p className="mb-3 text-sm text-gray-300">Tél : <a href={car.contact.phoneHref} className="font-semibold text-primary hover:underline">{car.contact.phone}</a></p>
+                  )}
+                  <SellerContact contact={car.contact} reputation={car.reputation} />
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function MarocReputationBlock({ maroc, make }: { maroc: MarocReputationData | null; make: string }) {
+  const brand = maroc?.brand ?? null;
+  const tests = maroc?.tests ?? [];
+  const socialIcon = (network: string) =>
+    network === "instagram" ? <Instagram className="h-3.5 w-3.5" /> : <Facebook className="h-3.5 w-3.5" />;
+
+  if (!brand) {
+    return (
+      <div>
+        <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+          <Globe className="h-4 w-4 text-primary" />
+          Présence &amp; sources au Maroc
+        </div>
+        <div className="rounded-xl border border-white/5 bg-dark-800/30 p-4">
+          <p className="text-xs text-gray-500">
+            Aucune source officielle marocaine vérifiée pour <strong className="text-gray-300">{make}</strong>.
+            Les liens officiels seront ajoutés dès qu&apos;ils seront confirmés.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <Globe className="h-4 w-4 text-primary" />
+          Présence &amp; sources au Maroc
+        </div>
+        <span className="text-[10px] text-gray-600">Vérifié le {brand.verifiedAt || "—"}</span>
+      </div>
+
+      {brand.distributor && (
+        <div className="mb-3 flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-2">
+          <BadgeCheck className="h-4 w-4 shrink-0 text-primary" />
+          <p className="text-xs text-gray-200">
+            Importateur officiel : <strong>{brand.distributor}</strong>
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        {brand.officialSite && (
+          <a href={brand.officialSite.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg bg-dark-800/50 px-3 py-2 text-xs text-gray-300 transition hover:bg-dark-800 hover:text-white">
+            <Globe className="h-3.5 w-3.5 shrink-0 text-primary" />
+            Site officiel · {brand.officialSite.label}
+            <ExternalLink className="ml-auto h-3 w-3 text-gray-600" />
+          </a>
+        )}
+        {brand.resellers && (
+          <a href={brand.resellers.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg bg-dark-800/50 px-3 py-2 text-xs text-gray-300 transition hover:bg-dark-800 hover:text-white">
+            <Store className="h-3.5 w-3.5 shrink-0 text-primary" />
+            {brand.resellers.label}
+            <ExternalLink className="ml-auto h-3 w-3 text-gray-600" />
+          </a>
+        )}
+        {brand.socials.map((s, i) => (
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg bg-dark-800/50 px-3 py-2 text-xs text-gray-300 transition hover:bg-dark-800 hover:text-white">
+            {socialIcon(s.network)}
+            {s.label}
+            {typeof s.followers === "number" && (
+              <span className="ml-1 text-gray-500">· {s.followers.toLocaleString("fr-FR")} abonnés</span>
+            )}
+            <ExternalLink className="ml-auto h-3 w-3 text-gray-600" />
+          </a>
+        ))}
+      </div>
+
+      {tests.length > 0 && (
+        <div className="mt-4">
+          <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+            <Newspaper className="h-3.5 w-3.5" />
+            Essais Moteur.ma pour ce modèle
+          </div>
+          <div className="space-y-2">
+            {tests.map((t, i) => (
+              <a key={i} href={t.url} target="_blank" rel="noopener noreferrer" className="block rounded-lg bg-dark-800/50 px-3 py-2 text-xs text-gray-300 transition hover:bg-dark-800 hover:text-white">
+                <span className="flex items-center gap-2">
+                  <Newspaper className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  {t.title}
+                  <ExternalLink className="ml-auto h-3 w-3 text-gray-600" />
+                </span>
+                {t.verdict && <span className="mt-1 block text-[11px] text-gray-500">{t.verdict}</span>}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -264,7 +571,7 @@ function ReputationInsufficient({ reputation }: { reputation: ReputationData }) 
           <div>
             <p className="text-sm font-medium text-yellow-300">Données insuffisantes</p>
             <p className="text-xs text-yellow-400/70 mt-1">
-              {reputation.totalReviews} avis collectés sur {MIN_REVIEWS} minimum requis. Le score ne sera publié qu&apos;à {MIN_REVIEWS} avis exploitables.
+              {reputation.totalReviews} avis collectés sur {MIN_REVIEWS} minimum requis. Le score sera publié dès {MIN_REVIEWS} avis exploitables. Ajoutez le vôtre ci-dessous !
             </p>
           </div>
         </div>

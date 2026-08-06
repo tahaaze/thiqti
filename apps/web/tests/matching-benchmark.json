@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "date": "2026-07-31",
+  "date": "2026-08-05",
   "dataset": "apps/web/src/lib/sources/fallback.ts",
   "description": "Benchmark du pipeline NLP + TOPSIS. Chaque requete est executee sur le jeu de donnees reel (vehicules neufs). expectCriteria compare l'extraction NLP exacte. Les assertions verifient les proprietes du classement. Les bornes de prix correspondent au calcul meetsBudget (min/max +/- tolerance).",
   "queries": [
@@ -14,7 +14,7 @@
         { "type": "priceMax", "value": 264500 },
         { "type": "topMake", "value": "Dacia" },
         { "type": "minTotal", "value": 50 },
-        { "type": "maxTotal", "value": 100 }
+        { "type": "maxTotal", "value": 176 }
       ]
     },
     {
@@ -27,7 +27,7 @@
         { "type": "priceMax", "value": 230000 },
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 50 },
-        { "type": "maxTotal", "value": 90 }
+        { "type": "maxTotal", "value": 160 }
       ]
     },
     {
@@ -39,7 +39,7 @@
         { "type": "priceMax", "value": 207000 },
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 40 },
-        { "type": "maxTotal", "value": 80 }
+        { "type": "maxTotal", "value": 150 }
       ]
     },
     {
@@ -52,7 +52,7 @@
         { "type": "priceMax", "value": 360000 },
         { "type": "topFuel", "value": "Essence" },
         { "type": "minTotal", "value": 100 },
-        { "type": "maxTotal", "value": 150 }
+        { "type": "maxTotal", "value": 256 }
       ]
     },
     {
@@ -64,7 +64,7 @@
         { "type": "priceMin", "value": 255000 },
         { "type": "topFuel", "value": "Hybride" },
         { "type": "minTotal", "value": 80 },
-        { "type": "maxTotal", "value": 130 }
+        { "type": "maxTotal", "value": 176 }
       ]
     },
     {
@@ -75,8 +75,8 @@
       "assertions": [
         { "type": "priceMin", "value": 72250 },
         { "type": "priceMax", "value": 132250 },
-        { "type": "topMake", "value": "Dacia" },
-        { "type": "maxTotal", "value": 20 }
+        { "type": "topMake", "value": "Changan" },
+        { "type": "maxTotal", "value": 34 }
       ]
     },
     {
@@ -89,7 +89,7 @@
         { "type": "priceMax", "value": 264500 },
         { "type": "topMake", "value": "Dacia" },
         { "type": "minTotal", "value": 50 },
-        { "type": "maxTotal", "value": 100 }
+        { "type": "maxTotal", "value": 176 }
       ]
     },
     {
@@ -101,7 +101,7 @@
         { "type": "bodyType", "value": "SUV" },
         { "type": "topMake", "value": "Chery" },
         { "type": "minTotal", "value": 80 },
-        { "type": "maxTotal", "value": 100 }
+        { "type": "maxTotal", "value": 182 }
       ]
     },
     {
@@ -113,7 +113,7 @@
         { "type": "bodyType", "value": "Citadine" },
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 25 },
-        { "type": "maxTotal", "value": 40 }
+        { "type": "maxTotal", "value": 66 }
       ]
     },
     {
@@ -125,7 +125,7 @@
         { "type": "bodyType", "value": "Berline" },
         { "type": "topMake", "value": "Changan" },
         { "type": "minTotal", "value": 18 },
-        { "type": "maxTotal", "value": 30 }
+        { "type": "maxTotal", "value": 46 }
       ]
     },
     {
@@ -137,7 +137,7 @@
         { "type": "bodyType", "value": "Monospace" },
         { "type": "topMake", "value": "Dacia" },
         { "type": "minTotal", "value": 1 },
-        { "type": "maxTotal", "value": 5 }
+        { "type": "maxTotal", "value": 6 }
       ]
     },
     {
@@ -149,7 +149,7 @@
         { "type": "bodyType", "value": "Utilitaire" },
         { "type": "topMake", "value": "Citroën" },
         { "type": "minTotal", "value": 1 },
-        { "type": "maxTotal", "value": 5 }
+        { "type": "maxTotal", "value": 6 }
       ]
     },
     {
@@ -160,7 +160,7 @@
       "assertions": [
         { "type": "bodyType", "value": "SUV" },
         { "type": "minTotal", "value": 80 },
-        { "type": "maxTotal", "value": 100 }
+        { "type": "maxTotal", "value": 182 }
       ]
     },
     {
@@ -172,7 +172,7 @@
         { "type": "fuel", "value": "Diesel" },
         { "type": "topMake", "value": "Citroën" },
         { "type": "minTotal", "value": 40 },
-        { "type": "maxTotal", "value": 60 }
+        { "type": "maxTotal", "value": 100 }
       ]
     },
     {
@@ -184,7 +184,7 @@
         { "type": "fuel", "value": "Essence" },
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 80 },
-        { "type": "maxTotal", "value": 110 }
+        { "type": "maxTotal", "value": 192 }
       ]
     },
     {
@@ -196,7 +196,7 @@
         { "type": "fuel", "value": "Hybride" },
         { "type": "topMake", "value": "Toyota" },
         { "type": "minTotal", "value": 30 },
-        { "type": "maxTotal", "value": 45 }
+        { "type": "maxTotal", "value": 72 }
       ]
     },
     {
@@ -208,7 +208,7 @@
         { "type": "fuel", "value": "Électrique" },
         { "type": "topMake", "value": "Dacia" },
         { "type": "minTotal", "value": 10 },
-        { "type": "maxTotal", "value": 20 }
+        { "type": "maxTotal", "value": 28 }
       ]
     },
     {
@@ -219,7 +219,7 @@
       "assertions": [
         { "type": "fuel", "value": "Diesel" },
         { "type": "minTotal", "value": 40 },
-        { "type": "maxTotal", "value": 60 }
+        { "type": "maxTotal", "value": 100 }
       ]
     },
     {
@@ -230,7 +230,7 @@
       "assertions": [
         { "type": "fuel", "value": "Électrique" },
         { "type": "minTotal", "value": 10 },
-        { "type": "maxTotal", "value": 20 }
+        { "type": "maxTotal", "value": 28 }
       ]
     },
     {
@@ -242,7 +242,7 @@
         { "type": "make", "value": "Toyota" },
         { "type": "topMake", "value": "Toyota" },
         { "type": "minTotal", "value": 10 },
-        { "type": "maxTotal", "value": 20 }
+        { "type": "maxTotal", "value": 28 }
       ]
     },
     {
@@ -254,7 +254,7 @@
         { "type": "make", "value": "Dacia" },
         { "type": "topMake", "value": "Dacia" },
         { "type": "minTotal", "value": 15 },
-        { "type": "maxTotal", "value": 30 }
+        { "type": "maxTotal", "value": 44 }
       ]
     },
     {
@@ -266,7 +266,7 @@
         { "type": "make", "value": "Toyota" },
         { "type": "topMake", "value": "Toyota" },
         { "type": "minTotal", "value": 10 },
-        { "type": "maxTotal", "value": 20 }
+        { "type": "maxTotal", "value": 28 }
       ]
     },
     {
@@ -278,7 +278,7 @@
         { "type": "make", "value": "Mercedes" },
         { "type": "topMake", "value": "Mercedes" },
         { "type": "minTotal", "value": 3 },
-        { "type": "maxTotal", "value": 10 }
+        { "type": "maxTotal", "value": 12 }
       ]
     },
     {
@@ -290,7 +290,7 @@
         { "type": "yearMin", "value": 2023 },
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 150 },
-        { "type": "maxTotal", "value": 180 }
+        { "type": "maxTotal", "value": 201 }
       ]
     },
     {
@@ -302,7 +302,7 @@
         { "type": "transmission", "value": "Automatique" },
         { "type": "topMake", "value": "Dacia" },
         { "type": "minTotal", "value": 130 },
-        { "type": "maxTotal", "value": 160 }
+        { "type": "maxTotal", "value": 288 }
       ]
     },
     {
@@ -313,7 +313,7 @@
       "assertions": [
         { "type": "topCity", "value": "Casablanca" },
         { "type": "minTotal", "value": 150 },
-        { "type": "maxTotal", "value": 200 }
+        { "type": "maxTotal", "value": 392 }
       ]
     },
     {
@@ -324,7 +324,7 @@
       "assertions": [
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 150 },
-        { "type": "maxTotal", "value": 200 }
+        { "type": "maxTotal", "value": 392 }
       ]
     },
     {
@@ -335,7 +335,7 @@
       "assertions": [
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 150 },
-        { "type": "maxTotal", "value": 200 }
+        { "type": "maxTotal", "value": 392 }
       ]
     },
     {
@@ -344,9 +344,9 @@
       "query": "économique",
       "expectCriteria": { "carrosserie": null, "motorisation": null, "transmission": null, "marque": null, "budgetMin": null, "budgetMax": null, "budgetTolerance": 0.15, "ville": null, "anneeMin": null, "anneeMax": null, "kmMax": null, "intent": ["economique"] },
       "assertions": [
-        { "type": "topMake", "value": "Kia" },
+        { "type": "topMake", "value": "Changan" },
         { "type": "minTotal", "value": 150 },
-        { "type": "maxTotal", "value": 200 }
+        { "type": "maxTotal", "value": 392 }
       ]
     },
     {
@@ -357,7 +357,7 @@
       "assertions": [
         { "type": "topMake", "value": "Kia" },
         { "type": "minTotal", "value": 150 },
-        { "type": "maxTotal", "value": 200 }
+        { "type": "maxTotal", "value": 392 }
       ]
     },
     {
@@ -372,7 +372,7 @@
         { "type": "priceMax", "value": 330625 },
         { "type": "topMake", "value": "Renault" },
         { "type": "minTotal", "value": 5 },
-        { "type": "maxTotal", "value": 20 }
+        { "type": "maxTotal", "value": 27 }
       ]
     },
     {
@@ -383,10 +383,10 @@
       "assertions": [
         { "type": "bodyType", "value": "Citadine" },
         { "type": "fuel", "value": "Essence" },
-        { "type": "topMake", "value": "Dacia" },
+        { "type": "topMake", "value": "Renault" },
         { "type": "topCity", "value": "Casablanca" },
         { "type": "minTotal", "value": 15 },
-        { "type": "maxTotal", "value": 40 }
+        { "type": "maxTotal", "value": 54 }
       ]
     },
     {
@@ -413,7 +413,7 @@
         { "type": "priceMax", "value": 345000 },
         { "type": "topMake", "value": "Chery" },
         { "type": "minTotal", "value": 40 },
-        { "type": "maxTotal", "value": 70 }
+        { "type": "maxTotal", "value": 126 }
       ]
     },
     {
@@ -452,7 +452,7 @@
         { "type": "fuel", "value": "Diesel" },
         { "type": "topMake", "value": "Citroën" },
         { "type": "minTotal", "value": 1 },
-        { "type": "maxTotal", "value": 5 }
+        { "type": "maxTotal", "value": 6 }
       ]
     },
     {

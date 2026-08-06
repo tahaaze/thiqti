@@ -1,4 +1,5 @@
 import { SearchCriteria } from "./nlp";
+import { InventoryType } from "./sources/types";
 
 export interface MatchExplanation {
   label: string;
@@ -22,6 +23,7 @@ export interface ScoredCar {
   score: number;
   source: string;
   url: string;
+  inventoryType: InventoryType;
   matchScore: number;
   matchPercent: number;
   explanations: MatchExplanation[];
@@ -50,6 +52,7 @@ interface NormalizedVehicle {
   source: string;
   url: string;
   score: number;
+  inventoryType: InventoryType;
 }
 
 export interface CriterionWeights {

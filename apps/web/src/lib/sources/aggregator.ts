@@ -1,46 +1,141 @@
 // ============================================================================
-// AGREGATEUR DE SOURCES — REFRAICHISSEMENT QUOTIDIEN (PAS ACTIF, Phase 2)
+// AGREGATEUR DE SOURCES MAROCAINES
 // ============================================================================
 //
-// Comportement actuel (INCHANGE) :
-//   - Dataset statique fallback (fallback.ts) charge en memoire avec un TTL de
-//     5 minutes (getCars). Aucune source externe n'est appelee.
-//
-// Mecanisme prevu (a activer plus tard, uniquement apres validation PAR ECRIT
-// des sources — cahier des charges section 7.3, voir collector.ts) :
-//   1. Un job quotidien (ex. Vercel Cron ou node-cron) appellerait une fonction
-//      `refreshCatalogue()`.
-//   2. `refreshCatalogue()` lirait AUTHORIZED_SOURCES (collector.ts) et, pour
-//      chaque entree `licityStatus === "valide"`, declencherait son collecteur.
-//   3. Les donnees recoltees remplaceraient / fusionneraient le cache de
-//      getCars().
-//   4. Le dataset statique fallback resterait le SECOURS : sans source active
-//      ou en cas d'echec, getCars() retomberait sur le fallback, conservant
-//      exactement le comportement actuel.
-//
-// Activation (a ne PAS faire maintenant) : definir COLLECTION_ENABLED=true ET
-// disposer d'au moins une entree "valide" dans AUTHORIZED_SOURCES. Tant que
-// ces conditions ne sont pas reunies, ce fichier ne fait rien de plus que ce
-// qu'il fait aujourd'hui.
+// Comportement :
+//   1. Les annonces REELLES au Maroc sont chargees depuis trois sources
+//      nationales (autera.ma, moteur.ma, electrodrive.ma) — jamais MarketCheck
+//      (base 100% US, aucun véhicule marocain). Quand une source renvoie des
+//      annonces, elles portent leurs vraies photos, prix MAD, km, ville, leur
+//      réputation réelle et un moyen de contacter le vendeur / conseiller.
+//   2. Le catalogue marocain de reference (fallback.ts) n'est utilise QU'EN
+//      SECOURS : si toutes les sources live échouent, il fait office de socle
+//      hors-ligne (avec les vraies photos Wikimedia).
+//   3. Le tout est fusionne dans un cache en memoire (TTL 10 min).
 // ============================================================================
 
+import { promises as fs } from "fs";
+import path from "path";
+import { UnifiedCar, InventoryType } from "./types";
 import { getFallbackCars } from "./fallback";
+import { fetchAuteraCars } from "./autera";
+import { fetchMoteurCars } from "./moteur";
+import { fetchElectroDriveCars } from "./electrodrive";
+import { cachedImageFor } from "@/lib/images";
+import { safetyRatingFor } from "@/lib/safetyRatings";
 
-let cachedCars: ReturnType<typeof getFallbackCars> | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 10 * 60 * 1000;
+const DISK_TTL = 6 * 60 * 60 * 1000;
+const CACHE_FILE = path.join(process.cwd(), ".cache", "thiqti-cars.json");
 
-function getCars() {
-  const now = Date.now();
-  if (!cachedCars || now - cacheTimestamp > CACHE_TTL) {
-    cachedCars = getFallbackCars();
-    cacheTimestamp = now;
-  }
-  return cachedCars;
+interface DiskCacheShape {
+  cars: UnifiedCar[];
+  fetchedAt: number;
 }
 
-export async function fetchAllSources() {
+let cache: { cars: UnifiedCar[]; fetchedAt: number; liveSources: boolean } | null = null;
+let coldLoad: Promise<UnifiedCar[]> | null = null;
+
+async function readDiskCache(): Promise<DiskCacheShape | null> {
+  if (process.env.NODE_ENV === "test") return null;
+  try {
+    const parsed = JSON.parse(await fs.readFile(CACHE_FILE, "utf8")) as DiskCacheShape;
+    return Array.isArray(parsed.cars) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeDiskCache(cars: UnifiedCar[], fetchedAt: number): Promise<void> {
+  if (process.env.NODE_ENV === "test") return;
+  try {
+    await fs.mkdir(path.dirname(CACHE_FILE), { recursive: true });
+    await fs.writeFile(CACHE_FILE, JSON.stringify({ cars, fetchedAt }), "utf8");
+  } catch {
+    // Le cache disque est optionnel : un échec d'écriture ne doit pas casser la réponse.
+  }
+}
+
+async function loadAndCache(): Promise<UnifiedCar[]> {
+  const cars = await loadMergedCars();
+  const fetchedAt = Date.now();
+  cache = { cars, fetchedAt, liveSources: cars.some((c) => c.contact || c.reputation) };
+  void writeDiskCache(cars, fetchedAt);
+  return cars;
+}
+
+function withDedup(loader: () => Promise<UnifiedCar[]>): Promise<UnifiedCar[]> {
+  if (!coldLoad) {
+    coldLoad = loader().finally(() => {
+      coldLoad = null;
+    });
+  }
+  return coldLoad;
+}
+
+async function loadMergedCars(): Promise<UnifiedCar[]> {
+  const [autera, moteur, electro] = await Promise.all([
+    fetchAuteraCars(),
+    fetchMoteurCars(),
+    fetchElectroDriveCars(),
+  ]);
+  const live = [...autera, ...moteur, ...electro];
+
+  const withSafety = (car: UnifiedCar): UnifiedCar => ({
+    ...car,
+    safety: safetyRatingFor(car.make, car.model),
+  });
+
+  // Source primaire : vraies annonces marocaines (photos, prix MAD, km reels).
+  if (live.length > 0) {
+    return live.map(withSafety);
+  }
+
+  // Secours hors-ligne : catalogue marocain + photos reelles en cache.
+  const byId = new Map<string, UnifiedCar>();
+  for (const car of getFallbackCars()) {
+    if (byId.has(car.id)) continue;
+    const realPhoto = cachedImageFor(car.make, car.model);
+    byId.set(car.id, {
+      ...car,
+      image: realPhoto || car.image,
+      photos: realPhoto && car.photos.length === 0 ? [realPhoto] : car.photos,
+      safety: safetyRatingFor(car.make, car.model),
+    });
+  }
+  return [...byId.values()];
+}
+
+async function getCars(): Promise<UnifiedCar[]> {
+  const now = Date.now();
+  if (cache && now - cache.fetchedAt < CACHE_TTL) {
+    return cache.cars;
+  }
+
+  const disk = await readDiskCache();
+  if (disk && now - disk.fetchedAt < DISK_TTL) {
+    cache = { cars: disk.cars, fetchedAt: disk.fetchedAt, liveSources: true };
+    void withDedup(loadAndCache);
+    return disk.cars;
+  }
+
+  return withDedup(loadAndCache);
+}
+
+export async function fetchAllSources(): Promise<UnifiedCar[]> {
   return getCars();
+}
+
+/** Vraies annonces neuves (API si active, sinon derivees du catalogue). */
+export async function fetchNewCars(): Promise<UnifiedCar[]> {
+  const cars = await getCars();
+  return cars.filter((c) => c.inventoryType === "new");
+}
+
+/** Vraies annonces occasion (API si active, sinon derivees du catalogue). */
+export async function fetchUsedCars(): Promise<UnifiedCar[]> {
+  const cars = await getCars();
+  return cars.filter((c) => c.inventoryType === "used");
 }
 
 const STOP_WORDS = new Set([
@@ -56,7 +151,7 @@ const STOP_WORDS = new Set([
   "the", "a", "an", "of", "to", "for", "and", "or", "i", "we", "you",
 ]);
 
-function carMatches(car: ReturnType<typeof getFallbackCars>[number], word: string): boolean {
+function carMatches(car: UnifiedCar, word: string): boolean {
   return (
     car.make.toLowerCase().includes(word) ||
     car.model.toLowerCase().includes(word) ||
@@ -70,9 +165,13 @@ function carMatches(car: ReturnType<typeof getFallbackCars>[number], word: strin
   );
 }
 
-export async function searchAllSources(query: string) {
-  const allCars = getCars();
-  if (!query) return allCars;
+export async function searchAllSources(query: string, type?: InventoryType): Promise<UnifiedCar[]> {
+  const allCars = await getCars();
+  let pool = allCars;
+  if (type === "new" || type === "used") {
+    pool = allCars.filter((c) => c.inventoryType === type);
+  }
+  if (!query) return pool;
 
   const words = query
     .toLowerCase()
@@ -81,10 +180,20 @@ export async function searchAllSources(query: string) {
     .map((w) => w.replace(/^[^\p{L}\p{N}]+/u, "").replace(/[^\p{L}\p{N}]+$/u, ""))
     .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
 
-  const searchable = words.filter((w) => allCars.some((car) => carMatches(car, w)));
+  const searchable = words.filter((w) => pool.some((car) => carMatches(car, w)));
 
-  if (words.length === 0) return allCars;
+  if (words.length === 0) return pool;
   if (searchable.length === 0) return [];
 
-  return allCars.filter((car) => searchable.every((w) => carMatches(car, w)));
+  return pool.filter((car) => searchable.every((w) => carMatches(car, w)));
+}
+
+/** Statistiques par source (nombre d'annonces). */
+export async function getSourceStats(): Promise<Record<string, number>> {
+  const cars = await getCars();
+  const stats: Record<string, number> = {};
+  for (const car of cars) {
+    stats[car.source] = (stats[car.source] || 0) + 1;
+  }
+  return stats;
 }

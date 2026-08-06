@@ -112,10 +112,15 @@ const CANONICAL_BRANDS: Record<string, string> = {
 };
 
 function normalizeText(text: string): string {
+  const arabicDigits: Record<string, string> = {
+    "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9",
+    "۰": "0", "۱": "1", "۲": "2", "۳": "3", "۴": "4", "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9",
+  };
   return text
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (d) => arabicDigits[d])
     .replace(/[^\w\s\d\u0600-\u06FF\u0400-\u04FF]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -195,6 +200,20 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
     if (budgetMatch) {
       const val = parseInt(budgetMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) {
+        max = Math.round(val * 1.15);
+        min = Math.round(val * 0.85);
+        tolerance = 0.15;
+      }
+    }
+  }
+
+  // Nombre seul (ex. "200000", "200 000") : consideré comme un budget en DH,
+  // sauf s'il s'agit d'une année (20xx) ou d'une petite valeur (modèle, km).
+  if (min === null && max === null) {
+    const bareMatch = text.match(/(\d[\d\s]*\d)/);
+    if (bareMatch) {
+      const val = parseInt(bareMatch[1].replace(/\s/g, ""));
+      if (val >= 10000 && val <= 9000000 && !(val >= 2000 && val <= 2026)) {
         max = Math.round(val * 1.15);
         min = Math.round(val * 0.85);
         tolerance = 0.15;

@@ -7,6 +7,12 @@ node_modules/
 .next/
 out/
 
+# Runtime cache
+.cache/
+
+# Scratch / debug
+apps/web/_dbcheck.js
+
 # Build
 dist/
 build/

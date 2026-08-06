@@ -2,13 +2,17 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal, Star, MapPin, Fuel, Heart, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, GitCompareArrows } from "lucide-react";
+import { Search, Star, MapPin, Fuel, Heart, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows, ShieldCheck } from "lucide-react";
 import CarImage from "@/components/CarImage";
+import SafetyBadge from "@/components/SafetyBadge";
+import FilterPanel from "@/components/FilterPanel";
 import VoiceInput from "@/components/VoiceInput";
 import SearchSuggestions from "@/components/SearchSuggestions";
 import EmptyState from "@/components/EmptyState";
 import ErrorState from "@/components/ErrorState";
 import Skeleton from "@/components/Skeleton";
+import SellerContact from "@/components/SellerContact";
+import { SearchFilters, SearchFacets } from "@/lib/searchTypes";
 
 interface MatchExplanation {
   label: string;
@@ -29,14 +33,31 @@ interface CarListing {
   fuel: string;
   city: string;
   image: string;
+  photos?: string[];
   score: number;
   source: string;
   url: string;
+  inventoryType?: "new" | "used";
   matchPercent?: number;
+  bodyType?: string;
   explanations?: MatchExplanation[];
   meetsBudget?: boolean;
   meetsBody?: boolean;
   meetsFuel?: boolean;
+  safety?: { stars: number; ratingYear?: number; source?: string } | null;
+  contact?: {
+    name?: string;
+    phone?: string;
+    phoneHref?: string;
+    whatsappHref?: string;
+    url?: string;
+  };
+  reputation?: {
+    verified?: boolean;
+    trustBadge?: boolean;
+    views?: number;
+    label?: string;
+  };
 }
 
 interface SearchCriteria {
@@ -52,29 +73,17 @@ interface SearchCriteria {
   intent: string[];
 }
 
-const BODY_TYPES = ["SUV", "Berline", "Citadine", "Compacte", "Crossover", "Break", "Utilitaire", "Monospace", "Pickup", "Coupé", "Cabriolet"];
-const FUEL_TYPES = ["Essence", "Diesel", "Hybride", "Électrique"];
-const BRANDS = ["Dacia", "Renault", "Peugeot", "Toyota", "Hyundai", "Kia", "Volkswagen", "BMW", "Mercedes", "Audi", "Ford", "Nissan", "Citroën", "Opel", "Fiat", "Jeep", "Škoda", "Seat", "Suzuki", "Mazda", "Honda", "Volvo", "BYD", "MG", "Chery", "Omoda", "Jaecoo", "Changan", "Haval", "Geely", "GAC", "DFSK"];
-const CITIES = ["Casablanca", "Rabat", "Marrakech", "Fès", "Tanger", "Agadir", "Meknès", "Oujda", "Kénitra", "Tétouan", "Nador", "El Jadida", "Béni Mellal", "Safi", "Mohammedia", "Khouribga", "Témara", "Salé", "Dakhla", "Laâyoune"];
-
 export default function ResultsPage() {
   const [cars, setCars] = useState<CarListing[]>([]);
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [invType, setInvType] = useState<"new" | "used" | "">("");
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [criteria, setCriteria] = useState<SearchCriteria | null>(null);
+  const [filters, setFilters] = useState<SearchFilters>({});
+  const [facets, setFacets] = useState<SearchFacets | null>(null);
   const [expandedExplanations, setExpandedExplanations] = useState<string | null>(null);
-  const [refineOpen, setRefineOpen] = useState(false);
-  const [refine, setRefine] = useState({
-    carrosserie: "",
-    motorisation: "",
-    budgetMax: "",
-    anneeMin: "",
-    kmMax: "",
-    marque: "",
-    ville: "",
-  });
   const loadedRef = useRef(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -89,62 +98,77 @@ export default function ResultsPage() {
     localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  const doSearch = useCallback(async (q: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      if (!res.ok) throw new Error("Erreur réseau");
-      const data = await res.json();
-      setCars(data.results);
-      setCriteria(data.criteria);
-      if (data.criteria) {
-        setRefine({
-          carrosserie: data.criteria.carrosserie || "",
-          motorisation: data.criteria.motorisation || "",
-          budgetMax: data.criteria.budgetMax ? String(data.criteria.budgetMax) : "",
-          anneeMin: data.criteria.anneeMin ? String(data.criteria.anneeMin) : "",
-          kmMax: data.criteria.kmMax ? String(data.criteria.kmMax) : "",
-          marque: data.criteria.marque || "",
-          ville: data.criteria.ville || "",
+  const doSearch = useCallback(
+    async (q: string, type: "new" | "used" | "" = invType, flt: SearchFilters = filters) => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (q) params.set("q", q);
+        if (type) params.set("type", type);
+        Object.entries(flt).forEach(([key, value]) => {
+          if (value !== undefined && value !== "") params.set(key, String(value));
         });
+        const res = await fetch(`/api/search?${params.toString()}`);
+        if (!res.ok) throw new Error("Erreur réseau");
+        const data = await res.json();
+        setCars(data.results);
+        setCriteria(data.criteria);
+        setFacets(data.facets || null);
+      } catch {
+        setCars([]);
+        setCriteria(null);
+        setFacets(null);
       }
-    } catch {
-      setCars([]);
-      setCriteria(null);
-    }
-    setLoading(false);
-  }, []);
+      setLoading(false);
+    },
+    [invType, filters]
+  );
+
+  const handleFiltersChange = useCallback(
+    (flt: SearchFilters) => {
+      setFilters(flt);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => doSearch(query, invType, flt), 250);
+    },
+    [doSearch, query, invType]
+  );
+
+  const removeFilter = useCallback(
+    (key: keyof SearchFilters) => {
+      const next: SearchFilters = { ...filters };
+      delete next[key];
+      setFilters(next);
+      doSearch(query, invType, next);
+    },
+    [doSearch, filters, query, invType]
+  );
+
+  const resetFilters = useCallback(() => {
+    setFilters({});
+    doSearch(query, invType, {});
+  }, [doSearch, query, invType]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q") || "";
+    const t = params.get("type");
+    const type = t === "new" || t === "used" ? t : "";
     setQuery(q);
-    doSearch(q);
+    setInvType(type);
+    doSearch(q, type);
   }, [doSearch]);
+
+  const changeInvType = (type: "new" | "used" | "") => {
+    setInvType(type);
+    const params = new URLSearchParams(window.location.search);
+    if (type) params.set("type", type);
+    else params.delete("type");
+    window.history.replaceState(null, "", `?${params.toString()}`);
+    doSearch(query, type);
+  };
 
   const toggleFav = (id: string) => {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
-  };
-
-  // Instant refine: auto-search when any refine field changes
-  const handleRefineChange = (field: string, value: string) => {
-    const updated = { ...refine, [field]: value };
-    setRefine(updated);
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      const parts: string[] = [];
-      if (updated.carrosserie) parts.push(updated.carrosserie);
-      if (updated.motorisation) parts.push(updated.motorisation);
-      if (updated.marque) parts.push(updated.marque);
-      if (updated.ville) parts.push(updated.ville);
-      if (updated.budgetMax) parts.push(`sous ${updated.budgetMax} dh`);
-      if (updated.anneeMin) parts.push(`depuis ${updated.anneeMin}`);
-      if (updated.kmMax) parts.push(`moins de ${updated.kmMax} km`);
-      const q = parts.join(" ");
-      setQuery(q || "");
-      doSearch(q || query);
-    }, 400);
   };
 
   const formatCriteriaLabel = (key: string): string => {
@@ -156,11 +180,28 @@ export default function ResultsPage() {
     return labels[key] || key;
   };
 
+  const filterLabel = (key: string, value: string | number): string => {
+    switch (key) {
+      case "minPrice": return `Prix ≥ ${Number(value).toLocaleString()} DH`;
+      case "maxPrice": return `Prix ≤ ${Number(value).toLocaleString()} DH`;
+      case "minYear": return `Année ≥ ${value}`;
+      case "maxKm": return `Km ≤ ${Number(value).toLocaleString()}`;
+      case "minSafety": return `Sécurité ≥ ${value}★`;
+      default: return String(value);
+    }
+  };
+
+  const activeFilterEntries = Object.entries(filters) as [keyof SearchFilters, string | number][];
+
   return (
     <div className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Résultats de recherche</h1>
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
+            <Search className="h-3.5 w-3.5" />
+            Catalogue marocain réel
+          </span>
+          <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-white">Résultats de recherche</h1>
           <p className="mt-2 text-gray-400">{loading ? "Analyse en cours..." : `${cars.length} véhicules trouvés`}</p>
         </div>
 
@@ -215,74 +256,59 @@ export default function ResultsPage() {
               </div>
             )}
 
-            {/* Refine form - shown after results, instant update */}
-            <div className="glass-card p-5">
-              <button
-                onClick={() => setRefineOpen(!refineOpen)}
-                className="flex w-full items-center justify-between text-sm font-semibold"
-              >
-                <span className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-primary" />
-                  Affiner la recherche
-                </span>
-                {refineOpen ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
-              </button>
-              {refineOpen && (
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Carrosserie</label>
-                    <select value={refine.carrosserie} onChange={(e) => handleRefineChange("carrosserie", e.target.value)} className="input-field text-sm">
-                      <option value="">Toutes</option>
-                      {BODY_TYPES.map((b) => (<option key={b} value={b}>{b}</option>))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Motorisation</label>
-                    <select value={refine.motorisation} onChange={(e) => handleRefineChange("motorisation", e.target.value)} className="input-field text-sm">
-                      <option value="">Toutes</option>
-                      {FUEL_TYPES.map((f) => (<option key={f} value={f}>{f}</option>))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Budget max (DH)</label>
-                    <input type="number" value={refine.budgetMax} onChange={(e) => handleRefineChange("budgetMax", e.target.value)} placeholder="Ex: 350000" className="input-field text-sm" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Année min</label>
-                    <input type="number" value={refine.anneeMin} onChange={(e) => handleRefineChange("anneeMin", e.target.value)} placeholder="Ex: 2020" className="input-field text-sm" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Km max</label>
-                    <input type="number" value={refine.kmMax} onChange={(e) => handleRefineChange("kmMax", e.target.value)} placeholder="Ex: 50000" className="input-field text-sm" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Marque</label>
-                    <select value={refine.marque} onChange={(e) => handleRefineChange("marque", e.target.value)} className="input-field text-sm">
-                      <option value="">Toutes</option>
-                      {BRANDS.map((m) => (<option key={m} value={m}>{m}</option>))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-gray-400">Ville</label>
-                    <select value={refine.ville} onChange={(e) => handleRefineChange("ville", e.target.value)} className="input-field text-sm">
-                      <option value="">Toutes</option>
-                      {CITIES.map((c) => (<option key={c} value={c}>{c}</option>))}
-                    </select>
-                  </div>
+            {/* Filtres modernes */}
+            {facets ? (
+              <FilterPanel
+                facets={facets}
+                filters={filters}
+                total={cars.length}
+                onChange={handleFiltersChange}
+                onReset={resetFilters}
+              />
+            ) : (
+              <div className="glass-card animate-pulse p-5">
+                <div className="h-4 w-24 rounded bg-dark-800/50" />
+                <div className="mt-4 space-y-3">
+                  {[1, 2, 3, 4].map((i) => <div key={i} className="h-8 rounded-lg bg-dark-800/50" />)}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </aside>
 
           <div className="flex-1">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-gray-400">Source: <span className="text-white font-medium">Multi-sources</span></p>
-              <div className="flex items-center gap-2">
-                <Link href="/compare" className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-400 hover:text-primary"><GitCompareArrows className="h-3 w-3" />Comparer</Link>
-                <button onClick={() => setView("grid")} className={`rounded-lg p-2 ${view === "grid" ? "bg-primary/20 text-primary" : "text-gray-500 hover:text-white"}`}><Grid3X3 className="h-4 w-4" /></button>
-                <button onClick={() => setView("list")} className={`rounded-lg p-2 ${view === "list" ? "bg-primary/20 text-primary" : "text-gray-500 hover:text-white"}`}><List className="h-4 w-4" /></button>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="segmented">
+                  <button className={`segmented-item ${invType === "" ? "active" : ""}`} onClick={() => changeInvType("")}>Tous</button>
+                  <button className={`segmented-item ${invType === "new" ? "active" : ""}`} onClick={() => changeInvType("new")}>Neuf</button>
+                  <button className={`segmented-item ${invType === "used" ? "active" : ""}`} onClick={() => changeInvType("used")}>Occasion</button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link href="/compare" className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-400 hover:text-primary"><GitCompareArrows className="h-3 w-3" />Comparer</Link>
+                  <button onClick={() => setView("grid")} className={`rounded-lg p-2 ${view === "grid" ? "bg-primary/20 text-primary" : "text-gray-500 hover:text-white"}`}><Grid3X3 className="h-4 w-4" /></button>
+                  <button onClick={() => setView("list")} className={`rounded-lg p-2 ${view === "list" ? "bg-primary/20 text-primary" : "text-gray-500 hover:text-white"}`}><List className="h-4 w-4" /></button>
+                </div>
               </div>
             </div>
+
+            {activeFilterEntries.length > 0 && (
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                {activeFilterEntries.map(([key, value]) => (
+                  <button
+                    key={key}
+                    onClick={() => removeFilter(key)}
+                    className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs text-primary transition hover:bg-primary/20"
+                  >
+                    {filterLabel(key, value)}
+                    <X className="h-3 w-3" />
+                  </button>
+                ))}
+                <button onClick={resetFilters} className="text-xs text-gray-500 underline transition hover:text-white">
+                  Tout effacer
+                </button>
+              </div>
+            )}
 
             {loading ? (
               <Skeleton count={6} />
@@ -293,7 +319,8 @@ export default function ResultsPage() {
                 {cars.map((v) => (
                   <Link key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
                     <div className="relative h-44 overflow-hidden">
-                      <CarImage src={v.image} alt={v.title} make={v.make} model={v.model} className="h-full w-full object-cover transition group-hover:scale-105" />
+                      <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
+                      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
                       <div className="absolute right-2 top-2">
                         {v.meetsBudget === false ? (
@@ -305,14 +332,35 @@ export default function ResultsPage() {
                       <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
                         <Heart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-400 text-red-400" : ""}`} />
                       </button>
+                      {v.reputation?.verified && (
+                        <div className="absolute bottom-2 left-2">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary backdrop-blur">
+                            <ShieldCheck className="h-3 w-3" />
+                            Vérifiée
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold">{v.title}</h3>
                       <p className="text-sm text-gray-500">{v.year} &middot; {v.km.toLocaleString()} km</p>
                       <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
+                        {v.inventoryType && (
+                          <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>
+                            {v.inventoryType === "new" ? "Neuf" : "Occasion"}
+                          </span>
+                        )}
                         <span className="flex items-center gap-1"><Fuel className="h-3 w-3" />{v.fuel}</span>
                         <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{v.city}</span>
                       </div>
+                      <div className="mt-2">
+                        <SafetyBadge safety={v.safety} />
+                      </div>
+                      {(v.reputation && (v.reputation.verified || v.reputation.trustBadge || v.reputation.label || (v.reputation.views ?? 0) > 0)) || (v.contact && (v.contact.phoneHref || v.contact.whatsappHref || v.contact.url)) ? (
+                        <div className="mt-2">
+                          <SellerContact contact={v.contact} reputation={v.reputation} compact showButtons={false} />
+                        </div>
+                      ) : null}
                       <div className="mt-3 flex items-center justify-between">
                         <span className="text-lg font-bold text-primary">{v.priceFormatted}</span>
                         <span className={`flex items-center gap-1 text-sm font-bold ${v.score >= 85 ? "text-green-500" : v.score >= 70 ? "text-yellow-500" : "text-red-500"}`}>

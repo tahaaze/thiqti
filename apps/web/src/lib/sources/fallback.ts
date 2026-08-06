@@ -1,4 +1,4 @@
-import { UnifiedCar, generateId, computeScore } from "./types";
+import { UnifiedCar, generateId, computeScore, formatPriceDH } from "./types";
 
 const CDN = "https://s1.cdn.autoevolution.com/images-webp/models";
 
@@ -139,7 +139,7 @@ function img(make: string, model: string, year: number): string {
   return `${CDN}/${mapped}-${year}_main.jpg.webp`;
 }
 
-const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score">[] = [
+const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryType" | "safety">[] = [
   // Dacia - Le leader marocain
   { title: "Dacia Sandero Access 2024", make: "Dacia", model: "Sandero", year: 2024, price: 149000, priceFormatted: "149 000 DH", km: 0, fuel: "Essence", transmission: "Manuelle", bodyType: "Citadine", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Dacia Sandero Stepway 2023", make: "Dacia", model: "Sandero", year: 2023, price: 165000, priceFormatted: "165 000 DH", km: 0, fuel: "Essence", transmission: "Manuelle", bodyType: "Crossover", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
@@ -446,12 +446,50 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score">[] = [
 
 ];
 
+function hashString(str: string): number {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (h * 31 + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+/** Derive une variante occasion realiste (annee/kilometrage/prix) de facon deterministe. */
+function buildOccasionVariant(
+  base: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryType" | "safety">
+): UnifiedCar {
+  const seed = hashString(`${base.make}_${base.model}_${base.year}`);
+  const ageStep = 1 + (seed % 3);
+  const variantYear = Math.max(2018, base.year - ageStep);
+  const variantKm = 25000 + (seed % 6) * 15000;
+  const priceFactor = 0.7 + ((seed * 3) % 25) / 100;
+  const variantPrice = Math.round((base.price * priceFactor) / 1000) * 1000;
+
+  return {
+    ...base,
+    title: `${base.make} ${base.model} ${variantYear}`,
+    year: variantYear,
+    km: variantKm,
+    price: variantPrice,
+    priceFormatted: formatPriceDH(variantPrice),
+    inventoryType: "used",
+    safety: null,
+    id: generateId("fallback", base.make, base.model, variantYear, variantKm, variantPrice),
+    score: computeScore(variantYear, variantKm, variantPrice),
+    scrapedAt: new Date().toISOString(),
+  };
+}
+
 export function getFallbackCars(): UnifiedCar[] {
-  return MOROCCAN_CARS.map((car) => ({
+  const newCars = MOROCCAN_CARS.map((car) => ({
     ...car,
     image: car.image || img(car.make, car.model, car.year),
     id: generateId("fallback", car.make, car.model, car.year, car.km, car.price),
     score: computeScore(car.year, car.km, car.price),
     scrapedAt: new Date().toISOString(),
+    inventoryType: "new" as const,
+    safety: null,
   }));
+  const usedCars = MOROCCAN_CARS.map(buildOccasionVariant);
+  return [...newCars, ...usedCars];
 }

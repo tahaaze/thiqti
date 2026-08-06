@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { normalizeFuel, normalizeBody, normalizeBrand, generateId, computeScore } from "@/lib/sources/types";
 import { fetchAllSources, searchAllSources } from "@/lib/sources/aggregator";
+
+vi.mock("@/lib/sources/autera", () => ({ fetchAuteraCars: async () => [] }));
+vi.mock("@/lib/sources/moteur", () => ({ fetchMoteurCars: async () => [] }));
+vi.mock("@/lib/sources/electrodrive", () => ({ fetchElectroDriveCars: async () => [] }));
 
 describe("normalizeFuel", () => {
   it("normalise les carburants connus", () => {
@@ -37,7 +41,7 @@ describe("normalizeBrand", () => {
   });
 
   it("retourne la valeur brute si inconnue", () => {
-    expect(normalizeBrand("tata")).toBe("tata");
+    expect(normalizeBrand("ziggurat")).toBe("ziggurat");
   });
 });
 

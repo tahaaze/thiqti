@@ -2,6 +2,7 @@ declare module "lucide-react" {
   import { FC, SVGProps } from "react";
   export const Search: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Star: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Store: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Shield: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const BarChart3: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const ChevronRight: FC<SVGProps<SVGSVGElement> & { className?: string }>;
@@ -32,6 +33,8 @@ declare module "lucide-react" {
   export const BadgeCheck: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const CreditCard: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Clock: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ExternalLink: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Facebook: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Building2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Brain: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const ThumbsUp: FC<SVGProps<SVGSVGElement> & { className?: string }>;
@@ -40,14 +43,23 @@ declare module "lucide-react" {
   export const Loader: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const CarFront: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Info: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Instagram: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Hash: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Sparkles: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const SearchX: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const RotateCcw: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const RefreshCw: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const GitCompareArrows: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Globe: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Loader2: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Mic: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const MicOff: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Newspaper: FC<SVGProps<SVGSVGElement> & { className?: string }>;
   export const Tag: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const MessageCircle: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ArrowRight: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const ShieldCheck: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const MessageSquareText: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Phone: FC<SVGProps<SVGSVGElement> & { className?: string }>;
+  export const Eye: FC<SVGProps<SVGSVGElement> & { className?: string }>;
 }

@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
+import { safetyRatingFor, safetyLabel, safetyLevel } from "@/lib/safetyRatings";
+import { marocReputationFor, marocTestsFor } from "@/lib/marocReputation";
+import { MarocBrandReputation, MarocTest } from "@/lib/marocReputation";
+
+interface SafetyInfo {
+  stars: number;
+  ratingYear: number;
+  className: string;
+  source: "euroncap" | "nhtsa";
+  label: string;
+  level: "elevee" | "moyenne" | "faible";
+}
 
 interface ReputationData {
   modelKey: string;
@@ -15,6 +27,8 @@ interface ReputationData {
   volume: { total: number; positive: number; negative: number; neutral: number };
   reliability: "elevee" | "moyenne" | "faible";
   reliabilityLabel: string;
+  safety: SafetyInfo | null;
+  maroc: { brand: MarocBrandReputation | null; tests: MarocTest[] };
 }
 
 interface ReviewRow {
@@ -99,6 +113,8 @@ function insufficientData(modelKey: string): ReputationData {
     volume: { total: 0, positive: 0, negative: 0, neutral: 0 },
     reliability: "faible",
     reliabilityLabel: "Faible",
+    safety: null,
+    maroc: { brand: null, tests: [] },
   };
 }
 
@@ -185,6 +201,8 @@ function buildFromDb(modelKey: string, reviews: ReviewRow[], score: ScoreRow | n
     volume: { total: totalReviews, positive, negative, neutral },
     reliability: reliability.key,
     reliabilityLabel: reliability.label,
+    safety: null,
+    maroc: { brand: null, tests: [] },
   };
 }
 
@@ -232,6 +250,82 @@ async function loadReputation(make: string, model: string): Promise<ReputationDa
   }
 }
 
+function safetyInfoFor(make: string, model: string): SafetyInfo | null {
+  const entry = safetyRatingFor(make, model);
+  if (!entry) return null;
+  return {
+    stars: entry.stars,
+    ratingYear: entry.ratingYear,
+    className: entry.className,
+    source: entry.source,
+    label: safetyLabel(entry),
+    level: safetyLevel(entry.stars) ?? "faible",
+  };
+}
+
+function marocBlockFor(make: string, model: string): { brand: MarocBrandReputation | null; tests: MarocTest[] } {
+  return {
+    brand: marocReputationFor(make),
+    tests: marocTestsFor(make, model),
+  };
+}
+
+// --- Normalisation vers les enums PostgreSQL (schema.sql) ---
+function dbBodyType(bodyType: string | undefined): string {
+  const v = (bodyType || "").toLowerCase();
+  if (v.includes("suv") || v.includes("4x4") || v.includes("4x4")) return "suv";
+  if (v.includes("berline")) return "berline";
+  if (v.includes("citadine")) return "citadine";
+  if (v.includes("monospace")) return "monospace";
+  if (v.includes("pick") || v.includes("utilitaire")) return "pick-up";
+  return "crossover";
+}
+
+function dbFuelType(fuel: string | undefined): string {
+  const v = (fuel || "").toLowerCase();
+  if (v.includes("électr") || v.includes("electr")) return "electrique";
+  if (v.includes("hybr")) return "hybride";
+  if (v.includes("diesel")) return "diesel";
+  if (v.includes("essence")) return "essence";
+  return "essence";
+}
+
+function dbTransmission(transmission: string | undefined): string {
+  const v = (transmission || "").toLowerCase();
+  if (v.includes("manuel")) return "manuelle";
+  return "automatique";
+}
+
+/** Trouve le vehicle_id par marque/modele, ou cree la ligne si absente. */
+async function getOrCreateVehicle(
+  client: { query: (sql: string, params?: unknown[]) => Promise<{ rowCount: number; rows: { id: string }[] }> },
+  make: string,
+  model: string,
+  car: { year?: number; fuel?: string; bodyType?: string; transmission?: string }
+): Promise<string> {
+  const existing = await client.query(
+    `SELECT id FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2)`,
+    [make, model]
+  );
+  if (existing.rowCount && existing.rowCount > 0) return existing.rows[0].id;
+  const inserted = await client.query(
+    `INSERT INTO vehicles (make, model, year, trim, body_type, fuel_type, transmission, seats, price_mad)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [
+      make,
+      model,
+      car.year || 2026,
+      model,
+      dbBodyType(car.bodyType),
+      dbFuelType(car.fuel),
+      dbTransmission(car.transmission),
+      5,
+      0,
+    ]
+  );
+  return inserted.rows[0].id;
+}
+
 export async function GET(request: NextRequest) {
   const make = request.nextUrl.searchParams.get("make") || "";
   const model = request.nextUrl.searchParams.get("model") || "";
@@ -242,31 +336,29 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await loadReputation(make, model);
+    data.safety = safetyInfoFor(make, model);
+    data.maroc = marocBlockFor(make, model);
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json(insufficientData(getModelKey(make, model)));
+    const fallback = insufficientData(getModelKey(make, model));
+    fallback.safety = safetyInfoFor(make, model);
+    fallback.maroc = marocBlockFor(make, model);
+    return NextResponse.json(fallback);
   }
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { make, model, text, score, sentiment } = body;
+  const { make, model, text, score, sentiment, year, fuel, bodyType, transmission } = body;
 
   if (!make || !model || !text || score === undefined) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const modelKey = getModelKey(make, model);
   let client;
   try {
     client = await getPool().connect();
-    const vehicleResult = await client.query(
-      `SELECT id FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2)`,
-      [make, model]
-    );
-    if (vehicleResult.rowCount === 0) {
-      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
-    }
+    const vehicleId = await getOrCreateVehicle(client, make, model, { year, fuel, bodyType, transmission });
 
     const rating = round1(clamp(Number(score), 0, 10));
     const title = String(text).slice(0, 300);
@@ -278,7 +370,7 @@ export async function POST(request: NextRequest) {
       `INSERT INTO reviews (vehicle_id, source, author_name, rating, title, body, pros, cons, verified, published_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
       [
-        vehicleResult.rows[0].id,
+        vehicleId,
         "web",
         null,
         rating,
@@ -291,6 +383,8 @@ export async function POST(request: NextRequest) {
     );
 
     const data = await loadReputation(make, model);
+    data.safety = safetyInfoFor(make, model);
+    data.maroc = marocBlockFor(make, model);
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
