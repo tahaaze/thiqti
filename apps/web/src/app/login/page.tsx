@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck } from "lucide-react";
+import { ThiqtiShield } from "@/components/icons";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -38,20 +38,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md">
         <div className="glass-card p-8">
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/50 bg-gradient-to-br from-dark-700 to-dark-900 shadow-[0_0_28px_rgba(212,169,74,0.3)]">
-              <ShieldCheck className="h-8 w-8 text-primary" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/40 bg-gradient-to-br from-[#f3d9a3] to-[#d4a94a] shadow-[0_0_28px_rgba(196,128,46,0.25)]">
+              <ThiqtiShield className="h-8 w-8 text-[#241505]" />
             </div>
-            <h1 className="font-display text-4xl font-bold text-white">Thiqti<span className="text-primary">.</span></h1>
-            <p className="text-gray-400 mt-2 uppercase tracking-widest text-xs font-semibold">Administration</p>
+            <h1 className="font-display text-4xl font-bold text-ink">Thiqti<span className="text-primary">.</span></h1>
+            <p className="text-muted mt-2 uppercase tracking-widest text-xs font-semibold">Administration</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-ink mb-1">
                 Email
               </label>
               <input
@@ -67,7 +67,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-ink mb-1">
                 Mot de passe
               </label>
               <input
@@ -82,7 +82,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="bg-red-500/10 text-red-400 text-sm px-4 py-2.5 rounded-lg border border-red-500/20">
+              <div className="bg-red-500/10 text-red-600 text-sm px-4 py-2.5 rounded-lg border border-red-500/20">
                 {error}
               </div>
             )}

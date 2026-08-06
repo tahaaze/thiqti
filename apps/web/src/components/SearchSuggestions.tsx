@@ -48,12 +48,12 @@ export default function SearchSuggestions({ query, onSelect }: SearchSuggestions
 
   return (
     <div className="flex flex-wrap items-center gap-2 mt-2">
-      <Sparkles className="h-4 w-4 text-amber-400/70 shrink-0" />
+      <Sparkles className="h-4 w-4 text-amber-600/70 shrink-0" />
       {filtered.slice(0, 5).map((suggestion) => (
         <button
           key={suggestion}
           onClick={() => onSelect(suggestion)}
-          className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300 backdrop-blur-md transition-all hover:border-amber-400/30 hover:bg-amber-400/10 hover:text-amber-300"
+          className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
         >
           {suggestion}
         </button>

@@ -1,6 +1,7 @@
 "use client";
 
-import { Phone, MessageCircle, ExternalLink, ShieldCheck, BadgeCheck, Eye, Star, Clock } from "lucide-react";
+import { Phone, MessageCircle, ExternalLink, Eye, Clock } from "lucide-react";
+import { ZelligeStar, ThiqtiShield } from "@/components/icons";
 
 export interface SellerContactInfo {
   name?: string;
@@ -37,37 +38,37 @@ function ReputationBadge({ reputation, compact }: { reputation?: CarReputationIn
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {verified && (
-        <span className={`inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-400 ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
-          <ShieldCheck className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
+        <span className={`inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-700 ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
+          <ThiqtiShield className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {label || "Annonce vérifiée"}
         </span>
       )}
       {!verified && trustBadge && (
         <span className={`inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
-          <BadgeCheck className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
+          <ThiqtiShield className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
           Badge de confiance
         </span>
       )}
       {!verified && !trustBadge && label && (
-        <span className={`inline-flex items-center gap-1 rounded-full bg-white/5 text-gray-400 ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
-          <BadgeCheck className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
+        <span className={`inline-flex items-center gap-1 rounded-full bg-muted/10 text-muted ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
+          <ThiqtiShield className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {label}
         </span>
       )}
       {typeof rating5 === "number" && rating5 > 0 && (reviews ?? 0) > 0 && (
-        <span className={`inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-400 ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
-          <Star className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
+        <span className={`inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-700 ${compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"}`}>
+          <ZelligeStar className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {rating5}/5 · {reviews} avis
         </span>
       )}
       {sellerSince && (
-        <span className={`inline-flex items-center gap-1 text-gray-400 ${compact ? "text-[10px]" : "text-xs"}`}>
+        <span className={`inline-flex items-center gap-1 text-muted ${compact ? "text-[10px]" : "text-xs"}`}>
           <Clock className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {sellerSince}
         </span>
       )}
       {typeof views === "number" && views > 0 && (
-        <span className={`inline-flex items-center gap-1 text-gray-500 ${compact ? "text-[10px]" : "text-xs"}`}>
+        <span className={`inline-flex items-center gap-1 text-muted ${compact ? "text-[10px]" : "text-xs"}`}>
           <Eye className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {views.toLocaleString("fr-FR")} vues
         </span>
@@ -90,7 +91,7 @@ export default function SellerContact({ contact, reputation, compact, showButton
         ? "bg-gradient-to-br from-[#eed9a1] to-[#c2923d] text-[#1b1406] shadow-[0_2px_14px_rgba(212,169,74,0.4)]"
         : variant === "whatsapp"
           ? "bg-green-600/90 text-white hover:bg-green-600"
-          : "border border-white/10 text-gray-300 hover:bg-white/5";
+          : "border border-line text-ink hover:bg-muted/10";
     return (
       <a key={label} href={url} target={url.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className={`${base} ${styles}`}>
         {icon}

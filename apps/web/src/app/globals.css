@@ -127,7 +127,7 @@ body {
   }
   .chip {
     background: var(--surface);
-    border: 1px solid rgba(196, 128, 46, 0.4);
+    border: 1px solid rgba(196, 128, 46, 0.22);
     color: var(--brand);
     padding: 0.5rem 1rem;
     border-radius: 999px;
@@ -198,7 +198,31 @@ body {
   .input-field::placeholder {
     color: #9ca3af;
   }
+  /* Utilitaires alpha sur jetons CSS (Tailwind 3.4 ne calcule pas l'opacité sur var()) */
+  .bg-primary\/5 { background-color: rgba(196, 128, 46, 0.05); }
+  .bg-primary\/10 { background-color: rgba(196, 128, 46, 0.1); }
+  .bg-primary\/15 { background-color: rgba(196, 128, 46, 0.15); }
+  .bg-primary\/20 { background-color: rgba(196, 128, 46, 0.2); }
+  .hover\:bg-primary\/10:hover { background-color: rgba(196, 128, 46, 0.1); }
+  .hover\:bg-primary\/15:hover { background-color: rgba(196, 128, 46, 0.15); }
+  .hover\:bg-primary\/20:hover { background-color: rgba(196, 128, 46, 0.2); }
+  .bg-line\/60 { background-color: rgba(229, 231, 235, 0.6); }
+  .bg-muted\/10 { background-color: rgba(107, 114, 128, 0.1); }
+  .bg-muted\/20 { background-color: rgba(107, 114, 128, 0.2); }
+  .hover\:bg-muted\/10:hover { background-color: rgba(107, 114, 128, 0.1); }
+  .hover\:bg-muted\/20:hover { background-color: rgba(107, 114, 128, 0.2); }
+  .bg-surface\/85 { background-color: rgba(255, 255, 255, 0.85); }
+  .text-muted\/10 { color: rgba(107, 114, 128, 0.1); }
+  .border-primary\/20 { border-color: rgba(196, 128, 46, 0.2); }
+  .border-primary\/30 { border-color: rgba(196, 128, 46, 0.3); }
+  .border-primary\/40 { border-color: rgba(196, 128, 46, 0.4); }
+  .border-primary\/50 { border-color: rgba(196, 128, 46, 0.5); }
+  .hover\:border-primary\/40:hover { border-color: rgba(196, 128, 46, 0.4); }
 }
+
+/* Règles hors @layer : certains variants disparaissaient dans le minifier (lightningcss) */
+.hover\:bg-ink\/5:hover { background-color: rgba(28, 30, 34, 0.05); }
+.focus\:ring-primary\/50:focus { --tw-ring-color: rgba(196, 128, 46, 0.5); }
 
 /* Icônes Lucide : un seul poids de trait, cohérent avec les SVG maison */
 svg {

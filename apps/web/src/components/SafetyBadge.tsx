@@ -1,4 +1,4 @@
-import { Star, Shield, ShieldCheck } from "lucide-react";
+import { ZelligeStar, ThiqtiShield } from "@/components/icons";
 
 export interface SafetyInfo {
   stars: number;
@@ -15,10 +15,10 @@ export function safetyLabelOf(safety: SafetyInfo | null | undefined): string {
 }
 
 function starColor(stars: number): string {
-  if (stars >= 4) return "text-green-400";
-  if (stars === 3) return "text-yellow-400";
-  if (stars === 2) return "text-orange-400";
-  return "text-red-400";
+  if (stars >= 4) return "text-green-600";
+  if (stars === 3) return "text-yellow-600";
+  if (stars === 2) return "text-orange-600";
+  return "text-red-600";
 }
 
 interface SafetyBadgeProps {
@@ -32,8 +32,8 @@ interface SafetyBadgeProps {
 export default function SafetyBadge({ safety, size = 13, full = false }: SafetyBadgeProps) {
   if (!safety) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-0.5 text-[11px] text-gray-500">
-        <Shield style={{ width: size, height: size }} />
+      <span className="inline-flex items-center gap-1 rounded-md bg-muted/10 px-2 py-0.5 text-[11px] text-muted">
+        <ThiqtiShield style={{ width: size, height: size }} />
         {full ? "Non évalué" : ""}
       </span>
     );
@@ -41,12 +41,12 @@ export default function SafetyBadge({ safety, size = 13, full = false }: SafetyB
   return (
     <span className="inline-flex items-center gap-1.5">
       <span className={`inline-flex items-center gap-0.5 ${starColor(safety.stars)}`}>
-        <ShieldCheck style={{ width: size, height: size }} />
+        <ThiqtiShield style={{ width: size, height: size }} />
         {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} style={{ width: size, height: size }} className={i < safety.stars ? "fill-current" : "opacity-25"} />
+          <ZelligeStar key={i} style={{ width: size, height: size }} className={i < safety.stars ? "fill-current" : "opacity-25"} />
         ))}
       </span>
-      {full && <span className="text-xs text-gray-400">{safetyLabelOf(safety)}</span>}
+      {full && <span className="text-xs text-muted">{safetyLabelOf(safety)}</span>}
     </span>
   );
 }

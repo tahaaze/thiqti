@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { SlidersHorizontal, RotateCcw, ShieldCheck, Calendar, Gauge, Tag, Fuel } from "lucide-react";
+import { SlidersHorizontal, RotateCcw, Calendar, Gauge, Tag, Fuel } from "lucide-react";
+import { ThiqtiShield } from "@/components/icons";
 import { SearchFilters, SearchFacets, countActiveFilters } from "@/lib/searchTypes";
 
 const PRICE_PRESETS = [
@@ -48,7 +49,7 @@ function Slider({
   return (
     <div>
       <div className="mb-1 flex items-center justify-between">
-        <span className="flex items-center gap-1 text-xs text-gray-400">
+        <span className="flex items-center gap-1 text-xs text-muted">
           <Icon className="h-3.5 w-3.5 text-primary" />
           {label}
         </span>
@@ -82,7 +83,7 @@ function Chip({
       className={`rounded-full border px-2.5 py-1 text-xs font-medium transition ${
         active
           ? "border-primary bg-primary/15 text-primary"
-          : "border-white/10 text-gray-400 hover:border-white/25 hover:text-white"
+          : "border-line text-muted hover:border-primary/40 hover:text-ink"
       }`}
     >
       {children}
@@ -92,8 +93,8 @@ function Chip({
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-white/5 pt-4">
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">{title}</p>
+    <div className="border-t border-line pt-4">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">{title}</p>
       {children}
     </div>
   );
@@ -138,15 +139,15 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
         </div>
         <button
           onClick={onReset}
-          className="flex items-center gap-1 text-xs text-gray-500 transition hover:text-white"
+          className="flex items-center gap-1 text-xs text-muted transition hover:text-ink"
         >
           <RotateCcw className="h-3 w-3" />
           Réinitialiser
         </button>
       </div>
 
-      <div className="mb-4 flex items-baseline justify-between rounded-xl bg-dark-800/50 px-3 py-2">
-        <p className="text-xs text-gray-500">Résultats</p>
+      <div className="mb-4 flex items-baseline justify-between rounded-xl bg-line/60 px-3 py-2">
+        <p className="text-xs text-muted">Résultats</p>
         <p className="text-sm font-bold text-primary">{total} véhicules</p>
       </div>
 
@@ -170,7 +171,7 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
               onChange={(e) => set({ minPrice: e.target.value ? Number(e.target.value) : undefined })}
               className="input-field text-sm"
             />
-            <span className="text-gray-600">—</span>
+            <span className="text-muted">—</span>
             <input
               type="number"
               placeholder="Max (DH)"
@@ -215,13 +216,13 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
             {SAFETY_OPTIONS.map((o) => (
               <Chip key={o.value} active={safetyActive(o.value)} onClick={() => toggle("minSafety", o.value)}>
                 <span className="inline-flex items-center gap-1">
-                  <ShieldCheck className="h-3 w-3" />
+                  <ThiqtiShield className="h-3 w-3" />
                   {o.label}
                 </span>
               </Chip>
             ))}
           </div>
-          <p className="mt-2 text-[10px] text-gray-600">
+          <p className="mt-2 text-[10px] text-muted">
             Basé sur Euro NCAP / NHTSA · {facets.safety.evaluated} modèles notés, {facets.safety.fiveStars} au maximum
           </p>
         </Section>
@@ -257,7 +258,7 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
 
         <Section title="Marque">
           <div className="relative">
-            <Tag className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-500" />
+            <Tag className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
             <input
               type="text"
               value={priceQuery}
@@ -299,7 +300,7 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
       {activeCount > 0 && (
         <button
           onClick={onReset}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 py-2.5 text-sm text-gray-400 transition hover:border-primary/40 hover:text-white"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm text-muted transition hover:border-primary/40 hover:text-ink"
         >
           <RotateCcw className="h-4 w-4" />
           Effacer {activeCount} filtre{activeCount > 1 ? "s" : ""}

@@ -117,7 +117,7 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
 
   if (!isSupported) {
     return (
-      <div className={`flex items-center gap-2 text-zinc-500 ${className}`}>
+      <div className={`flex items-center gap-2 text-muted ${className}`}>
         <MicOff className="h-5 w-5" />
         <span className="text-sm">Speech not supported</span>
       </div>
@@ -138,12 +138,12 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
           transition-all duration-200 ease-in-out
           ${
             isActive
-              ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              ? "bg-red-500/20 text-red-600 hover:bg-red-500/30"
               : isProcessing
-                ? "bg-amber-500/20 text-amber-400"
+                ? "bg-amber-500/20 text-amber-600"
                 : state === "error"
-                  ? "bg-red-500/20 text-red-400"
-                  : "bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                  ? "bg-red-500/20 text-red-600"
+                  : "bg-muted/10 text-ink hover:bg-muted/20"
           }
         `}
         aria-label={isActive ? "Stop recording" : "Start recording"}
@@ -168,14 +168,14 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
             <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
           </span>
-          <span className="text-sm text-zinc-400">
+          <span className="text-sm text-muted">
             {interimText || "Listening..."}
           </span>
         </div>
       )}
 
       {state === "error" && (
-        <span className="text-sm text-red-400">
+        <span className="text-sm text-red-600">
           Microphone access denied or error occurred
         </span>
       )}

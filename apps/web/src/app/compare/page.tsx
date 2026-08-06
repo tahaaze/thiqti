@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { X, Star, Loader, BadgeCheck, AlertTriangle, ThumbsUp, Wallet, Gauge, Calendar, Brain, ChevronLeft, Heart, Fuel, MapPin, CarFront, SlidersHorizontal, Hash, ShieldCheck } from "lucide-react";
+import { X, Loader, BadgeCheck, AlertTriangle, ThumbsUp, Wallet, Gauge, Calendar, Brain, ChevronLeft, Fuel, MapPin, CarFront, SlidersHorizontal, Hash } from "lucide-react";
+import { ZelligeStar, ThiqtiShield, FavHeart } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SellerContact from "@/components/SellerContact";
 
@@ -52,8 +53,8 @@ const SPECS: { label: string; format: (v: CarListing) => string; icon: React.Com
   { label: "Transmission", format: (v) => v.transmission || "—", icon: SlidersHorizontal, compare: "higher" },
   { label: "Carrosserie", format: (v) => v.bodyType || "—", icon: CarFront, compare: "higher" },
   { label: "Ville", format: (v) => v.city, icon: MapPin, compare: "higher" },
-  { label: "Score IA", format: (v) => `${v.score}/100`, icon: Star, compare: "higher" },
-  { label: "Sécurité", format: (v) => v.safety ? `${v.safety.stars}★` : "Non évalué", icon: ShieldCheck, compare: "higher" },
+  { label: "Score IA", format: (v) => `${v.score}/100`, icon: ZelligeStar, compare: "higher" },
+  { label: "Sécurité", format: (v) => v.safety ? `${v.safety.stars}★` : "Non évalué", icon: ThiqtiShield, compare: "higher" },
   { label: "Match %", format: (v) => v.matchPercent !== undefined ? `${v.matchPercent}%` : "—", icon: Hash, compare: "higher" },
 ];
 
@@ -154,8 +155,8 @@ export default function ComparePage() {
     return (
       <div className="min-h-screen px-6 py-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8"><h1 className="font-display text-4xl font-bold tracking-tight text-white">Comparaison</h1><p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
-          <div className="glass-card p-12 text-center"><Loader className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" /><p className="text-gray-400">Chargement des véhicules...</p></div>
+          <div className="mb-8"><h1 className="font-display text-4xl font-bold tracking-tight text-ink">Comparaison</h1><p className="mt-2 text-muted">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p></div>
+          <div className="glass-card p-12 text-center"><Loader className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" /><p className="text-muted">Chargement des véhicules...</p></div>
         </div>
       </div>
     );
@@ -167,29 +168,29 @@ export default function ComparePage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <Link href="/results" className="rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-white"><ChevronLeft className="h-5 w-5" /></Link>
-              <h1 className="font-display text-4xl font-bold tracking-tight text-white">Comparaison</h1>
+              <Link href="/results" className="rounded-lg p-2 text-muted hover:bg-ink/5 hover:text-ink"><ChevronLeft className="h-5 w-5" /></Link>
+              <h1 className="font-display text-4xl font-bold tracking-tight text-ink">Comparaison</h1>
             </div>
-            <p className="mt-2 text-gray-400">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p>
+            <p className="mt-2 text-muted">Comparez jusqu&apos;à {MAX_COMPARE} véhicules côte à côte</p>
           </div>
         </div>
 
         <div className="glass-card p-4 mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">Source des véhicules :</span>
-            <button onClick={() => setSource("search")} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${source === "search" ? "bg-primary/20 text-primary" : "text-gray-400 hover:text-white"}`}>Recherche</button>
-            <button onClick={() => setSource("favorites")} className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${source === "favorites" ? "bg-red-500/20 text-red-400" : "text-gray-400 hover:text-white"}`}><Heart className={`h-3.5 w-3.5 ${source === "favorites" ? "fill-red-400" : ""}`} />Favoris ({favoritesCars.length})</button>
+            <span className="text-sm text-muted">Source des véhicules :</span>
+            <button onClick={() => setSource("search")} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${source === "search" ? "bg-primary/20 text-primary" : "text-muted hover:text-ink"}`}>Recherche</button>
+            <button onClick={() => setSource("favorites")} className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${source === "favorites" ? "bg-red-500/20 text-red-600" : "text-muted hover:text-ink"}`}><FavHeart className={`h-3.5 w-3.5 ${source === "favorites" ? "fill-red-600" : ""}`} />Favoris ({favoritesCars.length})</button>
           </div>
         </div>
 
         <div className="glass-card overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="p-4 text-left text-sm text-gray-500 w-40">Caractéristique</th>
+              <tr className="border-b border-line">
+                <th className="p-4 text-left text-sm text-muted w-40">Caractéristique</th>
                 {selected.map((v) => (
                   <th key={v.id} className="relative p-4 text-center min-w-[200px]">
-                    <button onClick={() => removeCar(v.id)} className="absolute right-2 top-2 rounded-lg p-1 text-gray-500 hover:bg-red-500/10 hover:text-red-400"><X className="h-4 w-4" /></button>
+                    <button onClick={() => removeCar(v.id)} className="absolute right-2 top-2 rounded-lg p-1 text-muted hover:bg-red-500/10 hover:text-red-600"><X className="h-4 w-4" /></button>
                     <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="mx-auto h-24 w-40 rounded-lg object-cover" />
                     <p className="mt-2 font-semibold text-sm">{v.title}</p>
                     <div className="mt-1 flex items-center justify-center gap-2">{v.inventoryType && <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>{v.inventoryType === "new" ? "Neuf" : "Occasion"}</span>}<Link href={`/vehicle/${v.id}`} className="inline-block text-xs text-primary hover:underline">Voir détails</Link></div>
@@ -201,12 +202,12 @@ export default function ComparePage() {
                 {Array.from({ length: MAX_COMPARE - selected.length }).map((_, i) => (
                   <th key={`empty-${i}`} className="p-4 text-center">
                     <div className="flex flex-col items-center gap-2">
-                      <CarFront className="h-8 w-8 text-gray-600" />
+                      <CarFront className="h-8 w-8 text-muted" />
                       <select key={`${source}-${selected.length}-${i}`} onChange={(e) => { if (e.target.value) addCar(e.target.value); }} value="" className="input-field w-48 text-sm">
                         <option value="" disabled>+ Ajouter</option>
                         {available.map((v) => (<option key={v.id} value={v.id}>{v.title}</option>))}
                       </select>
-                      {available.length === 0 && <p className="text-xs text-gray-500">{source === "favorites" ? "Aucun favori" : "Aucun véhicule"}</p>}
+                      {available.length === 0 && <p className="text-xs text-muted">{source === "favorites" ? "Aucun favori" : "Aucun véhicule"}</p>}
                     </div>
                   </th>
                 ))}
@@ -217,13 +218,13 @@ export default function ComparePage() {
                 const bestId = getBestId(selected, spec.label);
                 const Icon = spec.icon;
                 return (
-                  <tr key={spec.label} className="border-b border-white/5">
-                    <td className="p-4 text-sm font-medium text-gray-300"><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-gray-500" />{spec.label}</span></td>
+                  <tr key={spec.label} className="border-b border-line">
+                    <td className="p-4 text-sm font-medium text-ink"><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-muted" />{spec.label}</span></td>
                     {selected.map((v) => {
                       const isBest = bestId === v.id;
                       return (
-                        <td key={v.id} className={`p-4 text-center text-sm rounded-lg ${isBest ? "text-green-400 bg-green-500/10 font-bold" : "text-gray-300"}`}>
-                          <span className="flex items-center justify-center gap-1.5">{isBest && <BadgeCheck className="h-4 w-4 text-green-400" />}{spec.format(v)}</span>
+                        <td key={v.id} className={`p-4 text-center text-sm rounded-lg ${isBest ? "text-green-600 bg-green-500/10 font-bold" : "text-ink"}`}>
+                          <span className="flex items-center justify-center gap-1.5">{isBest && <BadgeCheck className="h-4 w-4 text-green-600" />}{spec.format(v)}</span>
                         </td>
                       );
                     })}
@@ -232,16 +233,16 @@ export default function ComparePage() {
                 );
               })}
               {/* Price/km row */}
-              <tr className="border-b border-white/5">
-                <td className="p-4 text-sm font-medium text-gray-300"><span className="flex items-center gap-2"><Gauge className="h-4 w-4 text-gray-500" />Prix/km</span></td>
+              <tr className="border-b border-line">
+                <td className="p-4 text-sm font-medium text-ink"><span className="flex items-center gap-2"><Gauge className="h-4 w-4 text-muted" />Prix/km</span></td>
                 {selected.map((v) => {
                   const ratio = v.km > 0 ? Math.round(v.price / v.km) : 0;
                   const withKm = selected.filter((s) => s.km > 0);
                   const bestRatio = withKm.length >= 2 ? withKm.sort((a, b) => a.price / a.km - b.price / b.km)[0] : null;
                   const isBest = bestRatio?.id === v.id && v.km > 0;
                   return (
-                    <td key={v.id} className={`p-4 text-center text-sm rounded-lg ${isBest ? "text-green-400 bg-green-500/10 font-bold" : "text-gray-300"}`}>
-                      <span className="flex items-center justify-center gap-1.5">{isBest && <BadgeCheck className="h-4 w-4 text-green-400" />}{v.km > 0 ? `${ratio} DH/km` : "N/A"}</span>
+                    <td key={v.id} className={`p-4 text-center text-sm rounded-lg ${isBest ? "text-green-600 bg-green-500/10 font-bold" : "text-ink"}`}>
+                      <span className="flex items-center justify-center gap-1.5">{isBest && <BadgeCheck className="h-4 w-4 text-green-600" />}{v.km > 0 ? `${ratio} DH/km` : "N/A"}</span>
                     </td>
                   );
                 })}
@@ -259,19 +260,19 @@ export default function ComparePage() {
             </div>
             <div className="space-y-3">
               {advice.map((tip, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-xl bg-dark-800/50 p-4">
-                  {tip.includes("sûr") || tip.includes("meilleur") || tip.includes("récent") || tip.includes("peu utilisé") ? <ThumbsUp className="mt-0.5 h-4 w-4 shrink-0 text-green-400" /> :
-                   tip.includes("moins cher") || tip.includes("rapport") ? <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" /> :
-                   tip.includes("écart") || tip.includes("important") ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-400" /> :
-                   <Star className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
-                  <p className="text-sm text-gray-300">{tip}</p>
+                <div key={i} className="flex items-start gap-3 rounded-xl bg-line/60 p-4">
+                  {tip.includes("sûr") || tip.includes("meilleur") || tip.includes("récent") || tip.includes("peu utilisé") ? <ThumbsUp className="mt-0.5 h-4 w-4 shrink-0 text-green-600" /> :
+                   tip.includes("moins cher") || tip.includes("rapport") ? <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" /> :
+                   tip.includes("écart") || tip.includes("important") ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600" /> :
+                   <ZelligeStar className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
+                  <p className="text-sm text-ink">{tip}</p>
                 </div>
               ))}
             </div>
             {bestCar && (
               <div className="mt-4 rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-                <div className="flex items-center gap-2"><BadgeCheck className="h-5 w-5 text-green-400" /><p className="font-semibold text-green-400">Recommandation : {bestCar.make} {bestCar.model}</p></div>
-                <p className="mt-1 text-sm text-gray-400">Avec un score de {bestCar.score}/100 et un prix de {bestCar.priceFormatted}, c&apos;est le meilleur choix parmi vos sélectionnés.</p>
+                <div className="flex items-center gap-2"><BadgeCheck className="h-5 w-5 text-green-600" /><p className="font-semibold text-green-600">Recommandation : {bestCar.make} {bestCar.model}</p></div>
+                <p className="mt-1 text-sm text-muted">Avec un score de {bestCar.score}/100 et un prix de {bestCar.priceFormatted}, c&apos;est le meilleur choix parmi vos sélectionnés.</p>
               </div>
             )}
           </div>
@@ -279,9 +280,9 @@ export default function ComparePage() {
 
         {selected.length === 0 && (
           <div className="mt-6 glass-card p-12 text-center">
-            <CarFront className="mx-auto mb-4 h-12 w-12 text-gray-600" />
-            <p className="text-gray-400">Aucun véhicule sélectionné</p>
-            <p className="mt-1 text-sm text-gray-500">Sélectionnez des véhicules pour les comparer</p>
+            <CarFront className="mx-auto mb-4 h-12 w-12 text-muted" />
+            <p className="text-muted">Aucun véhicule sélectionné</p>
+            <p className="mt-1 text-sm text-muted">Sélectionnez des véhicules pour les comparer</p>
             <Link href="/results" className="btn-primary mt-6 inline-flex items-center gap-2">Explorer les annonces</Link>
           </div>
         )}

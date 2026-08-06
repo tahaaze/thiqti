@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Search, Star, MapPin, Fuel, Heart, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows, ShieldCheck } from "lucide-react";
+import { Search, MapPin, Fuel, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows } from "lucide-react";
+import { ZelligeStar, FavHeart, ThiqtiShield } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SafetyBadge from "@/components/SafetyBadge";
 import FilterPanel from "@/components/FilterPanel";
@@ -65,10 +66,13 @@ interface SearchCriteria {
   motorisation: string | null;
   transmission: string | null;
   marque: string | null;
+  modele: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
+  budgetTolerance: number;
   ville: string | null;
   anneeMin: number | null;
+  anneeMax: number | null;
   kmMax: number | null;
   intent: string[];
 }
@@ -85,6 +89,7 @@ export default function ResultsPage() {
   const [facets, setFacets] = useState<SearchFacets | null>(null);
   const [expandedExplanations, setExpandedExplanations] = useState<string | null>(null);
   const loadedRef = useRef(false);
+  const seededRef = useRef(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -149,13 +154,27 @@ export default function ResultsPage() {
   }, [doSearch, query, invType]);
 
   useEffect(() => {
+    if (seededRef.current) return;
+    seededRef.current = true;
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q") || "";
     const t = params.get("type");
     const type = t === "new" || t === "used" ? t : "";
+    const toNum = (v: string | null): number | undefined => {
+      if (v === null || v === "") return undefined;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : undefined;
+    };
+    const flt: SearchFilters = {
+      minPrice: toNum(params.get("minPrice")),
+      maxPrice: toNum(params.get("maxPrice")),
+      minYear: toNum(params.get("minYear")),
+      maxKm: toNum(params.get("maxKm")),
+    };
     setQuery(q);
     setInvType(type);
-    doSearch(q, type);
+    setFilters(flt);
+    doSearch(q, type, flt);
   }, [doSearch]);
 
   const changeInvType = (type: "new" | "used" | "") => {
@@ -174,8 +193,8 @@ export default function ResultsPage() {
   const formatCriteriaLabel = (key: string): string => {
     const labels: Record<string, string> = {
       carrosserie: "Carrosserie", motorisation: "Motorisation", transmission: "Transmission",
-      marque: "Marque", budgetMax: "Budget max", budgetMin: "Budget min",
-      ville: "Ville", anneeMin: "Année min", kmMax: "Km max",
+      marque: "Marque", modele: "Modèle", budgetMax: "Budget max", budgetMin: "Budget min",
+      ville: "Ville", anneeMin: "Année min", anneeMax: "Année max", kmMax: "Km max",
     };
     return labels[key] || key;
   };
@@ -201,8 +220,8 @@ export default function ResultsPage() {
             <Search className="h-3.5 w-3.5" />
             Catalogue marocain réel
           </span>
-          <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-white">Résultats de recherche</h1>
-          <p className="mt-2 text-gray-400">{loading ? "Analyse en cours..." : `${cars.length} véhicules trouvés`}</p>
+          <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-ink">Résultats de recherche</h1>
+          <p className="mt-2 text-muted">{loading ? "Analyse en cours..." : `${cars.length} véhicules trouvés`}</p>
         </div>
 
         <div className="flex flex-col gap-8 lg:flex-row">
@@ -210,7 +229,7 @@ export default function ResultsPage() {
             <div className="glass-card p-5">
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                   <input
                     type="text"
                     value={query}
@@ -238,8 +257,8 @@ export default function ResultsPage() {
                       return value !== null && value !== undefined && value !== "";
                     })
                     .map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between rounded-lg bg-dark-800/50 px-3 py-2">
-                        <span className="text-xs text-gray-400">{formatCriteriaLabel(key)}</span>
+                      <div key={key} className="flex items-center justify-between rounded-lg bg-line/60 px-3 py-2">
+                        <span className="text-xs text-muted">{formatCriteriaLabel(key)}</span>
                         <span className="text-xs font-medium text-primary">{String(value)}</span>
                       </div>
                     ))}
@@ -267,9 +286,9 @@ export default function ResultsPage() {
               />
             ) : (
               <div className="glass-card animate-pulse p-5">
-                <div className="h-4 w-24 rounded bg-dark-800/50" />
+                <div className="h-4 w-24 rounded bg-line/60" />
                 <div className="mt-4 space-y-3">
-                  {[1, 2, 3, 4].map((i) => <div key={i} className="h-8 rounded-lg bg-dark-800/50" />)}
+                  {[1, 2, 3, 4].map((i) => <div key={i} className="h-8 rounded-lg bg-line/60" />)}
                 </div>
               </div>
             )}
@@ -277,7 +296,7 @@ export default function ResultsPage() {
 
           <div className="flex-1">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-gray-400">Source: <span className="text-white font-medium">Multi-sources</span></p>
+              <p className="text-sm text-muted">Source: <span className="text-ink font-medium">Multi-sources</span></p>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="segmented">
                   <button className={`segmented-item ${invType === "" ? "active" : ""}`} onClick={() => changeInvType("")}>Tous</button>
@@ -285,9 +304,9 @@ export default function ResultsPage() {
                   <button className={`segmented-item ${invType === "used" ? "active" : ""}`} onClick={() => changeInvType("used")}>Occasion</button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link href="/compare" className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-400 hover:text-primary"><GitCompareArrows className="h-3 w-3" />Comparer</Link>
-                  <button onClick={() => setView("grid")} className={`rounded-lg p-2 ${view === "grid" ? "bg-primary/20 text-primary" : "text-gray-500 hover:text-white"}`}><Grid3X3 className="h-4 w-4" /></button>
-                  <button onClick={() => setView("list")} className={`rounded-lg p-2 ${view === "list" ? "bg-primary/20 text-primary" : "text-gray-500 hover:text-white"}`}><List className="h-4 w-4" /></button>
+                  <Link href="/compare" className="flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-xs text-muted hover:text-primary"><GitCompareArrows className="h-3 w-3" />Comparer</Link>
+                  <button onClick={() => setView("grid")} className={`rounded-lg p-2 ${view === "grid" ? "bg-primary/20 text-primary" : "text-muted hover:text-ink"}`}><Grid3X3 className="h-4 w-4" /></button>
+                  <button onClick={() => setView("list")} className={`rounded-lg p-2 ${view === "list" ? "bg-primary/20 text-primary" : "text-muted hover:text-ink"}`}><List className="h-4 w-4" /></button>
                 </div>
               </div>
             </div>
@@ -304,7 +323,7 @@ export default function ResultsPage() {
                     <X className="h-3 w-3" />
                   </button>
                 ))}
-                <button onClick={resetFilters} className="text-xs text-gray-500 underline transition hover:text-white">
+                <button onClick={resetFilters} className="text-xs text-muted underline transition hover:text-ink">
                   Tout effacer
                 </button>
               </div>
@@ -324,18 +343,18 @@ export default function ResultsPage() {
                       <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
                       <div className="absolute right-2 top-2">
                         {v.meetsBudget === false ? (
-                          <span className="rounded-lg bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-300 backdrop-blur">Hors budget</span>
+                          <span className="rounded-lg bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-600 backdrop-blur">Hors budget</span>
                         ) : v.matchPercent !== undefined && v.matchPercent >= 80 ? (
-                          <span className="rounded-lg bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300 backdrop-blur">{v.matchPercent}% match</span>
+                          <span className="rounded-lg bg-green-500/20 px-2 py-1 text-xs font-medium text-green-600 backdrop-blur">{v.matchPercent}% match</span>
                         ) : null}
                       </div>
-                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-gray-400 backdrop-blur hover:text-red-400">
-                        <Heart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-400 text-red-400" : ""}`} />
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-muted backdrop-blur hover:text-red-600">
+                        <FavHeart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-600 text-red-600" : ""}`} />
                       </button>
                       {v.reputation?.verified && (
                         <div className="absolute bottom-2 left-2">
                           <span className="inline-flex items-center gap-1 rounded-full border border-primary/50 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary backdrop-blur">
-                            <ShieldCheck className="h-3 w-3" />
+                            <ThiqtiShield className="h-3 w-3" />
                             Vérifiée
                           </span>
                         </div>
@@ -343,8 +362,8 @@ export default function ResultsPage() {
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold">{v.title}</h3>
-                      <p className="text-sm text-gray-500">{v.year} &middot; {v.km.toLocaleString()} km</p>
-                      <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
+                      <p className="text-sm text-muted">{v.year} &middot; {v.km.toLocaleString()} km</p>
+                      <div className="mt-2 flex items-center gap-3 text-xs text-muted">
                         {v.inventoryType && (
                           <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>
                             {v.inventoryType === "new" ? "Neuf" : "Occasion"}
@@ -363,16 +382,16 @@ export default function ResultsPage() {
                       ) : null}
                       <div className="mt-3 flex items-center justify-between">
                         <span className="text-lg font-bold text-primary">{v.priceFormatted}</span>
-                        <span className={`flex items-center gap-1 text-sm font-bold ${v.score >= 85 ? "text-green-500" : v.score >= 70 ? "text-yellow-500" : "text-red-500"}`}>
-                          <Star className="h-3.5 w-3.5" />{v.score}
+                        <span className={`flex items-center gap-1 text-sm font-bold ${v.score >= 85 ? "text-green-600" : v.score >= 70 ? "text-yellow-600" : "text-red-600"}`}>
+                          <ZelligeStar className="h-3.5 w-3.5" />{v.score}
                         </span>
                       </div>
 
                       {v.explanations && v.explanations.length > 0 && (
-                        <div className="mt-3 border-t border-white/5 pt-3">
+                        <div className="mt-3 border-t border-line pt-3">
                           <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedExplanations(expandedExplanations === v.id ? null : v.id); }}
-                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
+                            className="flex items-center gap-1 text-xs text-muted hover:text-ink"
                           >
                             <Brain className="h-3 w-3" />
                             {expandedExplanations === v.id ? "Masquer" : "Pourquoi ce résultat ?"}
@@ -381,11 +400,11 @@ export default function ResultsPage() {
                             <div className="mt-2 space-y-1">
                               {v.explanations.map((exp, i) => (
                                 <div key={i} className="flex items-center gap-2 text-[11px]">
-                                  {exp.impact === "positive" ? <CheckCircle2 className="h-3 w-3 shrink-0 text-green-400" /> :
-                                   exp.impact === "negative" ? <AlertTriangle className="h-3 w-3 shrink-0 text-red-400" /> :
-                                   <MessageSquare className="h-3 w-3 shrink-0 text-yellow-400" />}
-                                  <span className="text-gray-400">{exp.label}:</span>
-                                  <span className={exp.impact === "positive" ? "text-green-300" : exp.impact === "negative" ? "text-red-300" : "text-yellow-300"}>{exp.reason}</span>
+                                  {exp.impact === "positive" ? <CheckCircle2 className="h-3 w-3 shrink-0 text-green-600" /> :
+                                   exp.impact === "negative" ? <AlertTriangle className="h-3 w-3 shrink-0 text-red-600" /> :
+                                   <MessageSquare className="h-3 w-3 shrink-0 text-yellow-600" />}
+                                  <span className="text-muted">{exp.label}:</span>
+                                  <span className={exp.impact === "positive" ? "text-green-600" : exp.impact === "negative" ? "text-red-600" : "text-yellow-600"}>{exp.reason}</span>
                                 </div>
                               ))}
                             </div>
