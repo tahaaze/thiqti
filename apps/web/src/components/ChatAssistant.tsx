@@ -7,6 +7,7 @@ import { ThiqtiShield, ZelligeStar } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SellerContact from "@/components/SellerContact";
 import VoiceInput from "@/components/VoiceInput";
+import { addHistory } from "@/lib/history";
 import {
   ChatState,
   BotReply,
@@ -70,7 +71,13 @@ function InventoryBadge({ type }: { type?: "new" | "used" }) {
   );
 }
 
-export default function ChatAssistant() {
+export default function ChatAssistant({
+  onStart,
+  heightClassName = "h-[640px]",
+}: {
+  onStart?: () => void;
+  heightClassName?: string;
+}) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [botState, setBotState] = useState<ChatState>(() => createInitialState());
   const [quickReplies, setQuickReplies] = useState<string[]>([]);
@@ -80,6 +87,7 @@ export default function ChatAssistant() {
   const [input, setInput] = useState("");
   const idRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const startedRef = useRef(false);
 
   useEffect(() => {
     const init = initialMessage();
@@ -153,6 +161,14 @@ export default function ChatAssistant() {
         return;
       }
 
+      if (!startedRef.current) {
+        startedRef.current = true;
+        onStart?.();
+      }
+      if (text.toLowerCase() !== "voir plus" && text.toLowerCase() !== "voir tous" && text.toLowerCase() !== "afficher plus") {
+        addHistory(text);
+      }
+
       const reply: BotReply = answer(botState, text);
       setBotState(reply.state);
       setQuickReplies(reply.quickReplies);
@@ -165,7 +181,7 @@ export default function ChatAssistant() {
         fetchResultsFor(reply.state, /voir (?:plus|tous)|afficher plus|plus de r.sultats|d'autres options/i.test(text));
       }
     },
-    [botState, searching, reset, fetchResultsFor]
+    [botState, searching, reset, fetchResultsFor, onStart]
   );
 
   const resultsUrl = (() => {
@@ -178,7 +194,7 @@ export default function ChatAssistant() {
 
   return (
     <div className="w-full">
-      <div className="glass flex h-[640px] flex-col overflow-hidden rounded-3xl shadow-2xl shadow-primary/10">
+      <div className={`glass flex ${heightClassName} flex-col overflow-hidden rounded-3xl shadow-2xl shadow-primary/10`}>
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-line px-5 py-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/50 bg-gradient-to-br from-[#eed9a1] to-[#c2923d] shadow-[0_0_18px_rgba(196,128,46,0.3)]">

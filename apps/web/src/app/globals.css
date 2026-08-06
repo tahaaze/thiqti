@@ -13,6 +13,14 @@
   --brand-strong: #a86318;
   --brand-tint: #fbf3e4;
   --success: #16a34a;
+  /* Sidebar sombre de l'espace app */
+  --sidebar-bg: #17130e;
+  --sidebar-surface: #221c14;
+  --sidebar-ink: #f2ebdd;
+  --sidebar-muted: #a79c87;
+  --sidebar-line: rgba(196, 128, 46, 0.18);
+  --sidebar-hover: rgba(196, 128, 46, 0.12);
+  --sidebar-accent: #e8c178;
 }
 
 * {

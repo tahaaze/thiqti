@@ -14,6 +14,7 @@ import ErrorState from "@/components/ErrorState";
 import Skeleton from "@/components/Skeleton";
 import SellerContact from "@/components/SellerContact";
 import { SearchFilters, SearchFacets } from "@/lib/searchTypes";
+import { addHistory } from "@/lib/history";
 
 interface MatchExplanation {
   label: string;
@@ -174,6 +175,7 @@ export default function ResultsPage() {
     setQuery(q);
     setInvType(type);
     setFilters(flt);
+    if (q) addHistory(q);
     doSearch(q, type, flt);
   }, [doSearch]);
 

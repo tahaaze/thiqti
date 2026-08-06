@@ -18,6 +18,15 @@ const config: Config = {
         success: "var(--success)",
         warning: "#F59E0B",
         error: "#DC2626",
+        sidebar: {
+          bg: "var(--sidebar-bg)",
+          surface: "var(--sidebar-surface)",
+          ink: "var(--sidebar-ink)",
+          muted: "var(--sidebar-muted)",
+          line: "var(--sidebar-line)",
+          hover: "var(--sidebar-hover)",
+          accent: "var(--sidebar-accent)",
+        },
         // Échelle héritée de l'ancien thème sombre, remappée sur des surfaces
         // claires pour la transition. Migrée progressivement vers canvas/surface.
         dark: {

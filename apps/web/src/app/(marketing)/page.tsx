@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, MessageSquareText, CarFront, ArrowRight, Zap, MapPin, BadgeCheck } from "lucide-react";
+import { Sparkles, CarFront, ArrowRight, Zap, MapPin, BadgeCheck } from "lucide-react";
 import { ZelligeStar, ThiqtiShield } from "@/components/icons";
 import ChatAssistant from "@/components/ChatAssistant";
 import CarImage from "@/components/CarImage";
 import SellerContact from "@/components/SellerContact";
+import AppShell from "@/components/AppShell";
+import MarketingNavbar from "@/components/MarketingNavbar";
 
 interface HomeCar {
   id: string;
@@ -74,6 +76,7 @@ function CarCard({ car }: { car: HomeCar }) {
 export default function HomePage() {
   const [cars, setCars] = useState<HomeCar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState<"marketing" | "app">("marketing");
 
   useEffect(() => {
     fetch("/api/search")
@@ -83,67 +86,52 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 600);
-    return () => clearTimeout(t);
-  }, []);
-
   const selection = cars.slice(1, 4);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 left-1/2 h-[560px] w-[760px] -translate-x-1/2 rounded-full bg-primary/10 blur-[150px]" />
-        <div className="absolute right-0 top-1/3 h-[400px] w-[400px] rounded-full bg-amber-400/10 blur-[130px]" />
-        <div className="absolute bottom-0 left-0 h-[360px] w-[360px] rounded-full bg-primary/5 blur-[120px]" />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6">
-        {/* ===== Hero ===== */}
-        <section className="pb-16 pt-12 lg:pt-16">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
+    <AppShell sidebar={mode === "app"}>
+      {/* ===== Mode marketing : navbar top + hero compact ===== */}
+      <div className={mode === "app" ? "hidden" : "block"}>
+        <MarketingNavbar />
+        <div className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-32 left-1/2 h-[440px] w-[720px] -translate-x-1/2 rounded-full bg-primary/10 blur-[150px]" />
+            <div className="absolute right-0 top-1/3 h-[360px] w-[360px] rounded-full bg-amber-400/10 blur-[130px]" />
+          </div>
+          <div className="relative mx-auto max-w-7xl px-6 pb-8 pt-8">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary">
               <Zap className="h-3.5 w-3.5" />
               Le marché auto marocain, compris par l&apos;IA
             </span>
-            <h1 className="font-display mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-ink md:text-6xl">
+            <h1 className="font-display mt-4 text-3xl font-bold leading-[1.1] tracking-tight text-ink md:text-4xl">
               Trouvez la voiture idéale <span className="gradient-text">au Maroc</span>
             </h1>
-            <p className="mt-5 text-base leading-relaxed text-muted md:text-lg">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
               Décrivez votre envie en quelques mots : l&apos;assistant Thiqti vous guide,
               compare neuf et occasion, et vous propose les meilleurs choix, prix réels en DH.
             </p>
+            <a href="#assistant" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary transition hover:text-primary-dark">
+              Voir le guide d&apos;achat
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#assistant" className="btn-primary inline-flex items-center gap-2">
-                <MessageSquareText className="h-4 w-4" />
-                Démarrer l&apos;assistant
-              </a>
-              <Link href="/results" className="btn-secondary inline-flex items-center gap-2">
-                Parcourir le catalogue
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { icon: CarFront, value: "440+", label: "véhicules" },
                 { icon: BadgeCheck, value: "Neuf &", label: "occasion" },
                 { icon: Sparkles, value: "Score IA", label: "sur 100" },
                 { icon: ThiqtiShield, value: "Réputation", label: "vérifiée" },
               ].map((s) => (
-                <div key={s.label} className="glass-card p-3 text-center">
-                  <s.icon className="mx-auto mb-1.5 h-4 w-4 text-primary" />
+                <div key={s.label} className="glass-card p-2.5 text-center">
+                  <s.icon className="mx-auto mb-1 h-4 w-4 text-primary" />
                   <p className="font-display text-sm font-bold leading-tight text-primary">{s.value}</p>
                   <p className="text-[11px] text-muted">{s.label}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8">
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-muted">Marques populaires</p>
+            <div className="mt-6">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-muted">Marques populaires</p>
               <div className="flex flex-wrap gap-2">
                 {POPULAR_BRANDS.map((brand) => (
                   <Link key={brand} href={`/results?q=${encodeURIComponent(brand)}`} className="chip">
@@ -153,52 +141,46 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
-
-        {/* ===== Assistant ===== */}
-        <section id="assistant" className="scroll-mt-24 py-10">
-          <div className="mb-8 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
-              <MessageSquareText className="h-3.5 w-3.5" />
-              Votre guide d&apos;achat
-            </span>
-            <h2 className="font-display mt-4 text-3xl font-bold tracking-tight text-ink md:text-4xl">
-              Dites-lui ce que vous voulez, <span className="gradient-text">il trouve</span>
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-muted">
-              Budget, type de voiture, carburant, marque, année... Répondez pas à pas ou décrivez tout d&apos;un coup.
-              L&apos;assistant classe les meilleures options par score.
-            </p>
-          </div>
-          <ChatAssistant />
-        </section>
-
-        {/* ===== Selection du moment ===== */}
-        <section className="pb-20 pt-6">
-          <div className="mb-8 flex items-end justify-between">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
-                Sélection du moment
-              </span>
-              <h2 className="font-display mt-4 text-3xl font-bold tracking-tight text-ink">Les meilleures offres</h2>
-              <p className="mt-2 text-muted">Les véhicules les mieux notés par notre IA ce mois-ci.</p>
-            </div>
-            <Link href="/results" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
-              Tout voir <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          {loading ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {[1, 2, 3].map((i) => <div key={i} className="glass-card h-72 animate-pulse" />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {selection.map((car) => <CarCard key={car.id} car={car} />)}
-            </div>
-          )}
-        </section>
+        </div>
       </div>
-    </div>
+
+      {/* ===== Assistant : toujours monté pour préserver la conversation ===== */}
+      <div id="assistant" className="mx-auto w-full max-w-5xl scroll-mt-24 px-4 py-6 sm:px-6 lg:py-8">
+        <ChatAssistant
+          onStart={() => setMode("app")}
+          heightClassName={
+            mode === "marketing"
+              ? "h-[560px] lg:h-[min(680px,calc(100vh-26rem))]"
+              : "h-[640px]"
+          }
+        />
+      </div>
+
+      {/* ===== Sélection du moment : mode marketing uniquement ===== */}
+      <section className={mode === "app" ? "hidden" : "mx-auto max-w-7xl px-6 pb-20"}>
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
+              <Sparkles className="h-3.5 w-3.5" />
+              Sélection du moment
+            </span>
+            <h2 className="font-display mt-4 text-3xl font-bold tracking-tight text-ink">Les meilleures offres</h2>
+            <p className="mt-2 text-muted">Les véhicules les mieux notés par notre IA ce mois-ci.</p>
+          </div>
+          <Link href="/results" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
+            Tout voir <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {[1, 2, 3].map((i) => <div key={i} className="glass-card h-72 animate-pulse" />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {selection.map((car) => <CarCard key={car.id} car={car} />)}
+          </div>
+        )}
+      </section>
+    </AppShell>
   );
 }
