@@ -125,9 +125,14 @@ describe("parseQuery - extraction marque et ville", () => {
     expect(c.ville).toBe("Casablanca");
   });
 
-  it("extrait une ville arabe", () => {
+  it("extrait une ville arabe (canonique)", () => {
     const c = parseQuery("سيارة في الدار البيضاء");
-    expect(c.ville).toBe("الدار البيضاء");
+    expect(c.ville).toBe("Casablanca");
+  });
+
+  it("extrait une ville darija (كازا)", () => {
+    const c = parseQuery("بغيت سيارة في كازا");
+    expect(c.ville).toBe("Casablanca");
   });
 });
 
@@ -211,6 +216,90 @@ describe("parseQuery - requete combinee", () => {
     expect(c.budgetMax).toBe(345000);
     expect(c.anneeMin).toBe(2022);
     expect(c.anneeMax).toBe(2023);
+  });
+});
+
+describe("parseQuery - extraction modele", () => {
+  it("extrait un modele francais", () => {
+    const c = parseQuery("je cherche une Toyota Corolla");
+    expect(c.modele).toBe("Corolla");
+  });
+
+  it("extrait un modele Dacia", () => {
+    const c = parseQuery("Dacia Duster essence 2022");
+    expect(c.modele).toBe("Duster");
+  });
+
+  it("extrait un modele arabe (داستر)", () => {
+    const c = parseQuery("بغيت داسيا داستر");
+    expect(c.modele).toBe("Duster");
+  });
+
+  it("extrait un modele renvoie la marque correspondante", () => {
+    const c = parseQuery("Kia Sportage hybride");
+    expect(c.marque).toBe("Kia");
+    expect(c.modele).toBe("Sportage");
+  });
+
+  it("ne confond pas un modele numerique (2008) avec une annee", () => {
+    const c = parseQuery("Peugeot 2008 essence");
+    expect(c.modele).toBe("2008");
+    expect(c.anneeMin).toBeNull();
+    expect(c.anneeMax).toBeNull();
+  });
+
+  it("extrait le modele et l'annee quand les deux sont presents", () => {
+    const c = parseQuery("Peugeot 2008 2022");
+    expect(c.modele).toBe("2008");
+    expect(c.anneeMin).toBe(2022);
+  });
+});
+
+describe("parseQuery - budgets mille / k / darija", () => {
+  it("comprend '200 mille DH'", () => {
+    const c = parseQuery("200 mille DH");
+    expect(c.budgetMin).toBe(170000);
+    expect(c.budgetMax).toBe(230000);
+  });
+
+  it("comprend '300k dh'", () => {
+    const c = parseQuery("300k dh");
+    expect(c.budgetMin).toBe(255000);
+    expect(c.budgetMax).toBe(345000);
+  });
+
+  it("comprend 'ألف' (darija) avec multiplicateur", () => {
+    const c = parseQuery("بغيت سيارة 300 ألف درهم");
+    expect(c.budgetMin).toBe(255000);
+    expect(c.budgetMax).toBe(345000);
+  });
+
+  it("comprend '1 مليون درهم'", () => {
+    const c = parseQuery("1 مليون درهم");
+    expect(c.budgetMin).toBe(850000);
+    expect(c.budgetMax).toBe(1150000);
+  });
+});
+
+describe("parseQuery - darija combine", () => {
+  it("comprend une phrase complete en darija", () => {
+    const c = parseQuery("بغيت ربع ديزل اقل من 250000 درهم");
+    expect(c.carrosserie).toBe("SUV");
+    expect(c.motorisation).toBe("Diesel");
+    expect(c.budgetMin).toBeNull();
+    expect(c.budgetMax).toBe(250000);
+  });
+
+  it("comprend une phrase complete avec marque et ville en darija", () => {
+    const c = parseQuery("بغيت تويوتا ربع في الدار البيضاء");
+    expect(c.marque).toBe("Toyota");
+    expect(c.carrosserie).toBe("SUV");
+    expect(c.ville).toBe("Casablanca");
+  });
+
+  it("comprend une transmission automatique en darija", () => {
+    const c = parseQuery("بغيت سيارة ماتيك");
+    expect(c.transmission).toBe("Automatique");
   });
 });
 

@@ -16,7 +16,7 @@
 
 import { promises as fs } from "fs";
 import path from "path";
-import { UnifiedCar, InventoryType } from "./types";
+import { UnifiedCar, InventoryType, inferBodyType } from "./types";
 import { getFallbackCars } from "./fallback";
 import { fetchAuteraCars } from "./autera";
 import { fetchMoteurCars } from "./moteur";
@@ -25,7 +25,6 @@ import { cachedImageFor } from "@/lib/images";
 import { safetyRatingFor } from "@/lib/safetyRatings";
 
 const CACHE_TTL = 10 * 60 * 1000;
-const DISK_TTL = 6 * 60 * 60 * 1000;
 const CACHE_FILE = path.join(process.cwd(), ".cache", "thiqti-cars.json");
 
 interface DiskCacheShape {
@@ -36,11 +35,19 @@ interface DiskCacheShape {
 let cache: { cars: UnifiedCar[]; fetchedAt: number; liveSources: boolean } | null = null;
 let coldLoad: Promise<UnifiedCar[]> | null = null;
 
+function withInferredBody(car: UnifiedCar): UnifiedCar {
+  if (car.bodyType !== "Non précisé") return car;
+  const bodyType = inferBodyType(car.make, car.model, car.title);
+  if (bodyType === "Non précisé") return car;
+  return { ...car, bodyType };
+}
+
 async function readDiskCache(): Promise<DiskCacheShape | null> {
   if (process.env.NODE_ENV === "test") return null;
   try {
     const parsed = JSON.parse(await fs.readFile(CACHE_FILE, "utf8")) as DiskCacheShape;
-    return Array.isArray(parsed.cars) ? parsed : null;
+    if (!Array.isArray(parsed.cars)) return null;
+    return { cars: parsed.cars.map(withInferredBody), fetchedAt: parsed.fetchedAt };
   } catch {
     return null;
   }
@@ -79,7 +86,7 @@ async function loadMergedCars(): Promise<UnifiedCar[]> {
     fetchMoteurCars(),
     fetchElectroDriveCars(),
   ]);
-  const live = [...autera, ...moteur, ...electro];
+  const live = [...autera, ...moteur, ...electro].map(withInferredBody);
 
   const withSafety = (car: UnifiedCar): UnifiedCar => ({
     ...car,
@@ -103,7 +110,7 @@ async function loadMergedCars(): Promise<UnifiedCar[]> {
       safety: safetyRatingFor(car.make, car.model),
     });
   }
-  return [...byId.values()];
+  return [...byId.values()].map(withInferredBody);
 }
 
 async function getCars(): Promise<UnifiedCar[]> {
@@ -113,12 +120,23 @@ async function getCars(): Promise<UnifiedCar[]> {
   }
 
   const disk = await readDiskCache();
-  if (disk && now - disk.fetchedAt < DISK_TTL) {
+
+  // Cache disque valide (frais ou perime) : on le sert immediatement et on
+  // rafraichit en arriere-plan. Aucune requete ne bloque sur un rechargement
+  // live qui peut prendre plusieurs dizaines de secondes.
+  if (disk) {
     cache = { cars: disk.cars, fetchedAt: disk.fetchedAt, liveSources: true };
-    void withDedup(loadAndCache);
+    void withDedup(loadAndCache).catch(() => {});
     return disk.cars;
   }
 
+  // Cache memoire perime uniquement : on le sert et on rafraichit derriere.
+  if (cache) {
+    void withDedup(loadAndCache).catch(() => {});
+    return cache.cars;
+  }
+
+  // Premier demarrage totalement froid (ni memoire, ni disque) : on attend.
   return withDedup(loadAndCache);
 }
 
@@ -185,7 +203,22 @@ export async function searchAllSources(query: string, type?: InventoryType): Pro
   if (words.length === 0) return pool;
   if (searchable.length === 0) return [];
 
-  return pool.filter((car) => searchable.every((w) => carMatches(car, w)));
+  // Recherche "ET" stricte, avec relachement automatique : si l'intersection
+  // est vide (ex. "SUV" absent des titres des annonces occasion), on retire le
+  // mot le plus courant / le moins discriminant (jamais la marque ni le modele)
+  // et on reessaie, sans jamais vider des resultats pour une requete valide.
+  // La precision est assuree ensuite par rankVehicles.
+  const matchCount = (word: string): number =>
+    pool.reduce((n, car) => n + (carMatches(car, word) ? 1 : 0), 0);
+
+  const remaining = [...searchable].sort((a, b) => matchCount(b) - matchCount(a));
+  let matched = pool.filter((car) => remaining.every((w) => carMatches(car, w)));
+  while (matched.length === 0 && remaining.length > 1) {
+    remaining.shift();
+    matched = pool.filter((car) => remaining.every((w) => carMatches(car, w)));
+  }
+
+  return matched;
 }
 
 /** Statistiques par source (nombre d'annonces). */

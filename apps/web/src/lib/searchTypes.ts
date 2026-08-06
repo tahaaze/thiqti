@@ -55,10 +55,14 @@ function filterMatches(car: UnifiedCar, f: SearchFilters): boolean {
   if (f.maxPrice != null && car.price > f.maxPrice) return false;
   if (f.minYear != null && car.year < f.minYear) return false;
   if (f.maxKm != null && car.km > f.maxKm) return false;
-  if (f.bodyType && car.bodyType !== f.bodyType) return false;
-  if (f.fuel && car.fuel !== f.fuel) return false;
-  if (f.brand && car.make !== f.brand) return false;
-  if (f.city && car.city !== f.city) return false;
+  if (f.bodyType) {
+    const b = f.bodyType.toLowerCase();
+    const ok = car.bodyType.toLowerCase().includes(b) || car.title.toLowerCase().includes(b);
+    if (!ok) return false;
+  }
+  if (f.fuel && car.fuel.toLowerCase() !== f.fuel.toLowerCase()) return false;
+  if (f.brand && car.make.toLowerCase() !== f.brand.toLowerCase()) return false;
+  if (f.city && car.city.toLowerCase() !== f.city.toLowerCase()) return false;
   if (f.minSafety != null && !(car.safety && car.safety.stars >= f.minSafety)) return false;
   return true;
 }

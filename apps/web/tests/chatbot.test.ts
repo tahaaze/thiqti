@@ -7,47 +7,83 @@ const car = (id: string, title: string, priceFormatted: string, score: number) =
 });
 
 describe("conversation chatbot", () => {
+  it("lance une recherche dès qu'un seul critère est donné", () => {
+    const s = createInitialState();
+    const r = answer(s, "SUV");
+    expect(r.search).toBe(true);
+    expect(r.done).toBe(false);
+    expect(r.state.criteria.carrosserie).toBe("SUV");
+    expect(r.state.stage).toBe("collecting");
+  });
+
   it("accepte un nombre seul comme budget (bug fixe)", () => {
-    let s = createInitialState();
+    const s = createInitialState();
     const r = answer(s, "200000");
     expect(r.state.criteria.budgetMax).toBe(230000);
     expect(r.state.criteria.budgetMin).toBe(170000);
+    expect(r.search).toBe(true);
   });
 
-  it("comprend une phrase complete et passe direct aux recommandations", () => {
-    let s = createInitialState();
+  it("accumule les critères dans n'importe quel ordre", () => {
+    const s = createInitialState();
+    let r = answer(s, "diesel");
+    expect(r.state.criteria.motorisation).toBe("Diesel");
+    r = answer(r.state, "200000");
+    expect(r.state.criteria.budgetMax).toBe(230000);
+    r = answer(r.state, "Toyota");
+    expect(r.state.criteria.marque).toBe("Toyota");
+    expect(r.search).toBe(true);
+    expect(r.state.criteria.motorisation).toBe("Diesel");
+  });
+
+  it("comprend une phrase complete d'un coup", () => {
+    const s = createInitialState();
     const r = answer(s, "Dacia SUV essence 2022 moins de 250000 DH");
-    expect(r.done).toBe(true);
+    expect(r.search).toBe(true);
     expect(r.state.criteria.carrosserie).toBe("SUV");
     expect(r.state.criteria.motorisation).toBe("Essence");
     expect(r.state.criteria.marque).toBe("Dacia");
-    expect(buildSearchRequest(r.state).type).toBeUndefined();
-  });
-
-  it("guide pas a pas et permet de passer les questions", () => {
-    let s = createInitialState();
-    let r = answer(s, "200000");
-    expect(r.done).toBe(false);
-    expect(r.text).toContain("Compris");
-    r = answer(r.state, "SUV");
-    expect(r.state.criteria.carrosserie).toBe("SUV");
-    r = answer(r.state, "Passer"); // carburant ignore
-    expect(r.state.skipped).toContain("carburant");
-    r = answer(r.state, "Passer"); // marque ignoree
-    expect(r.state.skipped).toContain("marque");
-    r = answer(r.state, "2022"); // annee renseignee
     expect(r.state.criteria.anneeMin).toBe(2022);
-    expect(r.done).toBe(true);
   });
 
   it("detecte neuf/occasion", () => {
-    let s = createInitialState();
+    const s = createInitialState();
     const r = answer(s, "neuf 250000");
     expect(r.state.inventoryType).toBe("new");
+    expect(r.search).toBe(true);
+  });
+
+  it("comprend une phrase complete en darija", () => {
+    const s = createInitialState();
+    const r = answer(s, "بغيت ربع ديزل اقل من 250000 درهم");
+    expect(r.state.criteria.carrosserie).toBe("SUV");
+    expect(r.state.criteria.motorisation).toBe("Diesel");
+    expect(r.state.criteria.budgetMax).toBe(250000);
+    expect(r.search).toBe(true);
+    expect(/\d/.test(buildSearchRequest(r.state).q)).toBe(false);
+  });
+
+  it("affiche plus de resultats avec les memes criteres", () => {
+    const s = createInitialState();
+    let r = answer(s, "SUV");
+    expect(r.search).toBe(true);
+    r = answer(r.state, "voir plus");
+    expect(r.search).toBe(true);
+    expect(r.state.criteria.carrosserie).toBe("SUV");
+    expect(r.state.criteria.motorisation).toBeNull();
+  });
+
+  it("termine la conversation sur c'est bon", () => {
+    const s = createInitialState();
+    let r = answer(s, "Toyota SUV diesel");
+    expect(r.done).toBe(false);
+    r = answer(r.state, "c'est bon");
+    expect(r.done).toBe(true);
+    expect(r.state.stage).toBe("done");
   });
 
   it("gere la politesse et les messages incompris", () => {
-    let s = createInitialState();
+    const s = createInitialState();
     const g = answer(s, "bonjour");
     expect(g.text).toContain("Bonjour");
     const u = answer(s, "blablabla");
@@ -60,5 +96,30 @@ describe("conversation chatbot", () => {
     const t = recommendationText([car("a", "Duster", "200 000 DH", 92)], r.state);
     expect(t).toContain("Duster");
     expect(t).toContain("92/100");
+  });
+
+  it("envoie le budget en filtre et PAS dans le texte libre (bug trouve vehicules)", () => {
+    const s = createInitialState();
+    const r = answer(s, "Toyota SUV diesel 250 000 à 400 000 DH");
+    const req = buildSearchRequest(r.state);
+    expect(req.q).toBe("Toyota SUV Diesel");
+    expect(req.filters.minPrice).toBe(250000);
+    expect(req.filters.maxPrice).toBe(400000);
+    expect(/\d/.test(req.q)).toBe(false);
+  });
+
+  it("applique l'annee en filtre minYear", () => {
+    const s = createInitialState();
+    const r = answer(s, "Toyota SUV diesel moins de 150 000 DH 2022 et plus");
+    const req = buildSearchRequest(r.state);
+    expect(req.q).toBe("Toyota SUV Diesel");
+    expect(req.filters.minYear).toBe(2022);
+    expect(req.filters.maxPrice).toBe(150000);
+  });
+
+  it("propose des suggestions par defaut des l'ouverture", () => {
+    const init = initialMessage();
+    expect(init.quickReplies).toContain("SUV");
+    expect(init.quickReplies).toContain("Moins de 150 000 DH");
   });
 });

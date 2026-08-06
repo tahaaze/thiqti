@@ -3,6 +3,7 @@ export interface SearchCriteria {
   motorisation: string | null;
   transmission: string | null;
   marque: string | null;
+  modele: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
   budgetTolerance: number;
@@ -13,26 +14,41 @@ export interface SearchCriteria {
   intent: string[];
 }
 
+// ---------------------------------------------------------------------------
+// Carrosseries (francais + darija)
+// ---------------------------------------------------------------------------
+
 const CARROSSERIES: Record<string, string> = {
   suv: "SUV",
   "4x4": "SUV",
+  "4 x 4": "SUV",
+  toutterrain: "SUV",
+  "tout terrain": "SUV",
+  offroad: "SUV",
   berline: "Berline",
   citadine: "Citadine",
   compacte: "Compacte",
   utilitaire: "Utilitaire",
   crossover: "Crossover",
+  "cross over": "Crossover",
   break: "Break",
   coupé: "Coupé",
+  coupe: "Coupé",
   cabriolet: "Cabriolet",
   monospace: "Monospace",
   pickup: "Utilitaire",
+  "pick up": "Utilitaire",
   van: "Utilitaire",
-  coupe: "Coupé",
+  fourgon: "Utilitaire",
   // Darija
   "ربع": "SUV",
   "كاروسة": "Berline",
   "مدينة": "Citadine",
 };
+
+// ---------------------------------------------------------------------------
+// Carburants (francais + darija)
+// ---------------------------------------------------------------------------
 
 const FUELS: Record<string, string> = {
   diesel: "Diesel",
@@ -42,53 +58,492 @@ const FUELS: Record<string, string> = {
   "électrique": "Électrique",
   gnv: "GNV",
   gpl: "GPL",
+  gaz: "GPL",
+  gasoil: "Diesel",
   // Darija
   "مازوت": "Diesel",
   "مازوط": "Diesel",
   "كازوال": "Diesel",
+  "ديزل": "Diesel",
   "كاز": "Essence",
-  "سانس": "Darija",
+  "بنزين": "Essence",
   "هجين": "Hybride",
+  "هايبرد": "Hybride",
   "بطارية": "Électrique",
+  "بطاريات": "Électrique",
   "كهرباء": "Électrique",
+  "كهربائي": "Électrique",
 };
+
+// ---------------------------------------------------------------------------
+// Transmissions (francais + darija)
+// ---------------------------------------------------------------------------
 
 const TRANSMISSIONS: Record<string, string> = {
   manuelle: "Manuelle",
+  manuel: "Manuelle",
+  mecanique: "Manuelle",
   automatique: "Automatique",
   auto: "Automatique",
   "boîte auto": "Automatique",
   "boite auto": "Automatique",
+  "boite automatique": "Automatique",
   // Darija
   "اوتوماتيك": "Automatique",
   "اوماتيك": "Automatique",
   "ماتيك": "Automatique",
+  "مانيال": "Manuelle",
+  "مانيويل": "Manuelle",
+  "مانوال": "Manuelle",
   "اليدوي": "Manuelle",
   "يدوي": "Manuelle",
 };
 
-const BRANDS = [
-  "Dacia", "Renault", "Peugeot", "Toyota", "Hyundai", "Kia",
-  "Volkswagen", "BMW", "Mercedes", "Audi", "Ford", "Fiat",
-  "Nissan", "Opel", "Citroën", "Citroen", "Skoda", "Seat",
-  "Mazda", "Suzuki", "Honda", "Mitsubishi", "Volvo", "Jeep",
-  "Chevrolet", "Lexus", "Infiniti", "Alfa Romeo",
-  // Arabic brand mentions
-  "تويوتا", "هيونداي", "كيا", "رونو", "رينو", "بيجو",
-  "مرسيدس", "بي ام", "بي إم", "فولكس", "دacia",
-];
+// ---------------------------------------------------------------------------
+// Marques (francais + darija) : alias -> marque canonique
+// ---------------------------------------------------------------------------
 
-const CITIES = [
-  "Casablanca", "Rabat", "Marrakech", "Fès", "Tanger",
-  "Agadir", "Meknès", "Oujda", "Kénitra", "Tétouan",
-  "Tetouan", "Nador", "El Jadida", "Béni Mellal", "Beni Mellal",
-  // Arabic
-  "الدار البيضاء", "كازا", "الرباط", "مراكش", "فاس",
-  "طنجة", "أكادير", "مكناس", "وجدة", "تطوان",
-];
+const BRAND_NAMES: Record<string, string> = {
+  "toyota": "Toyota",
+  "تويوتا": "Toyota",
+  "تويوطة": "Toyota",
+  "renault": "Renault",
+  "reno": "Renault",
+  "رونو": "Renault",
+  "رينو": "Renault",
+  "peugeot": "Peugeot",
+  "peugeo": "Peugeot",
+  "بيجو": "Peugeot",
+  "dacia": "Dacia",
+  "داسيا": "Dacia",
+  "hyundai": "Hyundai",
+  "hyundei": "Hyundai",
+  "hyunday": "Hyundai",
+  "huyndai": "Hyundai",
+  "هيونداي": "Hyundai",
+  "kia": "Kia",
+  "كيا": "Kia",
+  "volkswagen": "Volkswagen",
+  "volks": "Volkswagen",
+  "vw": "Volkswagen",
+  "فولكس": "Volkswagen",
+  "mercedes": "Mercedes",
+  "mercedes-benz": "Mercedes",
+  "merco": "Mercedes",
+  "مرسيدس": "Mercedes",
+  "bmw": "BMW",
+  "بي ام": "BMW",
+  "بي إم": "BMW",
+  "audi": "Audi",
+  "ford": "Ford",
+  "fiat": "Fiat",
+  "nissan": "Nissan",
+  "opel": "Opel",
+  "citroen": "Citroën",
+  "citro": "Citroën",
+  "سيتروين": "Citroën",
+  "skoda": "Škoda",
+  "seat": "Seat",
+  "mazda": "Mazda",
+  "سوزوكي": "Suzuki",
+  "suzuki": "Suzuki",
+  "honda": "Honda",
+  "ميتسوبيشي": "Mitsubishi",
+  "mitsubishi": "Mitsubishi",
+  "mitsubichi": "Mitsubishi",
+  "volvo": "Volvo",
+  "jeep": "Jeep",
+  "جيب": "Jeep",
+  "chevrolet": "Chevrolet",
+  "chevy": "Chevrolet",
+  "lexus": "Lexus",
+  "لكزس": "Lexus",
+  "infiniti": "Infiniti",
+  "alfa romeo": "Alfa Romeo",
+  "alfa": "Alfa Romeo",
+  "porsche": "Porsche",
+  "بورش": "Porsche",
+  "tesla": "Tesla",
+  "land rover": "Land Rover",
+  "landrover": "Land Rover",
+  "range rover": "Range Rover",
+  "jaguar": "Jaguar",
+  "subaru": "Subaru",
+  "smart": "Smart",
+  "polestar": "Polestar",
+  "dodge": "Dodge",
+  "chrysler": "Chrysler",
+  "bentley": "Bentley",
+  "lamborghini": "Lamborghini",
+  "ferrari": "Ferrari",
+  "mclaren": "McLaren",
+  "maserati": "Maserati",
+  "aston martin": "Aston Martin",
+  "rolls royce": "Rolls-Royce",
+  "rolls": "Rolls-Royce",
+  "gmc": "GMC",
+  "cadillac": "Cadillac",
+  "buick": "Buick",
+  "acura": "Acura",
+  "byd": "BYD",
+  "changan": "Changan",
+  "chery": "Chery",
+  "haval": "Haval",
+  "gac": "GAC",
+  "baic": "BAIC",
+  "geely": "Geely",
+  "dfsk": "DFSK",
+  "jac": "JAC",
+  "omoda": "Omoda",
+  "jaecoo": "Jaecoo",
+  "exeed": "EXEED",
+  "xpeng": "XPENG",
+  "dongfeng": "Dongfeng",
+  "isuzu": "Isuzu",
+  "mahindra": "Mahindra",
+  "tata": "Tata",
+  "lada": "Lada",
+  "great wall": "Great Wall",
+};
+
+// ---------------------------------------------------------------------------
+// Villes (francais + darija) : alias -> ville canonique
+// ---------------------------------------------------------------------------
+
+const CITY_NAMES: Record<string, string[]> = {
+  "Casablanca": ["casablanca", "casa", "الدار البيضاء", "البيضاء", "كازا", "كازابلانكا"],
+  "Rabat": ["rabat", "الرباط"],
+  "Marrakech": ["marrakech", "مراكش"],
+  "Fès": ["fes", "فاس"],
+  "Tanger": ["tanger", "طنجة"],
+  "Agadir": ["agadir", "اكادير", "أكادير"],
+  "Meknès": ["meknes", "مكناس"],
+  "Oujda": ["oujda", "وجدة"],
+  "Tétouan": ["tetouan", "تطوان"],
+  "Nador": ["nador", "الناظور"],
+  "El Jadida": ["el jadida", "الجديدة"],
+  "Kénitra": ["kenitra", "القنيطرة"],
+  "Béni Mellal": ["beni mellal", "بني ملال"],
+  "Salé": ["سلا"],
+  "Temara": ["temara", "تمارة"],
+  "Mohammedia": ["mohammedia", "المحمدية"],
+  "Safi": ["safi", "اسفي", "آسفي"],
+  "Essaouira": ["essaouira", "الصويرة"],
+  "Khouribga": ["khouribga", "خريبكة"],
+  "Settat": ["settat", "سطات"],
+  "Benslimane": ["benslimane", "بن سليمان"],
+  "Ouarzazate": ["ouarzazate", "ورزازات"],
+  "Laâyoune": ["laayoune", "العيون"],
+  "Dakhla": ["dakhla", "الداخلة"],
+  "Taza": ["taza", "تازة"],
+  "Al Hoceima": ["al hoceima", "الحسيمة"],
+  "Sidi Kacem": ["sidi kacem", "سيدي قاسم"],
+  "Sidi Slimane": ["sidi slimane", "سيدي سليمان"],
+  "Errachidia": ["errachidia", "الرشيدية"],
+  "Sefrou": ["sefrou", "صفرو"],
+  "Taroudant": ["taroudant", "تارودانت"],
+  "Khémisset": ["khemisset", "خميسات"],
+  "Guercif": ["guercif", "جرسيف"],
+  "Youssoufia": ["youssoufia", "اليوسفية"],
+  "Ben Guerir": ["ben guerir", "بنجرير"],
+  "Berkane": ["berkane", "بوركان"],
+  "Fkih Ben Salah": ["fkih ben salah", "الفقيه بن صالح"],
+  "Sidi Bennour": ["sidi bennour", "سيدي بنور"],
+  "Larache": ["larache", "العرائش"],
+  "Azemmour": ["azemmour", "ازمور"],
+};
+
+// ---------------------------------------------------------------------------
+// Modeles (canonique -> alias de saisie)
+// ---------------------------------------------------------------------------
+
+const MODELS: Record<string, string[]> = {
+  // Dacia
+  "Duster": ["duster", "داستر"],
+  "Sandero": ["sandero", "stepway"],
+  "Logan": ["logan"],
+  "Jogger": ["jogger"],
+  "Spring": ["spring"],
+  "Dokker": ["dokker"],
+  "Lodgy": ["lodgy"],
+  // Renault
+  "Clio": ["clio", "كلارو"],
+  "Megane": ["megane", "meganne", "megan"],
+  "Captur": ["captur"],
+  "Kadjar": ["kadjar"],
+  "Arkana": ["arkana"],
+  "Koleos": ["koleos"],
+  "Kangoo": ["kangoo"],
+  "Trafic": ["trafic"],
+  "Twingo": ["twingo"],
+  "Symbol": ["symbol"],
+  "Talisman": ["talisman"],
+  "Scenic": ["scenic"],
+  "Espace": ["espace"],
+  "Zoe": ["zoe"],
+  "Kardian": ["kardian"],
+  "Express": ["express"],
+  // Peugeot
+  "208": ["208"],
+  "308": ["308"],
+  "2008": ["2008"],
+  "3008": ["3008"],
+  "5008": ["5008"],
+  "508": ["508"],
+  "301": ["301"],
+  "206": ["206"],
+  "207": ["207"],
+  "407": ["407"],
+  "406": ["406"],
+  "107": ["107"],
+  "108": ["108"],
+  "Partner": ["partner"],
+  "Rifter": ["rifter"],
+  // Toyota
+  "Yaris": ["yaris"],
+  "Yaris Cross": ["yaris cross"],
+  "Corolla": ["corolla"],
+  "Corolla Cross": ["corolla cross"],
+  "RAV4": ["rav4"],
+  "C-HR": ["c-hr", "chr"],
+  "Land Cruiser": ["land cruiser", "landcruiser", "prado"],
+  "Prado": ["prado"],
+  "Hilux": ["hilux"],
+  "Fortuner": ["fortuner"],
+  "Highlander": ["highlander"],
+  "Aygo": ["aygo"],
+  "Auris": ["auris"],
+  "Camry": ["camry"],
+  // Hyundai
+  "Tucson": ["tucson"],
+  "Santa Fe": ["santa fe", "sante fe"],
+  "Kona": ["kona"],
+  "i10": ["i10"],
+  "i20": ["i20"],
+  "Elantra": ["elantra"],
+  "Accent": ["accent"],
+  "Creta": ["creta"],
+  "Getz": ["getz"],
+  "Sonata": ["sonata"],
+  "Palisade": ["palisade"],
+  "Venue": ["venue"],
+  "Bayon": ["bayon"],
+  // Kia
+  "Picanto": ["picanto"],
+  "Rio": ["rio"],
+  "Sportage": ["sportage"],
+  "Sorento": ["sorento"],
+  "Stonic": ["stonic"],
+  "Soul": ["soul"],
+  "Carnival": ["carnival"],
+  "Ceed": ["ceed", "cee'd"],
+  "Cerato": ["cerato"],
+  "Niro": ["niro"],
+  "Seltos": ["seltos"],
+  "Telluride": ["telluride"],
+  // Volkswagen
+  "Golf": ["golf"],
+  "Polo": ["polo"],
+  "Passat": ["passat"],
+  "Tiguan": ["tiguan"],
+  "T-Roc": ["t-roc", "troc"],
+  "Jetta": ["jetta"],
+  "Touareg": ["touareg"],
+  "Touran": ["touran"],
+  "Sharan": ["sharan"],
+  "Caddy": ["caddy"],
+  "Transporter": ["transporter"],
+  "Coccinelle": ["coccinelle", "beetle", "bug"],
+  // BMW
+  "Série 1": ["serie 1", "serie1"],
+  "Série 3": ["serie 3", "serie3", "320i", "330i"],
+  "Série 5": ["serie 5", "serie5", "520i", "530i"],
+  "Série 7": ["serie 7", "serie7"],
+  "X1": ["x1"],
+  "X2": ["x2"],
+  "X3": ["x3"],
+  "X4": ["x4"],
+  "X5": ["x5"],
+  "X6": ["x6"],
+  "X7": ["x7"],
+  // Mercedes
+  "Classe A": ["classe a", "classea"],
+  "Classe B": ["classe b", "classeb"],
+  "Classe C": ["classe c", "classec", "c 200", "c200"],
+  "Classe E": ["classe e", "classee"],
+  "Classe S": ["classe s", "classes"],
+  "GLC": ["glc"],
+  "GLE": ["gle"],
+  "GLA": ["gla"],
+  "GLB": ["glb"],
+  "GLS": ["gls"],
+  "Classe G": ["classe g", "classeg", "g class", "gclass"],
+  "CLA": ["cla"],
+  "Vito": ["vito"],
+  "Sprinter": ["sprinter"],
+  // Audi
+  "A3": ["a3"],
+  "A4": ["a4"],
+  "A5": ["a5"],
+  "A6": ["a6"],
+  "A8": ["a8"],
+  "Q2": ["q2"],
+  "Q3": ["q3"],
+  "Q5": ["q5"],
+  "Q7": ["q7"],
+  "Q8": ["q8"],
+  "TT": ["tt"],
+  "e-tron": ["e-tron", "etron", "e tron"],
+  // Ford
+  "Fiesta": ["fiesta"],
+  "Focus": ["focus"],
+  "Kuga": ["kuga"],
+  "Puma": ["puma"],
+  "Ranger": ["ranger"],
+  "Mustang": ["mustang"],
+  "Mondeo": ["mondeo"],
+  "EcoSport": ["ecosport"],
+  "Explorer": ["explorer"],
+  "Escape": ["escape"],
+  // Nissan
+  "Qashqai": ["qashqai", "kashkai", "كشكاي"],
+  "Juke": ["juke"],
+  "X-Trail": ["x-trail", "xtrail", "x trail"],
+  "Micra": ["micra"],
+  "Patrol": ["patrol"],
+  "Pathfinder": ["pathfinder"],
+  "Navara": ["navara"],
+  "Sunny": ["sunny"],
+  "Sentra": ["sentra"],
+  "Murano": ["murano"],
+  "Kicks": ["kicks"],
+  // Opel
+  "Corsa": ["corsa"],
+  "Astra": ["astra"],
+  "Mokka": ["mokka"],
+  "Grandland": ["grandland"],
+  "Insignia": ["insignia"],
+  "Crossland": ["crossland"],
+  "Zafira": ["zafira"],
+  // Citroën
+  "C1": ["c1"],
+  "C3": ["c3"],
+  "C4": ["c4"],
+  "C4 Cactus": ["cactus"],
+  "C5": ["c5"],
+  "C5 Aircross": ["c5 aircross"],
+  "C3 Aircross": ["c3 aircross"],
+  "Picasso": ["picasso"],
+  "Berlingo": ["berlingo"],
+  "Jumpy": ["jumpy"],
+  "Elysée": ["elysee"],
+  "DS3": ["ds3"],
+  "DS4": ["ds4"],
+  "DS7": ["ds7"],
+  // Škoda
+  "Octavia": ["octavia"],
+  "Fabia": ["fabia"],
+  "Superb": ["superb"],
+  "Kamiq": ["kamiq"],
+  "Karoq": ["karoq"],
+  "Kodiaq": ["kodiaq"],
+  "Rapid": ["rapid"],
+  "Enyaq": ["enyaq"],
+  // Seat
+  "Ibiza": ["ibiza"],
+  "Leon": ["leon"],
+  "Arona": ["arona"],
+  "Ateca": ["ateca"],
+  "Alhambra": ["alhambra"],
+  "Toledo": ["toledo"],
+  // Mazda
+  "Mazda 2": ["mazda 2", "mazda2"],
+  "Mazda 3": ["mazda 3", "mazda3"],
+  "Mazda 6": ["mazda 6", "mazda6"],
+  "CX-3": ["cx-3", "cx3", "cx 3"],
+  "CX-5": ["cx-5", "cx5", "cx 5"],
+  "CX-30": ["cx-30", "cx30", "cx 30"],
+  "MX-5": ["mx-5", "mx5"],
+  // Suzuki
+  "Swift": ["swift"],
+  "Vitara": ["vitara"],
+  "S-Cross": ["s-cross", "scross", "s cross"],
+  "Jimny": ["jimny"],
+  "Baleno": ["baleno"],
+  "Alto": ["alto"],
+  "Ignis": ["ignis"],
+  "Ertiga": ["ertiga"],
+  // Honda
+  "Civic": ["civic", "سيفيك"],
+  "Accord": ["accord"],
+  "CR-V": ["cr-v", "crv", "cr v"],
+  "HR-V": ["hr-v", "hrv", "hr v"],
+  "Jazz": ["jazz"],
+  "City": ["city"],
+  // Mitsubishi
+  "Lancer": ["lancer"],
+  "Outlander": ["outlander"],
+  "Pajero": ["pajero"],
+  "ASX": ["asx"],
+  "Eclipse Cross": ["eclipse"],
+  "Triton": ["triton"],
+  "L200": ["l200"],
+  "Montero": ["montero"],
+  // Volvo
+  "XC40": ["xc40"],
+  "XC60": ["xc60"],
+  "XC90": ["xc90"],
+  "S60": ["s60"],
+  "S90": ["s90"],
+  // Jeep
+  "Cherokee": ["cherokee"],
+  "Grand Cherokee": ["grand cherokee"],
+  "Wrangler": ["wrangler"],
+  "Compass": ["compass"],
+  "Renegade": ["renegade"],
+  "Gladiator": ["gladiator"],
+  "Liberty": ["liberty"],
+  // Fiat
+  "500": ["500"],
+  "Panda": ["panda"],
+  "Punto": ["punto"],
+  "Tipo": ["tipo"],
+  "Doblo": ["doblo"],
+  "Ducato": ["ducato"],
+  // Land Rover / Range Rover
+  "Defender": ["defender"],
+  "Range Rover": ["range rover"],
+  "Discovery": ["discovery"],
+  "Evoque": ["evoque"],
+  // Chevrolet
+  "Cruze": ["cruze"],
+  "Malibu": ["malibu"],
+  "Spark": ["spark"],
+  "Aveo": ["aveo"],
+  "Tahoe": ["tahoe"],
+  "Camaro": ["camaro"],
+  // Lexus
+  "RX": ["rx"],
+  "NX": ["nx"],
+  "LX": ["lx"],
+  "UX": ["ux"],
+  // BYD
+  "Seal": ["seal"],
+  "Dolphin": ["dolphin"],
+  "Atto 3": ["atto 3", "atto3"],
+  "Han": ["han"],
+  "Tang": ["tang"],
+  "Song": ["song"],
+  // MG
+  "ZS": ["zs ev", "zsev", "zs"],
+  "MG5": ["mg5"],
+  "MG3": ["mg3"],
+  "HS": ["hs"],
+  "Marvel": ["marvel"],
+};
 
 const INTENT_KEYWORDS: Record<string, string[]> = {
-  familial: ["famille", "familial", "familiale", "enfant", "enfants", "bébé", "bebe", "pratique", "7aml", "عائلة", "اولاد", "دراري", "صغار"],
+  familial: ["famille", "familial", "familiale", "enfant", "enfants", "bébé", "bebe", "pratique", "7aml", "عائلة", "اولاد", "دراري", "صغار", "عائلي"],
   sportif: ["sport", "sportif", "sportive", "puissant", "puissance", "vitesse", "performance", "sari3", "سريع", "قوي"],
   economique: ["économique", "economique", "petit budget", "abordable", "pas cher", "moins cher", "pas trop cher", "budget serré", "رخيص", "رخص", "اقتصادي"],
   confort: ["confort", "confortable", "luxueux", "luxe", "premium", "haut de gamme", "مرتاح", "فخم", "راحة", "هادئ"],
@@ -97,19 +552,9 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   tout_terrain: ["tout-terrain", "tout terrain", "piste", "chemin", "offroad", "boue", "وعر"],
 };
 
-const CANONICAL_BRANDS: Record<string, string> = {
-  "تويوتا": "Toyota",
-  "هيونداي": "Hyundai",
-  "كيا": "Kia",
-  "رونو": "Renault",
-  "رينو": "Renault",
-  "بيجو": "Peugeot",
-  "مرسيدس": "Mercedes",
-  "بي ام": "BMW",
-  "بي إم": "BMW",
-  "فولكس": "Volkswagen",
-  "دacia": "Dacia",
-};
+// ---------------------------------------------------------------------------
+// Normalisation
+// ---------------------------------------------------------------------------
 
 function normalizeText(text: string): string {
   const arabicDigits: Record<string, string> = {
@@ -120,6 +565,8 @@ function normalizeText(text: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+    .replace(/[أإآٱ]/g, "ا")
     .replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (d) => arabicDigits[d])
     .replace(/[^\w\s\d\u0600-\u06FF\u0400-\u04FF]/g, " ")
     .replace(/\s+/g, " ")
@@ -131,12 +578,43 @@ function hasKeyword(text: string, key: string): boolean {
   return new RegExp(`(^|[^a-z0-9])${key}([^a-z0-9]|$)`).test(text);
 }
 
+function normalizeAlias(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+    .replace(/[أإآٱ]/g, "ا")
+    .replace(/[^a-z0-9\u0600-\u06FF]+/g, " ")
+    .trim();
+}
+
+function startsWithPhrase(text: string, phrases: string[]): boolean {
+  const t = text.trim();
+  return phrases.some((p) => t === p || t.startsWith(`${p} `));
+}
+
+// ---------------------------------------------------------------------------
+// Budget
+// ---------------------------------------------------------------------------
+
+function expandMoneyUnits(text: string): string {
+  const clean = (n: string) => n.replace(/\s/g, "");
+  return text
+    .replace(/(\d[\d\s]*\d?)\s*millions?\b/g, (_, n) => `${clean(n)}000000`)
+    .replace(/(\d[\d\s]*\d?)\s*mille\b/g, (_, n) => `${clean(n)}000`)
+    .replace(/(\d[\d\s]*\d?)\s*مليون/g, (_, n) => `${clean(n)}000000`)
+    .replace(/(\d[\d\s]*\d?)\s*(?:الف|الاف)/g, (_, n) => `${clean(n)}000`)
+    .replace(/(\d[\d\s]*\d?)\s*k\b/gi, (_, n) => `${clean(n)}000`);
+}
+
 function extractBudget(text: string): { min: number | null; max: number | null; tolerance: number } {
   let min: number | null = null;
   let max: number | null = null;
   let tolerance = 0.15;
+  const t = expandMoneyUnits(text);
 
-  const aroundMatch = text.match(/autour\s+d[e']\s*(\d[\d\s]*\d)\s*(dh)?/i);
+  const aroundMatch = t.match(/(?:autour\s+d[e']|environ|a peu pres|vers|تقريبا|حوالي|على ما يقارب)\s*(\d[\d\s]*\d)\s*(?:dh|درهم)?/i);
   if (aroundMatch) {
     const val = parseInt(aroundMatch[1].replace(/\s/g, ""));
     if (val >= 10000 && val <= 5000000) {
@@ -147,7 +625,7 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
   }
 
   if (min === null) {
-    const rangeMatch = text.match(/entre\s+(\d[\d\s]*\d)\s*(?:et|a|à)\s+(\d[\d\s]*\d)\s*(dh)?/i);
+    const rangeMatch = t.match(/(?:entre|بين)\s+(\d[\d\s]*\d)\s*(?:et|a|à|و)\s+(\d[\d\s]*\d)\s*(?:dh|درهم)?/i);
     if (rangeMatch) {
       const v1 = parseInt(rangeMatch[1].replace(/\s/g, ""));
       const v2 = parseInt(rangeMatch[2].replace(/\s/g, ""));
@@ -156,7 +634,7 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
   }
 
   if (min === null) {
-    const underMatch = text.match(/(?:sous|moins de|max|maximum|plafond)\s+(\d[\d\s]*\d)\s*(dh)?/i);
+    const underMatch = t.match(/(?:sous|moins de|max|maximum|plafond|اقل من|اقل|تحت|اقصى)\s+(\d[\d\s]*\d)\s*(?:dh|درهم)?/i);
     if (underMatch) {
       const val = parseInt(underMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) max = val;
@@ -164,7 +642,7 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
   }
 
   if (min === null) {
-    const aboveMatch = text.match(/(?:plus de|au-dessus de|min|minimum|a partir de|a partir)\s+(\d[\d\s]*\d)\s*(dh)?/i);
+    const aboveMatch = t.match(/(?:plus de|au-dessus de|min|minimum|a partir de|a partir|اكثر من|اكثر|فوق|اعلى من|الاكثر)\s+(\d[\d\s]*\d)\s*(?:dh|درهم)?/i);
     if (aboveMatch) {
       const val = parseInt(aboveMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) min = val;
@@ -172,7 +650,7 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
   }
 
   if (min === null && max === null) {
-    const budgetWordMatch = text.match(/(?:budget|ميزانية)\s+(\d[\d\s]*\d)/i);
+    const budgetWordMatch = t.match(/(?:budget|ميزانية|عندي|خاصني|بغيت)\s+(\d[\d\s]*\d)/i);
     if (budgetWordMatch) {
       const val = parseInt(budgetWordMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) {
@@ -184,7 +662,7 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
 
   // Darija patterns
   if (min === null && max === null) {
-    const darMatch = text.match(/(?:ف|على)\s*(\d[\d\s]*\d)\s*(?:درهم|دهم|dh)?/i);
+    const darMatch = t.match(/(?:ف|على|ب)\s*(\d[\d\s]*\d)\s*(?:درهم|دهم|dh)?/i);
     if (darMatch) {
       const val = parseInt(darMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) {
@@ -196,7 +674,7 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
   }
 
   if (min === null && max === null) {
-    const budgetMatch = text.match(/(\d[\d\s]*\d)\s*(dh|mad|درهم|دهم)/i);
+    const budgetMatch = t.match(/(\d[\d\s]*\d)\s*(?:dh|mad|درهم|دهم)/i);
     if (budgetMatch) {
       const val = parseInt(budgetMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 5000000) {
@@ -207,10 +685,10 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
     }
   }
 
-  // Nombre seul (ex. "200000", "200 000") : consideré comme un budget en DH,
+  // Nombre seul (ex. "200000", "200 000") : considéré comme un budget en DH,
   // sauf s'il s'agit d'une année (20xx) ou d'une petite valeur (modèle, km).
   if (min === null && max === null) {
-    const bareMatch = text.match(/(\d[\d\s]*\d)/);
+    const bareMatch = t.match(/(\d[\d\s]*\d)/);
     if (bareMatch) {
       const val = parseInt(bareMatch[1].replace(/\s/g, ""));
       if (val >= 10000 && val <= 9000000 && !(val >= 2000 && val <= 2026)) {
@@ -224,9 +702,15 @@ function extractBudget(text: string): { min: number | null; max: number | null; 
   return { min, max, tolerance };
 }
 
-function extractYear(text: string): { min: number | null; max: number | null } {
+function extractYear(text: string, ignored?: string[]): { min: number | null; max: number | null } {
   let min: number | null = null;
   let max: number | null = null;
+
+  if (ignored && ignored.length) {
+    for (const token of ignored) {
+      text = text.split(token).join(" ");
+    }
+  }
 
   const sinceMatch = text.match(/(?:depuis|a partir de|apres|post|من|بعد)\s*(\d{4})/i);
   if (sinceMatch) {
@@ -253,7 +737,7 @@ function extractYear(text: string): { min: number | null; max: number | null } {
 }
 
 function extractKmMax(text: string): number | null {
-  const kmMatch = text.match(/(?:moins de|sous|max|maximum|تحت|اقل|اقصى)\s*(\d[\d\s]*)\s*(?:km|كلم|كيلومتر)/i);
+  const kmMatch = text.match(/(?:moins de|sous|max|maximum|تحت|اقل|اقل من|اقصى)\s*(\d[\d\s]*)\s*(?:km|كلم|كيلومتر)/i);
   if (kmMatch) {
     const val = parseInt(kmMatch[1].replace(/\s/g, ""));
     if (val > 0 && val <= 500000) return val;
@@ -265,6 +749,18 @@ function extractKmMax(text: string): number | null {
   }
   return null;
 }
+
+// ---------------------------------------------------------------------------
+// Tables pre-triees (plus specifique d'abord)
+// ---------------------------------------------------------------------------
+
+const BRAND_ENTRIES = Object.entries(BRAND_NAMES).sort((a, b) => b[0].length - a[0].length);
+const CITY_ENTRIES = Object.entries(CITY_NAMES)
+  .flatMap(([city, aliases]) => aliases.map((a) => [a, city] as [string, string]))
+  .sort((a, b) => b[0].length - a[0].length);
+const MODEL_ENTRIES = Object.entries(MODELS)
+  .flatMap(([model, aliases]) => aliases.map((a) => [normalizeAlias(a), model] as [string, string]))
+  .sort((a, b) => b[0].length - a[0].length);
 
 export function parseQuery(query: string): SearchCriteria {
   const normalized = normalizeText(query);
@@ -285,19 +781,24 @@ export function parseQuery(query: string): SearchCriteria {
   }
 
   let marque: string | null = null;
-  for (const brand of BRANDS) {
-    const b = brand.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    if (normalized.includes(b)) { marque = CANONICAL_BRANDS[brand] ?? brand; break; }
+  for (const [alias, canonical] of BRAND_ENTRIES) {
+    if (normalized.includes(alias)) { marque = canonical; break; }
   }
 
   let ville: string | null = null;
-  for (const city of CITIES) {
-    const c = city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    if (normalized.includes(c)) { ville = city; break; }
+  for (const [alias, canonical] of CITY_ENTRIES) {
+    if (normalized.includes(alias)) { ville = canonical; break; }
+  }
+
+  let modele: string | null = null;
+  for (const [alias, canonical] of MODEL_ENTRIES) {
+    const matched = alias.includes(" ") ? normalized.includes(alias) : hasKeyword(normalized, alias);
+    if (matched) { modele = canonical; break; }
   }
 
   const { min: budgetMin, max: budgetMax, tolerance: budgetTolerance } = extractBudget(normalized);
-  const { min: anneeMin, max: anneeMax } = extractYear(normalized);
+  const numericModel = modele && /^\d+$/.test(modele) ? [modele] : [];
+  const { min: anneeMin, max: anneeMax } = extractYear(normalized, numericModel);
   const kmMax = extractKmMax(normalized);
 
   const intent: string[] = [];
@@ -308,8 +809,43 @@ export function parseQuery(query: string): SearchCriteria {
   }
 
   return {
-    carrosserie, motorisation, transmission, marque,
+    carrosserie, motorisation, transmission, marque, modele,
     budgetMin, budgetMax, budgetTolerance,
     ville, anneeMin, anneeMax, kmMax, intent,
   };
+}
+
+/** Construit un texte de recherche canonique (entites normalisees). */
+export function queryFromCriteria(c: SearchCriteria): string {
+  const parts: string[] = [];
+  if (c.marque) parts.push(c.marque);
+  if (c.modele) parts.push(c.modele);
+  if (c.carrosserie) parts.push(c.carrosserie);
+  if (c.motorisation) parts.push(c.motorisation);
+  if (c.transmission) parts.push(c.transmission);
+  if (c.ville) parts.push(c.ville);
+  return parts.join(" ").trim();
+}
+
+/** Détecte une salutation / formule de politesse en francais et darija. */
+export function isGreeting(text: string): boolean {
+  const n = normalizeText(text);
+  return startsWithPhrase(n, ["bonjour", "bonsoir", "salut", "hello", "hi", "hey", "salam", "salamo", "السلام", "سلام"]) ||
+    /bonjour|bonsoir|salut|hello|hi|hey|salam|صباح|مساء|السلام/.test(n);
+}
+
+export function isThanks(text: string): boolean {
+  return /merci|choukran|chokran|chokra|shukran|thanks|thank|thx|شكرا|الله يخليك|بارك الله/.test(normalizeText(text));
+}
+
+export function isHelp(text: string): boolean {
+  return /aide|help|comment|aidez|besoin|exemple|شنو|فهمني|كيفاش|عاونني/.test(normalizeText(text));
+}
+
+export function isSkip(text: string): boolean {
+  return /passer|passe|skip|sauter|peu importe|n'importe|nimporte|aucune|aucun|je ne sais pas|jsp|لا فرق|غير مهم|اي شيء|ماشي مهم|خلاص|بلاها/.test(normalizeText(text));
+}
+
+export function isYes(text: string): boolean {
+  return /oui|ouais|yes|yep|ok|dac|daccord|d'accord|bien sur|نعم|ايه|اوك|واه|يه/.test(normalizeText(text));
 }

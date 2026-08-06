@@ -44,11 +44,12 @@ export async function GET(request: NextRequest) {
 
   if (!q || q.trim().length < 2) {
     const filtered = applyFilters(pool, filters);
+    const sorted = [...filtered].sort((a, b) => b.score - a.score);
     return NextResponse.json({
-      results: filtered,
-      total: filtered.length,
+      results: sorted,
+      total: sorted.length,
       criteria: null,
-      sources: getSourceStats(filtered),
+      sources: getSourceStats(sorted),
       facets: buildFacets(pool),
     });
   }

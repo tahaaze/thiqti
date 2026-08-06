@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { normalizeFuel, normalizeBody, normalizeBrand, generateId, computeScore } from "@/lib/sources/types";
+import { normalizeFuel, normalizeBody, normalizeBrand, generateId, computeScore, inferBodyType } from "@/lib/sources/types";
 import { fetchAllSources, searchAllSources } from "@/lib/sources/aggregator";
 
 vi.mock("@/lib/sources/autera", () => ({ fetchAuteraCars: async () => [] }));
@@ -119,5 +119,53 @@ describe("aggregator", () => {
   it("retourne une liste vide si aucun vehicule ne correspond", async () => {
     const result = await searchAllSources("zzzqqqx");
     expect(result).toHaveLength(0);
+  });
+
+  it("relache un mot courant si l'intersection est vide, sans perdre la marque", async () => {
+    const result = await searchAllSources("Toyota SUV Diesel");
+    expect(result.length).toBeGreaterThan(0);
+    for (const car of result) {
+      const haystack = `${car.make} ${car.model} ${car.title}`.toLowerCase();
+      expect(haystack).toContain("toyota");
+    }
+  });
+});
+
+describe("inferBodyType", () => {
+  it("classifie les SUV courants du marche marocain", () => {
+    expect(inferBodyType("Dacia", "Duster", "Dacia Duster 4x4 2023")).toBe("SUV");
+    expect(inferBodyType("Renault", "Captur", "Renault Captur 2022")).toBe("SUV");
+    expect(inferBodyType("Peugeot", "3008", "Peugeot 3008 GT 2023")).toBe("SUV");
+    expect(inferBodyType("Toyota", "RAV4", "Toyota RAV4 Aventure")).toBe("SUV");
+    expect(inferBodyType("Hyundai", "Tucson", "Hyundai Tucson 2022")).toBe("SUV");
+    expect(inferBodyType("Kia", "Sportage", "Kia Sportage GT Line")).toBe("SUV");
+    expect(inferBodyType("Mercedes", "GLC", "Mercedes GLC 300 4MATIC")).toBe("SUV");
+    expect(inferBodyType("Volkswagen", "Tiguan", "Volkswagen Tiguan R-Line")).toBe("SUV");
+  });
+
+  it("classifie berlines et citadines", () => {
+    expect(inferBodyType("Dacia", "Logan", "Dacia Logan 2022")).toBe("Berline");
+    expect(inferBodyType("Toyota", "Corolla", "Toyota Corolla 2023")).toBe("Berline");
+    expect(inferBodyType("Peugeot", "208", "Peugeot 208 2023")).toBe("Citadine");
+    expect(inferBodyType("Renault", "Clio", "Renault Clio 2023")).toBe("Citadine");
+    expect(inferBodyType("Volkswagen", "Polo", "Volkswagen Polo 2022")).toBe("Citadine");
+  });
+
+  it("fait gagner le modele le plus specifique (yaris vs yaris cross)", () => {
+    expect(inferBodyType("Toyota", "Yaris", "Toyota Yaris 2022")).toBe("Citadine");
+    expect(inferBodyType("Toyota", "Yaris Cross", "Toyota Yaris Cross 2023")).toBe("SUV");
+    expect(inferBodyType("Toyota", "Corolla", "Toyota Corolla 2023")).toBe("Berline");
+    expect(inferBodyType("Toyota", "Corolla Cross", "Toyota Corolla Cross 2023")).toBe("SUV");
+  });
+
+  it("utilise le titre en filet de securite", () => {
+    expect(inferBodyType("Land Rover", "Range Rover", "Range Rover 4x4 2020")).toBe("SUV");
+    expect(inferBodyType("Peugeot", "508", "Peugeot 508 SW 2022")).toBe("Break");
+    expect(inferBodyType("Citroën", "Berlingo", "Citroën Berlingo fourgon")).toBe("Utilitaire");
+  });
+
+  it("reste sur Non precisé si rien ne correspond", () => {
+    expect(inferBodyType("Ziggurat", "Zx-9", "Annonce exotique")).toBe("Non précisé");
+    expect(inferBodyType("Suzuki", "Swift", "Suzuki Swift 2023")).toBe("Citadine");
   });
 });

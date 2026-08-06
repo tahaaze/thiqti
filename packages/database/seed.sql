@@ -1,5 +1,7 @@
 -- Thiqti - Seed Data
--- 6 vehicles, sample reviews, 3 dealers, offers
+-- 6 vehicles, 3 dealers, offers.
+-- NB : aucun avis fictif. Les tables reviews / reputation_scores ne sont
+-- remplies que par de vrais avis soumis via le site (POST /api/reputation).
 
 -- ===================== VEHICLES =====================
 INSERT INTO vehicles (id, make, model, year, trim, body_type, fuel_type, transmission, seats, price_mad, price_old_mad, power_ch, consumption_l100, co2_gkm, accel_0_100, trunk_liters, length_mm, width_mm, height_mm, wheelbase_mm) VALUES
@@ -38,95 +40,6 @@ INSERT INTO vehicles (id, make, model, year, trim, body_type, fuel_type, transmi
  'Ford', 'Kuga', 2026, 'PHEV Vignale',
  'suv', 'plug-in-hybride', 'automatique', 5,
  435000, NULL, 225, 1.4, 32, 9.2, 475, 4614, 1883, 1674, 2711);
-
--- ===================== REVIEWS =====================
-INSERT INTO reviews (vehicle_id, source, author_name, rating, title, body, pros, cons, verified) VALUES
--- RAV4 Hybrid reviews
-('a1111111-1111-1111-1111-111111111111', 'aggregated', 'Ahmed B.', 8.5, 'Excellent SUV familial',
- 'Le RAV4 Hybrid est un SUV fiable et polyvalent. Consommation très maîtrisée en ville.',
- ARRAY['Fiabilité Toyota','Consommation faible','Habitabilité généreuse','4WD disponible'],
- ARRAY['Intérieur un peu daté','Motorisation bruyante en accélération','Prix élevé'],
- TRUE),
-
-('a1111111-1111-1111-1111-111111111111', 'aggregated', 'Fatima Z.', 8.0, 'Bonne valeur sûre',
- 'Un SUV qui ne déçoit pas au quotidien. Parfait pour les familles.',
- ARRAY['Espace coffre','Tenue de route','Facilité de conduite'],
- ARRAY['Écran multimédia perfectible','Finition bas de gamme'],
- TRUE),
-
--- Tucson Hybrid reviews
-('a2222222-2222-2222-2222-222222222222', 'aggregated', 'Youssef M.', 8.8, 'Design sensationnel',
- 'Le Tucson impressionne par son design extérieur et intérieur. L''habitabilité est au top.',
- ARRAY['Design extérieur audacieux','Intérieur premium','Garantie 5 ans'],
- ARRAY['Suspension ferme','Consommation autoroutière','Visibility arrière limitée'],
- TRUE),
-
-('a2222222-2222-2222-2222-222222222222', 'aggregated', 'Salma K.', 8.2, 'Très satisfait',
- 'Excellent rapport qualité-prix dans le segment des hybrides.',
- ARRAY['Rapport qualité-prix','Équipements série','Service après-vente'],
- ARRAY['Bruit pneus sur revêtement dur','Sellerie tache facilement'],
- TRUE),
-
--- Sportage Hybrid reviews
-('a3333333-3333-3333-3333-333333333333', 'aggregated', 'Omar H.', 8.4, 'Sportif et confortable',
- 'La Sportage Hybrid combine dynamisme et confort. Le GT-Line ajoute une touche sport.',
- ARRAY['Conduite dynamique','Coffre généreux','Technologie embarquée'],
- ARRAY['Consommation supérieure aux promises','Bruit à haute vitesse'],
- TRUE),
-
-('a3333333-3333-3333-3333-333333333333', 'aggregated', 'Nadia A.', 8.6, 'Au-delà des attentes',
- 'Une crossover qui fait tout bien. Le système hybride est très fluide.',
- ARRAY['Fluidité hybride','Équipement sécurité','Design intérieur'],
- ARRAY['Tarification des accessoires','Chargeur sans fil lent'],
- TRUE),
-
--- Qashqai e-Power reviews
-('a4444444-4444-4444-4444-444444444444', 'aggregated', 'Rachid T.', 7.9, 'Innovant et économique',
- 'Le système e-Power est unique. On roule en électrique sans brancher.',
- ARRAY['Système e-Power original','Consommation faible','Confort routier'],
- ARRAY['Puissance modeste','Coffre moyen','Finition plastique'],
- TRUE),
-
-('a4444444-4444-4444-4444-444444444444', 'aggregated', 'Leila B.', 8.1, 'Original et pratique',
- 'Idéal pour ceux qui veulent du électrique sans contrainte de recharge.',
- ARRAY['Pas de branchement nécessaire','Ville très agréable','Écran intuitif'],
- ARRAY['Accélération moyenne','Isolation sonore perfectible'],
- TRUE),
-
--- Outlander PHEV reviews
-('a5555555-5555-5555-5555-555555555555', 'aggregated', 'Khalid D.', 8.3, 'PHEV familial 7 places',
- 'Le seul SUV hybride rechargeable 7 places du marché marocain. Très pratique.',
- ARRAY['7 places','Autonomie électrique ~45 km','4WD performant'],
- ARRAY['Poids élevé','Coffre réduit en 7 places','Prix premium'],
- TRUE),
-
-('a5555555-5555-5555-5555-555555555555', 'aggregated', 'Amina S.', 8.7, 'La polyvalence absolue',
- 'Peut rouler en 100% électrique pour les trajets courts. Parfait pour les familles.',
- ARRAY['Double motorisation','Modes de conduite','Technologie S-AWC'],
- ARRAY['Autonomie EV limitée','Entretien plus coûteux'],
- TRUE),
-
--- Kuga PHEV reviews
-('a6666666-6666-6666-6666-666666666666', 'aggregated', 'Hassan R.', 8.0, 'Le bon compromis',
- 'Le Kuga PHEV offre un excellent équilibre entre performance et économie.',
- ARRAY['Consommation très basse','Confort suspendu','SynchroConnect'],
- ARRAY['Design discret','Espace arrière moyen','Charge lente'],
- TRUE),
-
-('a6666666-6666-6666-6666-666666666666', 'aggregated', 'Meryem F.', 7.8, 'Satisfait mais...',
- 'Bon SUV hybride rechargeable mais quelques défauts à signaler.',
- ARRAY['Autonomie électrique correcte','Intérieur bien fini','Apple CarPlay'],
- ARRAY['Capot arrière manuel','Sièges arrière plats','Pas de toit ouvrant'],
- TRUE);
-
--- ===================== REPUTATION SCORES =====================
-INSERT INTO reputation_scores (vehicle_id, avg_rating, total_reviews, reliability, top_pros, top_cons) VALUES
-('a1111111-1111-1111-1111-111111111111', 8.25, 2, 'fiable', ARRAY['Fiabilité Toyota','Consommation faible'], ARRAY['Intérieur daté','Motorisation bruyante']),
-('a2222222-2222-2222-2222-222222222222', 8.50, 2, 'fiable', ARRAY['Design extérieur','Intérieur premium'], ARRAY['Suspension ferme','Consommation autoroute']),
-('a3333333-3333-3333-3333-333333333333', 8.50, 2, 'fiable', ARRAY['Conduite dynamique','Équipement sécurité'], ARRAY['Consommation promise','Bruit haute vitesse']),
-('a4444444-4444-4444-4444-444444444444', 8.00, 2, 'fiable', ARRAY['Système e-Power','Consommation faible'], ARRAY['Puissance modeste','Coffre moyen']),
-('a5555555-5555-5555-5555-555555555555', 8.50, 2, 'fiable', ARRAY['7 places','Autonomie électrique'], ARRAY['Poids élevé','Coffre réduit']),
-('a6666666-6666-6666-6666-666666666666', 7.90, 2, 'moyen', ARRAY['Consommation basse','Confort'], ARRAY['Design discret','Espace arrière']);
 
 -- ===================== DEALERS =====================
 INSERT INTO dealers (id, name, city, address, phone, lat, lng) VALUES
