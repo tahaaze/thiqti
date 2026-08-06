@@ -17,6 +17,7 @@ import {
   buildSearchRequest,
   recommendationText,
   criteriaSummary,
+  criteriaLine,
 } from "@/lib/chatbot";
 
 interface ChatMessage {
@@ -206,8 +207,10 @@ export default function ChatAssistant({
             <CarFront className="h-5 w-5 text-[#1b1406]" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              Assistant Thiqti
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-lg font-bold leading-tight tracking-tight text-ink">
+                Assistant <span className="text-primary">Thiqti</span>
+              </h2>
               <span className="flex h-2 w-2 items-center justify-center">
                 <span className="absolute h-2 w-2 animate-ping rounded-full bg-green-400 opacity-75" />
                 <span className="h-2 w-2 rounded-full bg-green-400" />
@@ -221,17 +224,25 @@ export default function ChatAssistant({
           </button>
         </div>
 
-        {/* Critères actuels */}
+        {/* Recommandations contextualisées */}
         <div className="border-b border-line px-5 py-3">
-          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">Critères actuels</p>
+          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
+            <Sparkles className="h-3 w-3 text-primary" />
+            Recommandations
+          </div>
           {chips.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5">
-              {chips.map((chip) => (
-                <span key={chip} className="chip text-[11px]">{chip}</span>
-              ))}
-            </div>
+            <>
+              <p className="mt-1 text-xs text-primary">
+                D&apos;après vos critères : {criteriaLine(botState)}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {chips.map((chip) => (
+                  <span key={chip} className="chip text-[11px]">{chip}</span>
+                ))}
+              </div>
+            </>
           ) : (
-            <p className="text-xs text-muted">Aucun critère pour l&apos;instant — décrivez votre envie.</p>
+            <p className="mt-1 text-xs text-muted">Aucun critère pour l&apos;instant — décrivez votre envie.</p>
           )}
         </div>
 
