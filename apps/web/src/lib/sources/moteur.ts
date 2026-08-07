@@ -20,7 +20,7 @@
 // sources continue de fonctionner).
 // ============================================================================
 
-import { UnifiedCar, normalizeBrand, normalizeFuel, formatPriceDH, computeScore } from "./types";
+import { UnifiedCar, BRAND_ALIASES, normalizeFuel, formatPriceDH, computeScore } from "./types";
 import { telHref, displayPhone } from "./contact";
 
 const SEARCH_BASE =
@@ -90,6 +90,69 @@ function stripHtml(s: string): string {
 
 function toNumber(raw: string): number {
   return Number(raw.replace(/[^\d]/g, "")) || 0;
+}
+
+function stripAccents(s: string): string {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Villes marocaines en tête de titre = bruit (ex. "Kénitra Kénitra [modèle]"). */
+const CITY_STOPWORDS = new Set([
+  "casablanca", "rabat", "marrakech", "tanger", "fes", "agadir", "kenitra",
+  "oujda", "meknes", "el jadida", "mohammedia", "temara", "sale", "tetouan",
+  "berrechid", "settat", "khouribga", "beni mellal", "nador", "laayoune",
+  "essaouira", "taza", "safi", "khenifra", "taroudant", "al hoceima",
+  "ouarzazate", "khemisset", "errachidia", "guelmim", "tiznit", "dakhla",
+]);
+
+/** Cherche la marque connue N'IMPORTE OÙ dans le titre, en ignorant le bruit
+ * de début (numéros de référence, tirets, emojis, villes). Retourne null si
+ * aucune marque reconnue (l'appelant doit alors utiliser "Autre").
+ *
+ * Ex. "1851 - Toyota Yaris Cross 2023" -> Toyota, "polo Volkswagen" -> Volkswagen,
+ * "🚗 Fiat 500" -> Fiat, "206 plus diesel" -> null, "Kénitra Kénitra x" -> null. */
+export function extractBrandFromTitle(title: string): string | null {
+  const search = stripAccents(title.toLowerCase().replace(/[-–—]/g, " ").replace(/[^\p{L}\p{N}]+/gu, " ")).trim();
+  if (search.length === 0) return null;
+  const padded = ` ${search} `;
+
+  let best: { canonical: string; pos: number } | null = null;
+  for (const [alias, canonical] of Object.entries(BRAND_ALIASES)) {
+    const key = stripAccents(alias.replace(/[-–—]/g, " ")).trim();
+    if (key.length < 2) continue;
+    // Mot délimité par des non-lettres (espace/chiffre) : autorise "mazda3",
+    // refuse "mini" dans "minivan" ou "ram" dans "programme".
+    const re = new RegExp(`(^|[^a-z])${escapeRegExp(key)}([^a-z]|$)`, "i");
+    const m = padded.match(re);
+    if (!m) continue;
+    const pos = (m.index || 0) + m[1].length;
+    if (!best || pos < best.pos) best = { canonical, pos };
+  }
+  return best ? best.canonical : null;
+}
+
+/** Extrait un modèle lisible : retire la marque détectée et le bruit de début
+ * (référence "1851 -", villes). Ne supprime jamais la marque du modèle. */
+export function extractModelFromTitle(title: string, make: string): string {
+  const words = title.replace(/[-–—]+/g, " ").replace(/[^\p{L}\p{N}]+/gu, " ").split(/\s+/).filter(Boolean);
+  const norm = (w: string) => stripAccents(w.toLowerCase());
+
+  // Référence "1851 - Toyota ..." : un numéro de tête ne précède une marque
+  // connue qu'en tant que référence, on le retire (mais garde "206", "3008"...).
+  if (words.length > 1 && /^\d{3,4}$/.test(words[0]) && extractBrandFromTitle(words.slice(1).join(" "))) {
+    words.shift();
+  }
+
+  const makeWords = new Set(norm(make).split(/\s+/).filter(Boolean));
+  const rest = words.filter((w) => !makeWords.has(norm(w)));
+
+  while (rest.length > 0 && CITY_STOPWORDS.has(norm(rest[0]))) rest.shift();
+
+  return rest.join(" ") || title;
 }
 
 /** Extrait une carte d'annonce depuis son bloc HTML. */
@@ -209,14 +272,13 @@ export async function fetchMoteurCars(): Promise<UnifiedCar[]> {
 
   return cards.map((card) => {
     const detail = details.get(card.id);
-    const make = normalizeBrand(card.title.split(/\s+/)[0] || "");
-    const modelWords = card.title.split(/\s+/).slice(1).join(" ");
-    const model = modelWords || card.title;
+    const make = extractBrandFromTitle(card.title) ?? "Autre";
+    const model = extractModelFromTitle(card.title, make);
 
     return {
       id: `moteur_${card.id}`,
       title: card.title,
-      make: make || card.title,
+      make,
       model,
       year: card.year || 0,
       price: card.price,
