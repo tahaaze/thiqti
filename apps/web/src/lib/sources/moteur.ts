@@ -93,7 +93,7 @@ function toNumber(raw: string): number {
 }
 
 function stripAccents(s: string): string {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return s.normalize("NFD").replace(/[\u0300-\u036f\u0653\u0654]+/g, "");
 }
 
 function escapeRegExp(s: string): string {
@@ -148,7 +148,14 @@ export function extractModelFromTitle(title: string, make: string): string {
   }
 
   const makeWords = new Set(norm(make).split(/\s+/).filter(Boolean));
-  const rest = words.filter((w) => !makeWords.has(norm(w)));
+  // Mots de la marque dans toutes les langues (ex. "بيجو" pour Peugeot) :
+  // on les retire aussi du modèle, pas seulement le nom canonique latin.
+  const makeAliasWords = new Set<string>();
+  for (const [alias, canonical] of Object.entries(BRAND_ALIASES)) {
+    if (canonical !== make) continue;
+    for (const w of norm(alias).split(/\s+/).filter(Boolean)) makeAliasWords.add(w);
+  }
+  const rest = words.filter((w) => !makeWords.has(norm(w)) && !makeAliasWords.has(norm(w)));
 
   while (rest.length > 0 && CITY_STOPWORDS.has(norm(rest[0]))) rest.shift();
 

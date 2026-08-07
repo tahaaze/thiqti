@@ -21,6 +21,18 @@ describe("extractBrandFromTitle (moteur.ma) — marque n'importe où dans le tit
     ["SUV hybride familiale", "Autre"],
     ["Daihatsu Sirion Essence Manuelle 2008", "Daihatsu"],
     ["DS 7 Crossback – 2024", "DS"],
+    ["بيجو 306", "Peugeot"],
+    ["داسيا داستر", "Dacia"],
+    ["دسيا دوكير نقية كارط كريز", "Dacia"],
+    ["رونو سينيك", "Renault"],
+    ["تويوتا كورولا 2020", "Toyota"],
+    ["سيارة فولكس فاجن غولف 4", "Volkswagen"],
+    ["مرسيديس 220", "Mercedes"],
+    ["سيارة ميرسيدس للبيع", "Mercedes"],
+    ["أودي A3", "Audi"],
+    ["نيسان كشكاي", "Nissan"],
+    ["فياط باليو", "Fiat"],
+    ["سيارة للبيع", "Autre"],
   ])("%s → make=%s", (title, expected) => {
     expect(brandOf(title)).toBe(expected);
   });
@@ -39,6 +51,9 @@ describe("extractModelFromTitle (moteur.ma) — modèle lisible sans la marque",
     ["Citroën C3 Aircross 2023", "Citroën", "C3 Aircross 2023"],
     ["DS 7 Crossback – 2024", "DS", "7 Crossback 2024"],
     ["Daihatsu Sirion Essence Manuelle 2008", "Daihatsu", "Sirion Essence Manuelle 2008"],
+    ["بيجو 306", "Peugeot", "306"],
+    ["داسيا داستر", "Dacia", "داستر"],
+    ["سيارة فولكس فاجن غولف 4", "Volkswagen", "سيارة غولف 4"],
   ])("%s (make=%s) → model=%s", (title, make, expected) => {
     expect(extractModelFromTitle(title, make)).toBe(expected);
   });

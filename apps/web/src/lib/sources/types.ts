@@ -200,10 +200,48 @@ export const BRAND_ALIASES: Record<string, string> = {
   isuzu: "Isuzu",
   mahindra: "Mahindra",
   tata: "Tata",
+  // Aliases arabes : titres Moteur.ma rédigés en arabe (transcription sans hamza,
+  // stripAccents normalise أ/إ/آ en ا).
+  بيجو: "Peugeot",
+  داسيا: "Dacia",
+  دسيا: "Dacia",
+  رونو: "Renault",
+  رينو: "Renault",
+  تويوتا: "Toyota",
+  مرسيدس: "Mercedes",
+  مرسيديس: "Mercedes",
+  ميرييديس: "Mercedes",
+  ميرسيدس: "Mercedes",
+  فيات: "Fiat",
+  فياط: "Fiat",
+  نيسان: "Nissan",
+  "فولكس فاجن": "Volkswagen",
+  هوندا: "Honda",
+  كيا: "Kia",
+  هيونداي: "Hyundai",
+  "بي ام دبليو": "BMW",
+  مازدا: "Mazda",
+  فورد: "Ford",
+  اودي: "Audi",
+  سوزوكي: "Suzuki",
+  شيفروليه: "Chevrolet",
+  ميتسوبيشي: "Mitsubishi",
+  "لاند روفر": "Land Rover",
+  "رنج روفر": "Range Rover",
+  فولفو: "Volvo",
+  جيب: "Jeep",
+  سيات: "Seat",
+  سكودا: "Škoda",
+  لكزس: "Lexus",
+  تسلا: "Tesla",
+  جاكوار: "Jaguar",
+  كاديلاك: "Cadillac",
+  بورش: "Porsche",
+  ميني: "Mini",
 };
 
 function stripAccents(s: string): string {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return s.normalize("NFD").replace(/[\u0300-\u036f\u0653\u0654]+/g, "");
 }
 
 // Inference de carrosserie pour les annonces occasion (moteur.ma / autera.ma)
