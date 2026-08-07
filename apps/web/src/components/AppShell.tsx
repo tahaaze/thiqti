@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CarFront, Menu, X, Search, GitCompareArrows, Heart, Trash2, User, ShieldCheck } from "lucide-react";
+import { CarFront, Menu, X, Search, GitCompareArrows, Heart, Trash2 } from "lucide-react";
 import { clearHistory, getHistory } from "@/lib/history";
 
 const NAV_ITEMS = [
@@ -93,36 +93,6 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           </div>
         )}
       </nav>
-
-      <div className="border-t border-sidebar-line px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-sidebar-line bg-sidebar-surface text-sidebar-accent">
-            <User className="h-4 w-4" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-bold text-sidebar-ink">Invité</p>
-            <p className="text-[10px] uppercase tracking-widest text-sidebar-muted">Lecture seule</p>
-          </div>
-        </div>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link
-            href="/login"
-            onClick={onNavigate}
-            className="flex items-center justify-center gap-1.5 rounded-full border border-sidebar-line bg-sidebar-surface px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-sidebar-ink transition hover:border-sidebar-accent hover:text-sidebar-accent"
-          >
-            <User className="h-3.5 w-3.5" />
-            Connexion
-          </Link>
-          <Link
-            href="/admin"
-            onClick={onNavigate}
-            className="flex items-center justify-center gap-1.5 rounded-full border border-sidebar-line bg-sidebar-surface px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-sidebar-ink transition hover:border-sidebar-accent hover:text-sidebar-accent"
-          >
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Admin
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }

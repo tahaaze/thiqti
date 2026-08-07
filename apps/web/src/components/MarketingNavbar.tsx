@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CarFront, Menu, ShieldCheck, X } from "lucide-react";
+import { CarFront, Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Assistant" },
@@ -44,13 +44,6 @@ export default function MarketingNavbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/login"
-            className="ml-2 flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-primary"
-          >
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Admin
-          </Link>
         </div>
         <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-full border border-line bg-white/50 p-2 text-muted hover:text-ink md:hidden">
           {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -69,7 +62,6 @@ export default function MarketingNavbar() {
                 {link.label}
               </Link>
             ))}
-            <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full px-4 py-2 text-sm font-semibold text-primary">Admin</Link>
           </div>
         </div>
       )}
