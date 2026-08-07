@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { normalizeFuel, normalizeBody, normalizeBrand, generateId, computeScore, inferBodyType } from "@/lib/sources/types";
 import { fetchAllSources, searchAllSources } from "@/lib/sources/aggregator";
+import { getFallbackCars } from "@/lib/sources/fallback";
 
 vi.mock("@/lib/sources/autera", () => ({ fetchAuteraCars: async () => [] }));
 vi.mock("@/lib/sources/moteur", () => ({ fetchMoteurCars: async () => [] }));
@@ -128,6 +129,47 @@ describe("aggregator", () => {
       const haystack = `${car.make} ${car.model} ${car.title}`.toLowerCase();
       expect(haystack).toContain("toyota");
     }
+  });
+});
+
+describe("catalogue de démonstration (isDemoData)", () => {
+  it("getFallbackCars ne contient que des véhicules neufs, tous marqués isDemoData", () => {
+    const cars = getFallbackCars();
+    expect(cars.length).toBe(196);
+    expect(cars.every((c) => c.inventoryType === "new")).toBe(true);
+    expect(cars.every((c) => c.isDemoData === true)).toBe(true);
+  });
+
+  it("aucune occasion n'est dérivée du catalogue de démo", () => {
+    expect(getFallbackCars().some((c) => c.inventoryType === "used")).toBe(false);
+  });
+
+  it("quand les sources live échouent, le secours sert le catalogue démo marqué", async () => {
+    const cars = await fetchAllSources();
+    expect(cars.length).toBe(196);
+    expect(cars.every((c) => c.isDemoData === true)).toBe(true);
+    const used = await searchAllSources("", "used");
+    expect(used).toHaveLength(0);
+  });
+
+  it("le bug MG ZS 1.5 est corrigé (modèle 'ZS', pas 'ZS EV')", () => {
+    const car = getFallbackCars().find((c) => c.title === "MG ZS 1.5 2024");
+    expect(car?.model).toBe("ZS");
+    expect(car?.fuel).toBe("Essence");
+  });
+
+  it("les carrosseries Pickup sont unifiées en Utilitaire", () => {
+    const cars = getFallbackCars();
+    expect(cars.some((c) => c.bodyType === "Pickup")).toBe(false);
+    expect(cars.filter((c) => c.bodyType === "Utilitaire").length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("aucun prix n'est stocké en notation scientifique", () => {
+    const cars = getFallbackCars();
+    const sci = cars.filter((c) => Number(c.price).toString().toLowerCase().includes("e"));
+    expect(sci).toHaveLength(0);
+    expect(cars.find((c) => c.model === "iX")?.price).toBe(1000000);
+    expect(cars.find((c) => c.model === "GLE")?.price).toBe(1000000);
   });
 });
 

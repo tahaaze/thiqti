@@ -1,4 +1,4 @@
-import { UnifiedCar, generateId, computeScore, formatPriceDH } from "./types";
+import { UnifiedCar, generateId, computeScore } from "./types";
 
 const CDN = "https://s1.cdn.autoevolution.com/images-webp/models";
 
@@ -288,14 +288,14 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryT
   { title: "Peugeot 508 GT 2023", make: "Peugeot", model: "508", year: 2023, price: 389000, priceFormatted: "389 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Berline", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Peugeot 301 Access 2022", make: "Peugeot", model: "301", year: 2022, price: 120000, priceFormatted: "120 000 DH", km: 0, fuel: "Essence", transmission: "Manuelle", bodyType: "Berline", city: "Fès", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Peugeot Partner 2023", make: "Peugeot", model: "Partner", year: 2023, price: 185000, priceFormatted: "185 000 DH", km: 0, fuel: "Diesel", transmission: "Manuelle", bodyType: "Utilitaire", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Peugeot Landtrek 4x4 2024", make: "Peugeot", model: "Landtrek", year: 2024, price: 329000, priceFormatted: "329 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Pickup", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Peugeot Landtrek 4x4 2024", make: "Peugeot", model: "Landtrek", year: 2024, price: 329000, priceFormatted: "329 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Utilitaire", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
   // Toyota - Plus de variantes
   { title: "Toyota Yaris Essential 2023", make: "Toyota", model: "Yaris", year: 2023, price: 195000, priceFormatted: "195 000 DH", km: 0, fuel: "Essence", transmission: "Manuelle", bodyType: "Citadine", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Toyota Yaris Cross 2023", make: "Toyota", model: "Yaris Cross", year: 2023, price: 265000, priceFormatted: "265 000 DH", km: 0, fuel: "Hybride", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Toyota Corolla Cross 2024", make: "Toyota", model: "Corolla Cross", year: 2024, price: 329000, priceFormatted: "329 000 DH", km: 0, fuel: "Hybride", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Toyota Hilux Double Cab 2024", make: "Toyota", model: "Hilux", year: 2024, price: 399000, priceFormatted: "399 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Pickup", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Toyota Hilux 2023", make: "Toyota", model: "Hilux", year: 2023, price: 359000, priceFormatted: "359 000 DH", km: 0, fuel: "Diesel", transmission: "Manuelle", bodyType: "Pickup", city: "Agadir", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Toyota Hilux Double Cab 2024", make: "Toyota", model: "Hilux", year: 2024, price: 399000, priceFormatted: "399 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Utilitaire", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Toyota Hilux 2023", make: "Toyota", model: "Hilux", year: 2023, price: 359000, priceFormatted: "359 000 DH", km: 0, fuel: "Diesel", transmission: "Manuelle", bodyType: "Utilitaire", city: "Agadir", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Toyota Land Cruiser Prado 2024", make: "Toyota", model: "Land Cruiser Prado", year: 2024, price: 699000, priceFormatted: "699 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Toyota RAV4 2023", make: "Toyota", model: "RAV4", year: 2023, price: 359000, priceFormatted: "359 000 DH", km: 0, fuel: "Hybride", transmission: "Automatique", bodyType: "SUV", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Toyota Corolla 2023", make: "Toyota", model: "Corolla", year: 2023, price: 269000, priceFormatted: "269 000 DH", km: 0, fuel: "Hybride", transmission: "Automatique", bodyType: "Berline", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
@@ -322,19 +322,19 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryT
   { title: "Volkswagen T-Roc 2023", make: "Volkswagen", model: "T-Roc", year: 2023, price: 295000, priceFormatted: "295 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Crossover", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Volkswagen Golf 8 2023", make: "Volkswagen", model: "Golf", year: 2023, price: 325000, priceFormatted: "325 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Compacte", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Volkswagen Polo 2022", make: "Volkswagen", model: "Polo", year: 2022, price: 195000, priceFormatted: "195 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Citadine", city: "Marrakech", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Volkswagen Amarok 2024", make: "Volkswagen", model: "Amarok", year: 2024, price: 459000, priceFormatted: "459 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Pickup", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Volkswagen Amarok 2024", make: "Volkswagen", model: "Amarok", year: 2024, price: 459000, priceFormatted: "459 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Utilitaire", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Volkswagen ID.4 2024", make: "Volkswagen", model: "ID.4", year: 2024, price: 485000, priceFormatted: "485 000 DH", km: 0, fuel: "Électrique", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
   // BMW
   { title: "BMW Série 3 320i 2024", make: "BMW", model: "Série 3", year: 2024, price: 495000, priceFormatted: "495 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Berline", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "BMW X1 2023", make: "BMW", model: "X1", year: 2023, price: 459000, priceFormatted: "459 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "BMW X5 xDrive 2024", make: "BMW", model: "X5", year: 2024, price: 989000, priceFormatted: "989 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "BMW iX xDrive50 2024", make: "BMW", model: "iX", year: 2024, price: 1e6, priceFormatted: "1 000 000 DH", km: 0, fuel: "Électrique", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "BMW iX xDrive50 2024", make: "BMW", model: "iX", year: 2024, price: 1000000, priceFormatted: "1 000 000 DH", km: 0, fuel: "Électrique", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
   // Mercedes
   { title: "Mercedes Classe C 200 2024", make: "Mercedes", model: "Classe C", year: 2024, price: 559000, priceFormatted: "559 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Berline", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Mercedes GLC 300 2024", make: "Mercedes", model: "GLC", year: 2024, price: 699000, priceFormatted: "699 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Mercedes GLE 450 2024", make: "Mercedes", model: "GLE", year: 2024, price: 1e6, priceFormatted: "1 000 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Mercedes GLE 450 2024", make: "Mercedes", model: "GLE", year: 2024, price: 1000000, priceFormatted: "1 000 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Mercedes EQB 300 2024", make: "Mercedes", model: "EQB", year: 2024, price: 599000, priceFormatted: "599 000 DH", km: 0, fuel: "Électrique", transmission: "Automatique", bodyType: "SUV", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
   // Audi
@@ -343,8 +343,8 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryT
 
   // Ford - Plus de variantes
   { title: "Ford Puma 2024", make: "Ford", model: "Puma", year: 2024, price: 259000, priceFormatted: "259 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Crossover", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Ford Ranger Wildtrak 2024", make: "Ford", model: "Ranger", year: 2024, price: 459000, priceFormatted: "459 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Pickup", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Ford Ranger 2023", make: "Ford", model: "Ranger", year: 2023, price: 399000, priceFormatted: "399 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Pickup", city: "Agadir", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Ford Ranger Wildtrak 2024", make: "Ford", model: "Ranger", year: 2024, price: 459000, priceFormatted: "459 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Utilitaire", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Ford Ranger 2023", make: "Ford", model: "Ranger", year: 2023, price: 399000, priceFormatted: "399 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Utilitaire", city: "Agadir", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Ford Mustang GT 2024", make: "Ford", model: "Mustang", year: 2024, price: 699000, priceFormatted: "699 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Coupé", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Ford Fiesta 2021", make: "Ford", model: "Fiesta", year: 2021, price: 145000, priceFormatted: "145 000 DH", km: 0, fuel: "Essence", transmission: "Manuelle", bodyType: "Citadine", city: "Fès", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
@@ -352,7 +352,7 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryT
   { title: "Nissan Qashqai 2023", make: "Nissan", model: "Qashqai", year: 2023, price: 289000, priceFormatted: "289 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Nissan X-Trail 2024", make: "Nissan", model: "X-Trail", year: 2024, price: 389000, priceFormatted: "389 000 DH", km: 0, fuel: "Hybride", transmission: "Automatique", bodyType: "SUV", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Nissan Pathfinder 2024", make: "Nissan", model: "Pathfinder", year: 2024, price: 515000, priceFormatted: "515 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "Nissan Navara 2024", make: "Nissan", model: "Navara", year: 2024, price: 389000, priceFormatted: "389 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Pickup", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "Nissan Navara 2024", make: "Nissan", model: "Navara", year: 2024, price: 389000, priceFormatted: "389 000 DH", km: 0, fuel: "Diesel", transmission: "Automatique", bodyType: "Utilitaire", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "Nissan Juke 2022", make: "Nissan", model: "Juke", year: 2022, price: 215000, priceFormatted: "215 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "Crossover", city: "Marrakech", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
   // Citroën - Plus de variantes
@@ -410,7 +410,7 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryT
   // MG
   { title: "MG4 Electric 2024", make: "MG", model: "MG4", year: 2024, price: 269000, priceFormatted: "269 000 DH", km: 0, fuel: "Électrique", transmission: "Automatique", bodyType: "Compacte", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
   { title: "MG5 Electric 2024", make: "MG", model: "MG5", year: 2024, price: 289000, priceFormatted: "289 000 DH", km: 0, fuel: "Électrique", transmission: "Automatique", bodyType: "Berline", city: "Rabat", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
-  { title: "MG ZS 1.5 2024", make: "MG", model: "ZS EV", year: 2024, price: 239000, priceFormatted: "239 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "SUV", city: "Marrakech", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
+  { title: "MG ZS 1.5 2024", make: "MG", model: "ZS", year: 2024, price: 239000, priceFormatted: "239 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "SUV", city: "Marrakech", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
 
   // Chery
   { title: "Chery Tiggo 4 Pro 2024", make: "Chery", model: "Tiggo 4 Pro", year: 2024, price: 199000, priceFormatted: "199 000 DH", km: 0, fuel: "Essence", transmission: "Automatique", bodyType: "SUV", city: "Casablanca", image: "", source: "Données Maroc", sourceUrl: "", url: "", photos: [] },
@@ -446,42 +446,15 @@ const MOROCCAN_CARS: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryT
 
 ];
 
-function hashString(str: string): number {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (h * 31 + str.charCodeAt(i)) | 0;
-  }
-  return Math.abs(h);
-}
-
-/** Derive une variante occasion realiste (annee/kilometrage/prix) de facon deterministe. */
-function buildOccasionVariant(
-  base: Omit<UnifiedCar, "id" | "scrapedAt" | "score" | "inventoryType" | "safety">
-): UnifiedCar {
-  const seed = hashString(`${base.make}_${base.model}_${base.year}`);
-  const ageStep = 1 + (seed % 3);
-  const variantYear = Math.max(2018, base.year - ageStep);
-  const variantKm = 25000 + (seed % 6) * 15000;
-  const priceFactor = 0.7 + ((seed * 3) % 25) / 100;
-  const variantPrice = Math.round((base.price * priceFactor) / 1000) * 1000;
-
-  return {
-    ...base,
-    title: `${base.make} ${base.model} ${variantYear}`,
-    year: variantYear,
-    km: variantKm,
-    price: variantPrice,
-    priceFormatted: formatPriceDH(variantPrice),
-    inventoryType: "used",
-    safety: null,
-    id: generateId("fallback", base.make, base.model, variantYear, variantKm, variantPrice),
-    score: computeScore(variantYear, variantKm, variantPrice),
-    scrapedAt: new Date().toISOString(),
-  };
-}
-
+/** Catalogue de démonstration hors-ligne.
+ *
+ * ATTENTION : ces données sont FICTIVES (prix, kilométrage, disponibilité ne
+ * sont pas garantis) et servent uniquement de filet de secours si les 3
+ * sources live (moteur.ma, autera.ma, electrodrive.ma) ne renvoient rien.
+ * Chaque véhicule est marqué `isDemoData: true` pour être affiché comme tel.
+ */
 export function getFallbackCars(): UnifiedCar[] {
-  const newCars = MOROCCAN_CARS.map((car) => ({
+  return MOROCCAN_CARS.map((car) => ({
     ...car,
     image: car.image || img(car.make, car.model, car.year),
     id: generateId("fallback", car.make, car.model, car.year, car.km, car.price),
@@ -489,7 +462,6 @@ export function getFallbackCars(): UnifiedCar[] {
     scrapedAt: new Date().toISOString(),
     inventoryType: "new" as const,
     safety: null,
+    isDemoData: true,
   }));
-  const usedCars = MOROCCAN_CARS.map(buildOccasionVariant);
-  return [...newCars, ...usedCars];
 }

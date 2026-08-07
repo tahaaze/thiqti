@@ -8,9 +8,10 @@
 //      (base 100% US, aucun véhicule marocain). Quand une source renvoie des
 //      annonces, elles portent leurs vraies photos, prix MAD, km, ville, leur
 //      réputation réelle et un moyen de contacter le vendeur / conseiller.
-//   2. Le catalogue marocain de reference (fallback.ts) n'est utilise QU'EN
-//      SECOURS : si toutes les sources live échouent, il fait office de socle
-//      hors-ligne (avec les vraies photos Wikimedia).
+//   2. Le catalogue de reference hors-ligne (fallback.ts) n'est utilise QU'EN
+//      SECOURS : si toutes les sources live échouent, il sert de socle de
+//      DEMONSTRATION. Toutes ses entrées portent `isDemoData: true` et l'API
+//      renvoie `demoData: true` pour que l'UI affiche un avertissement clair.
 //   3. Le tout est fusionne dans un cache en memoire (TTL 10 min).
 // ============================================================================
 
@@ -98,7 +99,8 @@ async function loadMergedCars(): Promise<UnifiedCar[]> {
     return live.map(withSafety);
   }
 
-  // Secours hors-ligne : catalogue marocain + photos reelles en cache.
+  // Secours hors-ligne : catalogue de DEMONSTRATION (donnees fictives, marquees
+  // isDemoData). L'UI doit afficher un bandeau "Catalogue de reference".
   const byId = new Map<string, UnifiedCar>();
   for (const car of getFallbackCars()) {
     if (byId.has(car.id)) continue;

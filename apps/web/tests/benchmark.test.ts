@@ -131,7 +131,7 @@ describe("Analyse de sensibilite (poids budget +/- 10%)", () => {
         for (let i = 0; i < Math.min(10, variant.length); i++) {
           const idx = variant.findIndex((c) => c.id === baseline[i].id);
           const shift = Math.abs(idx - i);
-          // Seuil elargi a 10 : le catalogue (neuf + occasion) cree des
+          // Seuil elargi a 10 : le catalogue de reference (196 neufs) cree des
           // quasi-egalites de score pour les requetes larges (ex. 126 SUV
           // sous 300 000 DH), le top-1 reste stable mais les rangs
           // intermediaires peuvent glisser de quelques positions.

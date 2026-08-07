@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
 
   const allCars = await fetchAllSources();
   const pool = type ? allCars.filter((c) => c.inventoryType === type) : allCars;
+  const demoData = allCars.length > 0 && allCars.every((c) => c.isDemoData);
 
   if (!q || q.trim().length < 2) {
     const filtered = applyFilters(pool, filters);
@@ -51,6 +52,7 @@ export async function GET(request: NextRequest) {
       criteria: null,
       sources: getSourceStats(sorted),
       facets: buildFacets(pool),
+      demoData,
     });
   }
 
@@ -65,6 +67,7 @@ export async function GET(request: NextRequest) {
     criteria,
     sources: getSourceStats(filtered),
     facets: buildFacets(pool),
+    demoData,
   });
 }
 

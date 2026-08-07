@@ -63,6 +63,8 @@ export interface UnifiedCar {
   contact?: CarContact;
   /** Réputation réelle de l'annonce fournie par la source. */
   reputation?: CarReputation;
+  /** Catalogue de démonstration hors-ligne (données fictives non garanties). */
+  isDemoData?: boolean;
 }
 
 /** Taux de conversion indicatif USD -> MAD utilisé pour les annonces API étrangères. */

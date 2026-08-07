@@ -40,6 +40,7 @@ interface CarListing {
   source: string;
   url: string;
   inventoryType?: "new" | "used";
+  isDemoData?: boolean;
   matchPercent?: number;
   bodyType?: string;
   explanations?: MatchExplanation[];
@@ -88,6 +89,7 @@ export default function ResultsPage() {
   const [criteria, setCriteria] = useState<SearchCriteria | null>(null);
   const [filters, setFilters] = useState<SearchFilters>({});
   const [facets, setFacets] = useState<SearchFacets | null>(null);
+  const [demoData, setDemoData] = useState(false);
   const [expandedExplanations, setExpandedExplanations] = useState<string | null>(null);
   const loadedRef = useRef(false);
   const seededRef = useRef(false);
@@ -120,10 +122,12 @@ export default function ResultsPage() {
         setCars(data.results);
         setCriteria(data.criteria);
         setFacets(data.facets || null);
+        setDemoData(Boolean(data.demoData));
       } catch {
         setCars([]);
         setCriteria(null);
         setFacets(null);
+        setDemoData(false);
       }
       setLoading(false);
     },
@@ -313,6 +317,20 @@ export default function ResultsPage() {
               </div>
             </div>
 
+            {demoData && (
+              <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+                <div>
+                  <p className="font-semibold text-ink">Catalogue de référence</p>
+                  <p className="mt-1 text-sm text-muted">
+                    Les annonces live (Moteur.ma, Autera.ma, ElectroDrive.ma) sont momentanément
+                    indisponibles. Les véhicules affichés proviennent d&apos;un catalogue de démonstration
+                    non garanti — vérifiez la disponibilité réelle auprès du concessionnaire.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {activeFilterEntries.length > 0 && (
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 {activeFilterEntries.map(([key, value]) => (
@@ -344,6 +362,11 @@ export default function ResultsPage() {
                       <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
+                      {v.isDemoData && (
+                        <div className="absolute left-2 top-9">
+                          <span className="rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-black backdrop-blur">Démo</span>
+                        </div>
+                      )}
                       <div className="absolute right-2 top-2">
                         {v.meetsBudget === false ? (
                           <span className="rounded-lg bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-600 backdrop-blur">Hors budget</span>
