@@ -5,7 +5,7 @@
 Thiqti est un moteur de recommandation automobile pour le Maroc. Il agrege de **vraies annonces marocaines** (prix MAD, km, photos et reponsabilite reels) depuis trois sources nationales, analyse les requetes via NLP rule-based, et classe via matching TOPSIS multicritere.
 
 **Composants cles (Phase 1):**
-- **Next.js 15** — Frontend + API routes (search, auth)
+- **Next.js 15** — Frontend + API routes (search)
 - **Sources reelles marocaines** — Autera.ma (API), Moteur.ma (annonces), ElectroDrive.ma (API)
 - **Catalogue hors-ligne** — fallback.ts (196 vehicules) utilise QU'EN SECOURS
 - **Cache** — In-memory (Map + TTL 10min)
@@ -109,21 +109,6 @@ npm run typecheck
 
 Corriger les erreurs avant de commit.
 
-### Le login admin ne fonctionne pas
-
-**Symptome:** 401 sur `/api/auth/login`.
-
-**Causes:**
-- `JWT_SECRET` non defini dans `.env`
-- `ADMIN_PASSWORD_HASH` non defini ou invalide
-- Mot de passe incorrect
-
-**Solution:** Verifier les variables dans `.env`. Regenerer le hash:
-
-```bash
-npx tsx apps/web/scripts/generate-password-hash.ts
-```
-
 ### Le serveur retourne "Donnees Maroc" au lieu des vraies annonces
 
 **Symptome:** `/api/search` renvoie uniquement les vehicules du catalogue (fallback) au lieu des annonces reelles d'Autera/Moteur/ElectroDrive.
@@ -165,11 +150,6 @@ Chaque annonce porte sa **reputation reelle** et un **lien de contact direct**. 
 3. Verifier le format (tous les champs requis)
 4. Commiter avec message descriptif
 
-### Ajouter un admin
-
-1. Generer le hash: `npx tsx apps/web/scripts/generate-password-hash.ts`
-2. Ajouter `ADMIN_EMAIL` et `ADMIN_PASSWORD_HASH` dans `.env`
-
 ## Monitoring
 
 | Aspect | Methode |
@@ -181,5 +161,4 @@ Chaque annonce porte sa **reputation reelle** et un **lien de contact direct**. 
 ## Securite
 
 - Ne jamais commit `.env`
-- Faire tourner `JWT_SECRET` si compromis
 - La `GOOGLE_API_KEY` est visible dans l'historique git — REVOQUER dans Google Cloud Console

@@ -24,7 +24,6 @@ Requete utilisateur --> NLP Parser --> Moteur Matching TOPSIS --> Resultats clas
 - **NLP**: Rule-based + dictionnaires francais/arabe (marque, budget, type, carburant)
 - **Matching**: TOPSIS avec ponderation contextuelle + score d'explication
 - **Catalogue**: Dataset statique de 196 vehicules neufs disponibles au Maroc
-- **Auth**: Admin unique via JWT + bcrypt (cookie httpOnly)
 
 ## Stack
 
@@ -35,7 +34,6 @@ Requete utilisateur --> NLP Parser --> Moteur Matching TOPSIS --> Resultats clas
 | API | Next.js API Routes |
 | Matching | TOPSIS multicritere |
 | NLP | Regex + dictionnaires FR/AR |
-| Auth | jose + bcryptjs |
 | Cache | In-memory (Map + TTL 5min) |
 | Icons | lucide-react |
 
@@ -52,11 +50,6 @@ thiqti/
    ADRs/       Architecture Decision Records (MADR)
    architecture/  C4, deploiement, securite, registre donnees
 ```
-
-## Administration
-
-- **Login**: `/login` — email + mot de passe admin
-- **Generer hash**: `npx tsx apps/web/scripts/generate-password-hash.ts`
 
 ## Licence
 

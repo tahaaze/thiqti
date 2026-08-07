@@ -18,8 +18,8 @@ graph TB
     subgraph "Vercel (Hebergement Principal)"
         direction TB
         VER[Next.js 15 App]
-        VER --> APP["Pages<br>/ /results /vehicle /compare /login"]
-        VER --> API["API Routes<br>/api/search<br>/api/reputation<br>/api/auth"]
+        VER --> APP["Pages<br>/ /results /vehicle /compare"]
+        VER --> API["API Routes<br>/api/search<br>/api/reputation"]
         VER --> STATIC["Assets statiques<br>/_next/static/*"]
     end
 
@@ -63,7 +63,6 @@ graph TB
 | SSL | None (local) | Vercel auto | Vercel auto |
 | Collecte donnees | Manuelle (dataset statique) | Manuelle | Manuelle |
 | Logs | Console | Vercel Function Logs | Vercel Function Logs |
-| Auth | Admin local (JWT + bcrypt) | Admin local | Admin local |
 | CDN | Local /public | Google CDN | Google CDN |
 
 ---
@@ -74,9 +73,6 @@ graph TB
 
 | Secret | Usage | Source |
 |--------|-------|--------|
-| `JWT_SECRET` | Signature des tokens JWT | Generer avec `openssl rand -hex 32` |
-| `ADMIN_EMAIL` | Email admin pour connexion | Defini par l'equipe |
-| `ADMIN_PASSWORD_HASH` | Hash bcrypt du mot de passe admin | Generer avec `scripts/generate-password-hash.ts` |
 | `GOOGLE_API_KEY` | Google Custom Search (images) | Google Cloud Console |
 | `GOOGLE_CX` | Google Custom Search Engine ID | Google Cloud Console |
 | `DB_PASSWORD` | Mot de passe PostgreSQL | Defini par l'equipe (optionnel Phase 1) |
