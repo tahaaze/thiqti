@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { SlidersHorizontal, RotateCcw, Calendar, Gauge, Tag, Fuel } from "lucide-react";
+import { Calendar, Gauge, Tag, Fuel } from "lucide-react";
 import { ThiqtiShield } from "@/components/icons";
 import { SearchFilters, SearchFacets, countActiveFilters } from "@/lib/searchTypes";
 
@@ -80,7 +80,7 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition ${
+      className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition ${
         active
           ? "border-primary bg-primary/15 text-primary"
           : "border-line text-muted hover:border-primary/40 hover:text-ink"
@@ -104,7 +104,6 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
   const [priceQuery, setPriceQuery] = useState("");
 
   const activeCount = countActiveFilters(filters);
-  const maxPrice = facets.priceMax || 600000;
   const maxYear = facets.yearMax || 2026;
   const minYear = facets.yearMin || 2018;
   const year = filters.minYear ?? minYear;
@@ -126,183 +125,161 @@ export default function FilterPanel({ facets, filters, total, onChange, onReset 
   );
 
   return (
-    <div className="glass-card p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 font-display text-lg font-bold text-ink">
-          <SlidersHorizontal className="h-4 w-4 text-primary" />
-          Filtres
-          {activeCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center border border-primary bg-primary px-1.5 text-[11px] font-bold text-white">
-              {activeCount}
-            </span>
-          )}
-        </div>
-        <button
-          onClick={onReset}
-          className="flex items-center gap-1 text-xs text-muted transition hover:text-ink"
-        >
-          <RotateCcw className="h-3 w-3" />
-          Réinitialiser
-        </button>
-      </div>
-
-      <div className="mb-4 flex items-baseline justify-between rounded-xl bg-line/60 px-3 py-2">
+    <div className="space-y-4">
+      <div className="rounded-xl bg-primary/5 px-4 py-3 text-center">
         <p className="text-xs text-muted">Résultats</p>
-        <p className="text-sm font-bold text-primary">{total} véhicules</p>
+        <p className="text-lg font-bold text-primary">{total}</p>
       </div>
 
-      <div className="space-y-4">
-        <Section title="Budget">
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {PRICE_PRESETS.map((p) => (
-              <Chip key={p.value} active={pricePresetActive && filters.maxPrice === p.value} onClick={() => set({ maxPrice: p.value, minPrice: undefined })}>
-                {p.label}
-              </Chip>
-            ))}
-            <Chip active={!filters.maxPrice && !filters.minPrice} onClick={() => set({ maxPrice: undefined, minPrice: undefined })}>
-              Tous
+      <Section title="Budget">
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          {PRICE_PRESETS.map((p) => (
+            <Chip key={p.value} active={pricePresetActive && filters.maxPrice === p.value} onClick={() => set({ maxPrice: p.value, minPrice: undefined })}>
+              {p.label}
             </Chip>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              placeholder="Min (DH)"
-              value={filters.minPrice ?? ""}
-              onChange={(e) => set({ minPrice: e.target.value ? Number(e.target.value) : undefined })}
-              className="input-field text-sm"
-            />
-            <span className="text-muted">—</span>
-            <input
-              type="number"
-              placeholder="Max (DH)"
-              value={filters.maxPrice ?? ""}
-              onChange={(e) => set({ maxPrice: e.target.value ? Number(e.target.value) : undefined })}
-              className="input-field text-sm"
-            />
-          </div>
-        </Section>
-
-        <Section title="Année minimum">
-          <Slider
-            label=""
-            icon={Calendar}
-            min={minYear}
-            max={maxYear}
-            step={1}
-            value={year}
-            display={String(year)}
-            onChange={(v) => set({ minYear: v })}
+          ))}
+          <Chip active={!filters.maxPrice && !filters.minPrice} onClick={() => set({ maxPrice: undefined, minPrice: undefined })}>
+            Tous
+          </Chip>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="Min (DH)"
+            value={filters.minPrice ?? ""}
+            onChange={(e) => set({ minPrice: e.target.value ? Number(e.target.value) : undefined })}
+            className="input-field text-sm"
           />
-        </Section>
-
-        <Section title="Kilométrage max">
-          <Slider
-            label=""
-            icon={Gauge}
-            min={0}
-            max={250000}
-            step={5000}
-            value={km}
-            display={km >= 250000 ? "Indifférent" : `${km.toLocaleString("fr-FR")} km`}
-            onChange={(v) => set({ maxKm: v === 250000 ? undefined : v })}
+          <span className="text-muted">—</span>
+          <input
+            type="number"
+            placeholder="Max (DH)"
+            value={filters.maxPrice ?? ""}
+            onChange={(e) => set({ maxPrice: e.target.value ? Number(e.target.value) : undefined })}
+            className="input-field text-sm"
           />
-        </Section>
+        </div>
+      </Section>
 
-        <Section title="Sécurité (crash test)">
-          <div className="flex flex-wrap gap-1.5">
-            <Chip active={!filters.minSafety} onClick={() => set({ minSafety: undefined })}>
-              Toutes
+      <Section title="Année minimum">
+        <Slider
+          label=""
+          icon={Calendar}
+          min={minYear}
+          max={maxYear}
+          step={1}
+          value={year}
+          display={String(year)}
+          onChange={(v) => set({ minYear: v })}
+        />
+      </Section>
+
+      <Section title="Kilométrage max">
+        <Slider
+          label=""
+          icon={Gauge}
+          min={0}
+          max={250000}
+          step={5000}
+          value={km}
+          display={km >= 250000 ? "Indifférent" : `${km.toLocaleString("fr-FR")} km`}
+          onChange={(v) => set({ maxKm: v === 250000 ? undefined : v })}
+        />
+      </Section>
+
+      <Section title="Sécurité (crash test)">
+        <div className="flex flex-wrap gap-1.5">
+          <Chip active={!filters.minSafety} onClick={() => set({ minSafety: undefined })}>
+            Toutes
+          </Chip>
+          {SAFETY_OPTIONS.map((o) => (
+            <Chip key={o.value} active={safetyActive(o.value)} onClick={() => toggle("minSafety", o.value)}>
+              <span className="inline-flex items-center gap-1">
+                <ThiqtiShield className="h-3 w-3" />
+                {o.label}
+              </span>
             </Chip>
-            {SAFETY_OPTIONS.map((o) => (
-              <Chip key={o.value} active={safetyActive(o.value)} onClick={() => toggle("minSafety", o.value)}>
-                <span className="inline-flex items-center gap-1">
-                  <ThiqtiShield className="h-3 w-3" />
-                  {o.label}
-                </span>
-              </Chip>
-            ))}
-          </div>
-          <p className="mt-2 text-[10px] text-muted">
-            Basé sur Euro NCAP / NHTSA · {facets.safety.evaluated} modèles notés, {facets.safety.fiveStars} au maximum
-          </p>
-        </Section>
+          ))}
+        </div>
+        <p className="mt-2 text-[10px] text-muted">
+          Basé sur Euro NCAP / NHTSA · {facets.safety.evaluated} modèles notés, {facets.safety.fiveStars} au maximum
+        </p>
+      </Section>
 
-        <Section title="Carrosserie">
-          <div className="flex flex-wrap gap-1.5">
-            <Chip active={!filters.bodyType} onClick={() => set({ bodyType: undefined })}>
-              Toutes
+      <Section title="Carrosserie">
+        <div className="flex flex-wrap gap-1.5">
+          <Chip active={!filters.bodyType} onClick={() => set({ bodyType: undefined })}>
+            Toutes
+          </Chip>
+          {facets.bodyTypes.map((b) => (
+            <Chip key={b} active={filters.bodyType === b} onClick={() => toggle("bodyType", b)}>
+              {b}
             </Chip>
-            {facets.bodyTypes.map((b) => (
-              <Chip key={b} active={filters.bodyType === b} onClick={() => toggle("bodyType", b)}>
-                {b}
-              </Chip>
-            ))}
-          </div>
-        </Section>
+          ))}
+        </div>
+      </Section>
 
-        <Section title="Motorisation">
-          <div className="flex flex-wrap gap-1.5">
-            <Chip active={!filters.fuel} onClick={() => set({ fuel: undefined })}>
-              Toutes
+      <Section title="Motorisation">
+        <div className="flex flex-wrap gap-1.5">
+          <Chip active={!filters.fuel} onClick={() => set({ fuel: undefined })}>
+            Toutes
+          </Chip>
+          {facets.fuels.map((f) => (
+            <Chip key={f} active={filters.fuel === f} onClick={() => toggle("fuel", f)}>
+              <span className="inline-flex items-center gap-1">
+                <Fuel className="h-3 w-3" />
+                {f}
+              </span>
             </Chip>
-            {facets.fuels.map((f) => (
-              <Chip key={f} active={filters.fuel === f} onClick={() => toggle("fuel", f)}>
-                <span className="inline-flex items-center gap-1">
-                  <Fuel className="h-3 w-3" />
-                  {f}
-                </span>
-              </Chip>
-            ))}
-          </div>
-        </Section>
+          ))}
+        </div>
+      </Section>
 
-        <Section title="Marque">
-          <div className="relative">
-            <Tag className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
-              value={priceQuery}
-              onChange={(e) => setPriceQuery(e.target.value)}
-              placeholder="Rechercher une marque…"
-              className="input-field pl-9 text-sm"
-            />
-          </div>
-          <select
-            value={filters.brand ?? ""}
-            onChange={(e) => set({ brand: e.target.value || undefined })}
-            className="mt-2 w-full input-field text-sm"
-          >
-            <option value="">Toutes les marques</option>
-            {filteredBrands.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
-            ))}
-          </select>
-        </Section>
+      <Section title="Marque">
+        <div className="relative">
+          <Tag className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
+          <input
+            type="text"
+            value={priceQuery}
+            onChange={(e) => setPriceQuery(e.target.value)}
+            placeholder="Rechercher une marque…"
+            className="input-field pl-9 text-sm"
+          />
+        </div>
+        <select
+          value={filters.brand ?? ""}
+          onChange={(e) => set({ brand: e.target.value || undefined })}
+          className="mt-2 w-full input-field text-sm"
+        >
+          <option value="">Toutes les marques</option>
+          {filteredBrands.map((b) => (
+            <option key={b} value={b}>
+              {b}
+            </option>
+          ))}
+        </select>
+      </Section>
 
-        <Section title="Ville">
-          <select
-            value={filters.city ?? ""}
-            onChange={(e) => set({ city: e.target.value || undefined })}
-            className="w-full input-field text-sm"
-          >
-            <option value="">Toutes les villes</option>
-            {facets.cities.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </Section>
-      </div>
+      <Section title="Ville">
+        <select
+          value={filters.city ?? ""}
+          onChange={(e) => set({ city: e.target.value || undefined })}
+          className="w-full input-field text-sm"
+        >
+          <option value="">Toutes les villes</option>
+          {facets.cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </Section>
 
       {activeCount > 0 && (
         <button
           onClick={onReset}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm text-muted transition hover:border-primary/40 hover:text-ink"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-sm text-muted transition hover:border-primary/40 hover:text-ink"
         >
-          <RotateCcw className="h-4 w-4" />
           Effacer {activeCount} filtre{activeCount > 1 ? "s" : ""}
         </button>
       )}

@@ -48,6 +48,7 @@ export default function CarImage({ src, sources = [], alt, make, model, bodyType
   }
 
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       key={imgSrc}
       src={imgSrc}

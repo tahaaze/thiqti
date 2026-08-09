@@ -380,7 +380,8 @@ export function generateId(source: string, make: string, model: string, year: nu
   return `src_${Math.abs(hash).toString(36)}`;
 }
 
-export function computeScore(year: number, km: number, price: number): number {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function computeScore(year: number, km: number, _price: number): number {
   let score = 70;
   const age = 2026 - year;
   if (age <= 1) score += 15;

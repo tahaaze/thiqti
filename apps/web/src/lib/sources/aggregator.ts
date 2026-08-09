@@ -3,11 +3,10 @@
 // ============================================================================
 //
 // Comportement :
-//   1. Les annonces REELLES au Maroc sont chargees depuis trois sources
-//      nationales (autera.ma, moteur.ma, electrodrive.ma) — jamais MarketCheck
-//      (base 100% US, aucun véhicule marocain). Quand une source renvoie des
-//      annonces, elles portent leurs vraies photos, prix MAD, km, ville, leur
-//      réputation réelle et un moyen de contacter le vendeur / conseiller.
+//   1. Les annonces REELLES au Maroc sont chargees depuis sept sources
+//      nationales (autera.ma, moteur.ma, electrodrive.ma, autohall.ma, auto24.ma, avito.ma, moteur-neuf). Quand une source
+//      renvoie des annonces, elles portent leurs vraies photos, prix MAD, km,
+//      ville, leur réputation réelle et un moyen de contacter le vendeur.
 //   2. Le catalogue de reference hors-ligne (fallback.ts) n'est utilise QU'EN
 //      SECOURS : si toutes les sources live échouent, il sert de socle de
 //      DEMONSTRATION. Toutes ses entrées portent `isDemoData: true` et l'API
@@ -22,6 +21,10 @@ import { getFallbackCars } from "./fallback";
 import { fetchAuteraCars } from "./autera";
 import { fetchMoteurCars } from "./moteur";
 import { fetchElectroDriveCars } from "./electrodrive";
+import { fetchAutohallCars } from "./autohall";
+import { fetchAuto24Cars } from "./auto24";
+import { fetchAvitoCars } from "./avito";
+import { fetchMoteurNeufCars } from "./moteur-neuf";
 import { cachedImageFor } from "@/lib/images";
 import { safetyRatingFor } from "@/lib/safetyRatings";
 
@@ -82,12 +85,16 @@ function withDedup(loader: () => Promise<UnifiedCar[]>): Promise<UnifiedCar[]> {
 }
 
 async function loadMergedCars(): Promise<UnifiedCar[]> {
-  const [autera, moteur, electro] = await Promise.all([
+  const [autera, moteur, electro, autohall, auto24, avito, moteurNeuf] = await Promise.all([
     fetchAuteraCars(),
     fetchMoteurCars(),
     fetchElectroDriveCars(),
+    fetchAutohallCars(),
+    fetchAuto24Cars(),
+    fetchAvitoCars(),
+    fetchMoteurNeufCars(),
   ]);
-  const live = [...autera, ...moteur, ...electro].map(withInferredBody);
+  const live = [...autera, ...moteur, ...electro, ...autohall, ...auto24, ...avito, ...moteurNeuf].map(withInferredBody);
 
   const withSafety = (car: UnifiedCar): UnifiedCar => ({
     ...car,
@@ -138,8 +145,22 @@ async function getCars(): Promise<UnifiedCar[]> {
     return cache.cars;
   }
 
-  // Premier demarrage totalement froid (ni memoire, ni disque) : on attend.
-  return withDedup(loadAndCache);
+  // Premier demarrage froid : on lance le scraping en arriere-plan et on
+  // retourne les donnees fallback immediatement pour eviter de bloquer l'UI.
+  void withDedup(loadAndCache).then((live) => {
+    cache = { cars: live, fetchedAt: Date.now(), liveSources: live.some((c) => c.contact || c.reputation) };
+  }).catch(() => {});
+  const fallback = getFallbackCars().map((c) => {
+    const realPhoto = cachedImageFor(c.make, c.model);
+    return withInferredBody({
+      ...c,
+      image: realPhoto || c.image,
+      photos: realPhoto && c.photos.length === 0 ? [realPhoto] : c.photos,
+      safety: safetyRatingFor(c.make, c.model),
+    });
+  });
+  cache = { cars: fallback, fetchedAt: Date.now(), liveSources: false };
+  return fallback;
 }
 
 export async function fetchAllSources(): Promise<UnifiedCar[]> {

@@ -98,28 +98,88 @@ describe("conversation chatbot", () => {
     expect(t).toContain("92/100");
   });
 
-  it("envoie le budget en filtre et PAS dans le texte libre (bug trouve vehicules)", () => {
+  it("envoie les criteres en filtres structures et PAS dans le texte libre (bug trouve vehicules)", () => {
     const s = createInitialState();
     const r = answer(s, "Toyota SUV diesel 250 000 à 400 000 DH");
     const req = buildSearchRequest(r.state);
-    expect(req.q).toBe("Toyota SUV Diesel");
+    expect(req.q).toBe("");
+    expect(req.filters.brand).toBe("Toyota");
+    expect(req.filters.bodyType).toBe("SUV");
+    expect(req.filters.fuel).toBe("Diesel");
     expect(req.filters.minPrice).toBe(250000);
     expect(req.filters.maxPrice).toBe(400000);
     expect(/\d/.test(req.q)).toBe(false);
+  });
+
+  it("refine les resultats a chaque nouvel indice (filtres cumules)", () => {
+    let r = answer(createInitialState(), "SUV");
+    expect(buildSearchRequest(r.state).filters.bodyType).toBe("SUV");
+    r = answer(r.state, "diesel");
+    expect(buildSearchRequest(r.state).filters.bodyType).toBe("SUV");
+    expect(buildSearchRequest(r.state).filters.fuel).toBe("Diesel");
+    r = answer(r.state, "Toyota");
+    const req = buildSearchRequest(r.state);
+    expect(req.filters.bodyType).toBe("SUV");
+    expect(req.filters.fuel).toBe("Diesel");
+    expect(req.filters.brand).toBe("Toyota");
   });
 
   it("applique l'annee en filtre minYear", () => {
     const s = createInitialState();
     const r = answer(s, "Toyota SUV diesel moins de 150 000 DH 2022 et plus");
     const req = buildSearchRequest(r.state);
-    expect(req.q).toBe("Toyota SUV Diesel");
+    expect(req.q).toBe("");
+    expect(req.filters.brand).toBe("Toyota");
+    expect(req.filters.bodyType).toBe("SUV");
+    expect(req.filters.fuel).toBe("Diesel");
     expect(req.filters.minYear).toBe(2022);
     expect(req.filters.maxPrice).toBe(150000);
+  });
+
+  it("cherche un modele en texte libre", () => {
+    const s = createInitialState();
+    const r = answer(s, "Duster 2022");
+    const req = buildSearchRequest(r.state);
+    expect(req.q).toBe("Duster");
+    expect(req.filters.minYear).toBe(2022);
   });
 
   it("propose des suggestions par defaut des l'ouverture", () => {
     const init = initialMessage();
     expect(init.quickReplies).toContain("SUV");
     expect(init.quickReplies).toContain("Moins de 150 000 DH");
+  });
+
+  it("comprend l'intention d'achat en darija sans critères", () => {
+    const s = createInitialState();
+    const r = answer(s, "bghit nchri tomobil");
+    expect(r.search).toBe(false);
+    expect(r.text).toContain("budget");
+    expect(r.text).toContain("type");
+    expect(r.quickReplies.length).toBeGreaterThan(0);
+  });
+
+  it("comprend l'intention d'achat en français", () => {
+    const s = createInitialState();
+    const r = answer(s, "je veux acheter une voiture");
+    expect(r.search).toBe(false);
+    expect(r.text).toContain("budget");
+  });
+
+  it("détecte l'intent familial dans l'achat", () => {
+    const s = createInitialState();
+    const r = answer(s, "je veux acheter une voiture familiale");
+    expect(r.search).toBe(false);
+    expect(r.text).toContain("budget");
+    expect(r.text).toContain("type");
+  });
+
+  it("fonctionne avec acheteur + critère structuré", () => {
+    const s = createInitialState();
+    const r = answer(s, "je veux acheter une voiture SUV diesel Toyota");
+    expect(r.search).toBe(true);
+    expect(r.state.criteria.carrosserie).toBe("SUV");
+    expect(r.state.criteria.motorisation).toBe("Diesel");
+    expect(r.state.criteria.marque).toBe("Toyota");
   });
 });

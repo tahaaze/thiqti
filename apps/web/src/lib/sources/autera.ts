@@ -23,8 +23,9 @@ import { telHref, whatsappHref, displayPhone } from "./contact";
 
 const API_BASE = "https://autera.ma/api/listings";
 const LISTING_BASE = "https://autera.ma/listings";
-const MAX_LISTINGS = 50;
-const TIMEOUT_MS = 8000;
+const MAX_LISTINGS = 200;
+const PAGE_SIZE = 50;
+const TIMEOUT_MS = 12000;
 
 interface AuteraListing {
   _id?: string;
@@ -126,14 +127,22 @@ async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Respons
 /** Vraies annonces d'occasion marocaines d'Autera.ma. */
 export async function fetchAuteraCars(): Promise<UnifiedCar[]> {
   try {
-    const res = await fetchWithTimeout(`${API_BASE}?limit=${MAX_LISTINGS}&skip=0`, TIMEOUT_MS);
-    if (!res.ok) return [];
-    const data = (await res.json()) as AuteraResponse;
-    const listings = data.data?.listings;
-    if (!Array.isArray(listings)) return [];
-    return listings
-      .map(mapListing)
-      .filter((c): c is UnifiedCar => c !== null);
+    const allCars: UnifiedCar[] = [];
+    const pages = Math.ceil(MAX_LISTINGS / PAGE_SIZE);
+    const fetches = Array.from({ length: pages }, (_, i) =>
+      fetchWithTimeout(`${API_BASE}?limit=${PAGE_SIZE}&skip=${i * PAGE_SIZE}`, TIMEOUT_MS)
+        .then(async (res) => {
+          if (!res.ok) return [];
+          const data = (await res.json()) as AuteraResponse;
+          const listings = data.data?.listings;
+          if (!Array.isArray(listings)) return [];
+          return listings.map(mapListing).filter((c): c is UnifiedCar => c !== null);
+        })
+        .catch(() => [] as UnifiedCar[])
+    );
+    const results = await Promise.all(fetches);
+    for (const r of results) allCars.push(...r);
+    return allCars;
   } catch {
     return [];
   }

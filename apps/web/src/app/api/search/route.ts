@@ -3,23 +3,23 @@ import { searchAllSources, fetchAllSources } from "@/lib/sources/aggregator";
 import { UnifiedCar, InventoryType } from "@/lib/sources/types";
 import { parseQuery } from "@/lib/nlp";
 import { rankVehicles } from "@/lib/matching";
-import { SearchFilters, SearchFacets, parseFilters, applyFilters } from "@/lib/searchTypes";
+import { SearchFacets, parseFilters, applyFilters, searchWithFallback } from "@/lib/searchTypes";
 
 function uniqueSorted(values: string[]): string[] {
   return [...new Set(values)].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 function buildFacets(cars: UnifiedCar[]): SearchFacets {
-  const prices = cars.map((c) => c.price);
-  const years = cars.map((c) => c.year);
+  const validPrices = cars.map((c) => c.price).filter((p) => p > 1000 && p < 5000000);
+  const validYears = cars.map((c) => c.year).filter((y) => y >= 2000 && y <= 2026);
   const safetyStars = cars
     .map((c) => c.safety?.stars)
     .filter((s): s is number => typeof s === "number");
   return {
-    priceMin: prices.length ? Math.min(...prices) : 0,
-    priceMax: prices.length ? Math.max(...prices) : 0,
-    yearMin: years.length ? Math.min(...years) : 0,
-    yearMax: years.length ? Math.max(...years) : 0,
+    priceMin: validPrices.length ? Math.min(...validPrices) : 0,
+    priceMax: validPrices.length ? Math.max(...validPrices) : 600000,
+    yearMin: validYears.length ? Math.min(...validYears) : 2018,
+    yearMax: validYears.length ? Math.max(...validYears) : 2026,
     brands: uniqueSorted(cars.map((c) => c.make)),
     bodyTypes: uniqueSorted(cars.map((c) => c.bodyType)),
     fuels: uniqueSorted(cars.map((c) => c.fuel)),
@@ -44,8 +44,8 @@ export async function GET(request: NextRequest) {
   const demoData = allCars.length > 0 && allCars.every((c) => c.isDemoData);
 
   if (!q || q.trim().length < 2) {
-    const filtered = applyFilters(pool, filters);
-    const sorted = [...filtered].sort((a, b) => b.score - a.score);
+    const fallback = searchWithFallback(pool, filters);
+    const sorted = [...fallback.results].sort((a, b) => b.score - a.score);
     return NextResponse.json({
       results: sorted,
       total: sorted.length,
@@ -53,6 +53,8 @@ export async function GET(request: NextRequest) {
       sources: getSourceStats(sorted),
       facets: buildFacets(pool),
       demoData,
+      relaxed: fallback.relaxed,
+      expandedBudget: fallback.expandedBudget,
     });
   }
 

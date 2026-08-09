@@ -334,3 +334,117 @@ describe("parseQuery - cas limites", () => {
     expect(c.motorisation).toBe("Électrique");
   });
 });
+
+describe("parseQuery - Arabizi (darija en latin)", () => {
+  // === Carburant Arabizi ===
+  it("reconnait 'mazot' comme Diesel", () => {
+    const c = parseQuery("bghit tomobil mazot");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("reconnait 'kazwal' comme Diesel", () => {
+    const c = parseQuery("voiture kazwal");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("reconnait 'dizel' comme Diesel", () => {
+    const c = parseQuery("dizel automatique");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("reconnait 'banzin' comme Essence", () => {
+    const c = parseQuery("banzin pas cher");
+    expect(c.motorisation).toBe("Essence");
+  });
+
+  it("reconnait 'kaz' comme Essence", () => {
+    const c = parseQuery("kaz 100000 dh");
+    expect(c.motorisation).toBe("Essence");
+  });
+
+  it("reconnait 'kahraba' comme Electrique", () => {
+    const c = parseQuery("kahraba 2024");
+    expect(c.motorisation).toBe("Électrique");
+  });
+
+  // === Carrosserie Arabizi ===
+  it("reconnait 'rab3' comme SUV", () => {
+    const c = parseQuery("bghit rab3 mazot");
+    expect(c.carrosserie).toBe("SUV");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("reconnait 'rba3' comme SUV", () => {
+    const c = parseQuery("rba3 4x4");
+    expect(c.carrosserie).toBe("SUV");
+  });
+
+  it("reconnait 'karosa' comme Berline", () => {
+    const c = parseQuery("karosa automatik");
+    expect(c.carrosserie).toBe("Berline");
+  });
+
+  it("reconnait 'madina' comme Citadine", () => {
+    const c = parseQuery("madina economique");
+    expect(c.carrosserie).toBe("Citadine");
+  });
+
+  // === Transmission Arabizi ===
+  it("reconnait 'matik' comme Automatique", () => {
+    const c = parseQuery("bghit tomobil matik");
+    expect(c.transmission).toBe("Automatique");
+  });
+
+  it("reconnait 'otomatic' comme Automatique", () => {
+    const c = parseQuery("voiture otomatic diesel");
+    expect(c.transmission).toBe("Automatique");
+  });
+
+  it("reconnait 'manyal' comme Manuelle", () => {
+    const c = parseQuery("manyal essence");
+    expect(c.transmission).toBe("Manuelle");
+  });
+
+  // === Combinaisons Arabizi ===
+  it("comprend 'bghit tomobil mazot ma tkonch ghalya'", () => {
+    const c = parseQuery("bghit tomobil mazot ma tkonch ghalya");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("comprend '3andi budget 100000 bghit SUV'", () => {
+    const c = parseQuery("3andi budget 100000 bghit SUV");
+    expect(c.carrosserie).toBe("SUV");
+    expect(c.budgetMin).toBe(85000);
+    expect(c.budgetMax).toBe(115000);
+  });
+
+  it("comprend requete complete Arabizi", () => {
+    const c = parseQuery("bghit rab3 mazot matik f casa 200000 dh");
+    expect(c.carrosserie).toBe("SUV");
+    expect(c.motorisation).toBe("Diesel");
+    expect(c.transmission).toBe("Automatique");
+    expect(c.ville).toBe("Casablanca");
+  });
+
+  it("comprend 'kazwal' avec budget", () => {
+    const c = parseQuery("kazwal 150000 dh");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  // === Les tests arabes existants continuent de passer ===
+  it("le darija arabe 'مازوت' fonctionne toujours", () => {
+    const c = parseQuery("بغيت سيارة مازوت");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("le darija arabe 'ربع' fonctionne toujours", () => {
+    const c = parseQuery("ربع ديزل");
+    expect(c.carrosserie).toBe("SUV");
+    expect(c.motorisation).toBe("Diesel");
+  });
+
+  it("le darija arabe 'ماتيك' fonctionne toujours", () => {
+    const c = parseQuery("ماتيك اوتوماتيك");
+    expect(c.transmission).toBe("Automatique");
+  });
+});

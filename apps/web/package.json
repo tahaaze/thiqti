@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "caniuse-lite": "^1.0.30001806",
     "clsx": "^2.1.0",
     "lucide-react": "^0.400.0",

@@ -124,7 +124,8 @@ function topsisScore(
 function buildExplanations(
   car: NormalizedVehicle,
   criteria: SearchCriteria,
-  matchScore: number
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _matchScore: number
 ): MatchExplanation[] {
   const explanations: MatchExplanation[] = [];
 

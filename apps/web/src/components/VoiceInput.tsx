@@ -14,14 +14,20 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
   const [state, setState] = useState<RecordingState>("idle");
   const [isSupported, setIsSupported] = useState(true);
   const [interimText, setInterimText] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const fullTextRef = useRef("");
+  const sentRef = useRef(false);
 
   useEffect(() => {
     const SpeechRecognitionAPI =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setIsSupported(false);
+      setErrorMessage(
+        "La reconnaissance vocale n'est pas disponible. Utilisez Chrome ou Edge."
+      );
     }
   }, []);
 
@@ -34,25 +40,34 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
     };
   }, []);
 
+  const commitTranscript = useCallback(() => {
+    const text = fullTextRef.current.trim();
+    if (text && !sentRef.current) {
+      sentRef.current = true;
+      onTranscript(text);
+    }
+    fullTextRef.current = "";
+  }, [onTranscript]);
+
   const createRecognition = useCallback(() => {
     const SpeechRecognitionAPI =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) return null;
 
     const recognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.interimResults = true;
-    recognition.lang = "fr-FR";
+    recognition.lang = "ar-MA";
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
       setState("listening");
-      setInterimText("");
+      setErrorMessage("");
+      fullTextRef.current = "";
+      sentRef.current = false;
       timeoutRef.current = setTimeout(() => {
-        if (recognitionRef.current) {
-          recognitionRef.current.stop();
-        }
-      }, 30000);
+        recognition.stop();
+      }, 20000);
     };
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -69,31 +84,37 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
         }
       }
 
-      setInterimText(interimTranscript);
-
       if (finalTranscript) {
-        onTranscript(finalTranscript.trim());
-        setInterimText("");
+        fullTextRef.current = (fullTextRef.current + " " + finalTranscript).trim();
+        commitTranscript();
       }
+      setInterimText(interimTranscript);
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      if (event.error === "not-allowed") {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        setErrorMessage("Accès au micro refusé : autorisez le micro dans votre navigateur.");
         setState("error");
+      } else if (event.error === "no-speech") {
+        if (fullTextRef.current.trim()) commitTranscript();
+        setInterimText("");
+        setState("idle");
       } else if (event.error !== "aborted") {
+        setErrorMessage("Erreur micro. Vérifiez votre micro et réessayez.");
         setState("error");
       }
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
 
     recognition.onend = () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      setState("idle");
+      if (fullTextRef.current.trim() && !sentRef.current) commitTranscript();
       setInterimText("");
+      setState("idle");
     };
 
     return recognition;
-  }, [onTranscript]);
+  }, [commitTranscript]);
 
   const toggleRecording = useCallback(() => {
     if (!isSupported) return;
@@ -103,23 +124,25 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
         recognitionRef.current.stop();
       }
       setState("processing");
-    } else {
-      recognitionRef.current = createRecognition();
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-        } catch {
-          setState("error");
-        }
+      return;
+    }
+
+    recognitionRef.current = createRecognition();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch {
+        setErrorMessage("Impossible de démarrer le micro. Réessayez.");
+        setState("error");
       }
     }
   }, [state, isSupported, createRecognition]);
 
   if (!isSupported) {
     return (
-      <div className={`flex items-center gap-2 text-muted ${className}`}>
+      <div className={`flex items-center gap-2 text-muted ${className}`} title={errorMessage}>
         <MicOff className="h-5 w-5" />
-        <span className="text-sm">Speech not supported</span>
+        <span className="text-xs">Micro indisponible</span>
       </div>
     );
   }
@@ -133,6 +156,8 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
         onClick={toggleRecording}
         disabled={isProcessing}
         type="button"
+        aria-label={isActive ? "Arrêter" : "Parler"}
+        title={isActive ? "Arrêter" : "Parler en français ou darija"}
         className={`
           relative flex items-center justify-center w-10 h-10 rounded-full
           transition-all duration-200 ease-in-out
@@ -146,7 +171,6 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
                   : "bg-muted/10 text-ink hover:bg-muted/20"
           }
         `}
-        aria-label={isActive ? "Stop recording" : "Start recording"}
       >
         {isActive && (
           <span className="absolute inset-0 rounded-full animate-ping bg-red-400/30" />
@@ -169,15 +193,13 @@ export default function VoiceInput({ onTranscript, className = "" }: VoiceInputP
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
           </span>
           <span className="text-sm text-muted">
-            {interimText || "Listening..."}
+            {interimText || "Je vous écoute... / سمعني..."}
           </span>
         </div>
       )}
 
-      {state === "error" && (
-        <span className="text-sm text-red-600">
-          Microphone access denied or error occurred
-        </span>
+      {state === "error" && errorMessage && (
+        <span className="text-xs text-red-600">{errorMessage}</span>
       )}
     </div>
   );

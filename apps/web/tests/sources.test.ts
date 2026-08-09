@@ -6,6 +6,8 @@ import { getFallbackCars } from "@/lib/sources/fallback";
 vi.mock("@/lib/sources/autera", () => ({ fetchAuteraCars: async () => [] }));
 vi.mock("@/lib/sources/moteur", () => ({ fetchMoteurCars: async () => [] }));
 vi.mock("@/lib/sources/electrodrive", () => ({ fetchElectroDriveCars: async () => [] }));
+vi.mock("@/lib/sources/autohall", () => ({ fetchAutohallCars: async () => [] }));
+vi.mock("@/lib/sources/moteur-neuf", () => ({ fetchMoteurNeufCars: async () => [] }));
 
 describe("normalizeFuel", () => {
   it("normalise les carburants connus", () => {

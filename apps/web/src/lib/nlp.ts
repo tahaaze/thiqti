@@ -40,10 +40,22 @@ const CARROSSERIES: Record<string, string> = {
   "pick up": "Utilitaire",
   van: "Utilitaire",
   fourgon: "Utilitaire",
-  // Darija
+  // Darija (arabe)
   "ربع": "SUV",
   "كاروسة": "Berline",
   "مدينة": "Citadine",
+  // Darija (Arabizi latin)
+  rab3: "SUV",
+  rba3: "SUV",
+  rab3a: "SUV",
+  karosa: "Berline",
+  caroussa: "Berline",
+  karoussa: "Berline",
+  madina: "Citadine",
+  mdina: "Citadine",
+  ludospace: "Monospace",
+  ludospas: "Monospace",
+  "pick-up": "Utilitaire",
 };
 
 // ---------------------------------------------------------------------------
@@ -60,7 +72,7 @@ const FUELS: Record<string, string> = {
   gpl: "GPL",
   gaz: "GPL",
   gasoil: "Diesel",
-  // Darija
+  // Darija (arabe)
   "مازوت": "Diesel",
   "مازوط": "Diesel",
   "كازوال": "Diesel",
@@ -73,6 +85,23 @@ const FUELS: Record<string, string> = {
   "بطاريات": "Électrique",
   "كهرباء": "Électrique",
   "كهربائي": "Électrique",
+  // Darija (Arabizi latin)
+  mazot: "Diesel",
+  mazout: "Diesel",
+  mazwot: "Diesel",
+  mazote: "Diesel",
+  kazwal: "Diesel",
+  kazwa: "Diesel",
+  dizel: "Diesel",
+  kaz: "Essence",
+  banzin: "Essence",
+  benzin: "Essence",
+  bnzin: "Essence",
+  hjin: "Hybride",
+  haibred: "Hybride",
+  kahraba: "Électrique",
+  kahraoui: "Électrique",
+  batariya: "Électrique",
 };
 
 // ---------------------------------------------------------------------------
@@ -88,7 +117,7 @@ const TRANSMISSIONS: Record<string, string> = {
   "boîte auto": "Automatique",
   "boite auto": "Automatique",
   "boite automatique": "Automatique",
-  // Darija
+  // Darija (arabe)
   "اوتوماتيك": "Automatique",
   "اوماتيك": "Automatique",
   "ماتيك": "Automatique",
@@ -97,6 +126,15 @@ const TRANSMISSIONS: Record<string, string> = {
   "مانوال": "Manuelle",
   "اليدوي": "Manuelle",
   "يدوي": "Manuelle",
+  // Darija (Arabizi latin)
+  otomatic: "Automatique",
+  awtomatic: "Automatique",
+  automatik: "Automatique",
+  matik: "Automatique",
+  manyal: "Manuelle",
+  manyouil: "Manuelle",
+  manwal: "Manuelle",
+  idawi: "Manuelle",
 };
 
 // ---------------------------------------------------------------------------
@@ -211,46 +249,46 @@ const BRAND_NAMES: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 const CITY_NAMES: Record<string, string[]> = {
-  "Casablanca": ["casablanca", "casa", "الدار البيضاء", "البيضاء", "كازا", "كازابلانكا"],
-  "Rabat": ["rabat", "الرباط"],
-  "Marrakech": ["marrakech", "مراكش"],
-  "Fès": ["fes", "فاس"],
-  "Tanger": ["tanger", "طنجة"],
-  "Agadir": ["agadir", "اكادير", "أكادير"],
-  "Meknès": ["meknes", "مكناس"],
-  "Oujda": ["oujda", "وجدة"],
-  "Tétouan": ["tetouan", "تطوان"],
-  "Nador": ["nador", "الناظور"],
-  "El Jadida": ["el jadida", "الجديدة"],
-  "Kénitra": ["kenitra", "القنيطرة"],
-  "Béni Mellal": ["beni mellal", "بني ملال"],
-  "Salé": ["سلا"],
-  "Temara": ["temara", "تمارة"],
-  "Mohammedia": ["mohammedia", "المحمدية"],
-  "Safi": ["safi", "اسفي", "آسفي"],
-  "Essaouira": ["essaouira", "الصويرة"],
-  "Khouribga": ["khouribga", "خريبكة"],
-  "Settat": ["settat", "سطات"],
-  "Benslimane": ["benslimane", "بن سليمان"],
-  "Ouarzazate": ["ouarzazate", "ورزازات"],
-  "Laâyoune": ["laayoune", "العيون"],
-  "Dakhla": ["dakhla", "الداخلة"],
-  "Taza": ["taza", "تازة"],
-  "Al Hoceima": ["al hoceima", "الحسيمة"],
-  "Sidi Kacem": ["sidi kacem", "سيدي قاسم"],
-  "Sidi Slimane": ["sidi slimane", "سيدي سليمان"],
-  "Errachidia": ["errachidia", "الرشيدية"],
-  "Sefrou": ["sefrou", "صفرو"],
-  "Taroudant": ["taroudant", "تارودانت"],
-  "Khémisset": ["khemisset", "خميسات"],
-  "Guercif": ["guercif", "جرسيف"],
-  "Youssoufia": ["youssoufia", "اليوسفية"],
-  "Ben Guerir": ["ben guerir", "بنجرير"],
-  "Berkane": ["berkane", "بوركان"],
-  "Fkih Ben Salah": ["fkih ben salah", "الفقيه بن صالح"],
-  "Sidi Bennour": ["sidi bennour", "سيدي بنور"],
-  "Larache": ["larache", "العرائش"],
-  "Azemmour": ["azemmour", "ازمور"],
+  "Casablanca": ["casablanca", "casa", "الدار البيضاء", "البيضاء", "كازا", "كازابلانكا", "da7let beida", "l7ay beida"],
+  "Rabat": ["rabat", "الرباط", "rbat"],
+  "Marrakech": ["marrakech", "مراكش", "mchicha", "amrcouch"],
+  "Fès": ["fes", "فاس", "fass"],
+  "Tanger": ["tanger", "طنجة", "tnja"],
+  "Agadir": ["agadir", "اكادير", "أكادير", "agadir"],
+  "Meknès": ["meknes", "مكناس", "mknas"],
+  "Oujda": ["oujda", "وجدة", "wjd"],
+  "Tétouan": ["tetouan", "تطوان", "ttwan"],
+  "Nador": ["nador", "الناظور", "nador"],
+  "El Jadida": ["el jadida", "الجديدة", "jadida", "ljadida"],
+  "Kénitra": ["kenitra", "القنيطرة", "qnitra"],
+  "Béni Mellal": ["beni mellal", "بني ملال", "bni mlal"],
+  "Salé": ["سلا", "sela"],
+  "Temara": ["temara", "تمارة", "tmar"],
+  "Mohammedia": ["mohammedia", "المحمدية", "mhamdia"],
+  "Safi": ["safi", "اسفي", "آسفي", "safi"],
+  "Essaouira": ["essaouira", "الصويرة", "swira"],
+  "Khouribga": ["khouribga", "خريبكة", "khribga"],
+  "Settat": ["settat", "سطات", "sttat"],
+  "Benslimane": ["benslimane", "بن سليمان", "bn sliman"],
+  "Ouarzazate": ["ouarzazate", "ورزازات", "wzazt"],
+  "Laâyoune": ["laayoune", "العيون", "layoun"],
+  "Dakhla": ["dakhla", "الداخلة", "dxla"],
+  "Taza": ["taza", "تازة", "tza"],
+  "Al Hoceima": ["al hoceima", "الحسيمة", "l7sima"],
+  "Sidi Kacem": ["sidi kacem", "سيدي قاسم", "sidi qasm"],
+  "Sidi Slimane": ["sidi slimane", "سيدي سليمان", "sidi sliman"],
+  "Errachidia": ["errachidia", "الرشيدية", "rshidia"],
+  "Sefrou": ["sefrou", "صفرو", "sfrou"],
+  "Taroudant": ["taroudant", "تارودانت", "trudant"],
+  "Khémisset": ["khemisset", "خميسات", "xmisset"],
+  "Guercif": ["guercif", "جرسيف", "grsif"],
+  "Youssoufia": ["youssoufia", "اليوسفية", "yusufia"],
+  "Ben Guerir": ["ben guerir", "بنجرير", "bn jirir"],
+  "Berkane": ["berkane", "بوركان", "barkan"],
+  "Fkih Ben Salah": ["fkih ben salah", "الفقيه بن صالح", "fqih bn sla7"],
+  "Sidi Bennour": ["sidi bennour", "سيدي بنور", "sidi bnur"],
+  "Larache": ["larache", "العرائش", "larech"],
+  "Azemmour": ["azemmour", "ازمور", "zmmur"],
 };
 
 // ---------------------------------------------------------------------------
@@ -543,6 +581,14 @@ const MODELS: Record<string, string[]> = {
 };
 
 const INTENT_KEYWORDS: Record<string, string[]> = {
+  achat: [
+    "acheter", "achete", "achetons", "acheteur", "achat",
+    "je veux acheter", "je souhaite acheter", "j'aimerais acheter", "je veux prendre",
+    "bghit nchri", "bghit nchri", "nchri", "ghadi nchri", "bghit nechri", "bghit nechri",
+    "buy", "want to buy", "looking for", "interested in",
+    "nchri tomobil", "nchri tomobila", "tomobil", "tomobila", "toumobil",
+    "عندني", "بغيت نشري",
+  ],
   familial: ["famille", "familial", "familiale", "enfant", "enfants", "bébé", "bebe", "pratique", "7aml", "عائلة", "اولاد", "دراري", "صغار", "عائلي"],
   sportif: ["sport", "sportif", "sportive", "puissant", "puissance", "vitesse", "performance", "sari3", "سريع", "قوي"],
   economique: ["économique", "economique", "petit budget", "abordable", "pas cher", "moins cher", "pas trop cher", "budget serré", "رخيص", "رخص", "اقتصادي"],
@@ -571,6 +617,43 @@ function normalizeText(text: string): string {
     .replace(/[^\w\s\d\u0600-\u06FF\u0400-\u04FF]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+// Translitération Arabizi → Arabe : convertit les chiffres/digraphes
+// Arabizi en leurs équivalents arabes pour enrichir le lookup.
+// Ex: "mazot" → "mazot" (inchangé, déjà dans dict), "3andi" → "عandi"
+// Sert de couche de secours si un terme n'est pas dans le dict Arabizi.
+function transliterateArabizi(text: string): string {
+  let result = text;
+  // Chiffres arabizi → lettres arabes (dans l'ordre, digraphes avant single)
+  const map: [RegExp, string][] = [
+    [/7[ba]/g, "حبا"],
+    [/7t/g, "حت"],
+    [/7m/g, "حم"],
+    [/7y/g, "حي"],
+    [/7a/g, "حا"],
+    [/7/g, "ح"],
+    [/3in/g, "عين"],
+    [/3an/g, "عان"],
+    [/3a/g, "ع"],
+    [/3i/g, "عي"],
+    [/3/g, "ع"],
+    [/9a/g, "قا"],
+    [/9i/g, "قي"],
+    [/9/g, "ق"],
+    [/2/g, "ء"],
+    [/8/g, "غ"],
+    [/kh/g, "خ"],
+    [/gh/g, "غ"],
+    [/sh/g, "ش"],
+    [/ch/g, "ش"],
+    [/6/g, "ط"],
+    [/5/g, "خ"],
+  ];
+  for (const [pattern, replacement] of map) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
 }
 
 function hasKeyword(text: string, key: string): boolean {
@@ -764,35 +847,38 @@ const MODEL_ENTRIES = Object.entries(MODELS)
 
 export function parseQuery(query: string): SearchCriteria {
   const normalized = normalizeText(query);
+  const normalizedAr = transliterateArabizi(normalized);
 
   let carrosserie: string | null = null;
   for (const [key, value] of Object.entries(CARROSSERIES)) {
-    if (normalized.includes(key)) { carrosserie = value; break; }
+    if (normalized.includes(key) || normalizedAr.includes(key)) { carrosserie = value; break; }
   }
 
   let motorisation: string | null = null;
   for (const [key, value] of Object.entries(FUELS)) {
-    if (normalized.includes(key)) { motorisation = value; break; }
+    if (normalized.includes(key) || normalizedAr.includes(key)) { motorisation = value; break; }
   }
 
   let transmission: string | null = null;
   for (const [key, value] of Object.entries(TRANSMISSIONS)) {
-    if (hasKeyword(normalized, key)) { transmission = value; break; }
+    if (hasKeyword(normalized, key) || hasKeyword(normalizedAr, key)) { transmission = value; break; }
   }
 
   let marque: string | null = null;
   for (const [alias, canonical] of BRAND_ENTRIES) {
-    if (normalized.includes(alias)) { marque = canonical; break; }
+    if (normalized.includes(alias) || normalizedAr.includes(alias)) { marque = canonical; break; }
   }
 
   let ville: string | null = null;
   for (const [alias, canonical] of CITY_ENTRIES) {
-    if (normalized.includes(alias)) { ville = canonical; break; }
+    if (normalized.includes(alias) || normalizedAr.includes(alias)) { ville = canonical; break; }
   }
 
   let modele: string | null = null;
   for (const [alias, canonical] of MODEL_ENTRIES) {
-    const matched = alias.includes(" ") ? normalized.includes(alias) : hasKeyword(normalized, alias);
+    const matched = alias.includes(" ")
+      ? normalized.includes(alias) || normalizedAr.includes(alias)
+      : hasKeyword(normalized, alias) || hasKeyword(normalizedAr, alias);
     if (matched) { modele = canonical; break; }
   }
 
@@ -804,7 +890,7 @@ export function parseQuery(query: string): SearchCriteria {
   const intent: string[] = [];
   for (const [key, keywords] of Object.entries(INTENT_KEYWORDS)) {
     for (const kw of keywords) {
-      if (normalized.includes(kw.toLowerCase())) { intent.push(key); break; }
+      if (normalized.includes(kw.toLowerCase()) || normalizedAr.includes(kw.toLowerCase())) { intent.push(key); break; }
     }
   }
 

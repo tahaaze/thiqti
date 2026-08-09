@@ -15,9 +15,11 @@ import {
   answer,
   buildSearchRequest,
   recommendationText,
+  relaxedText,
   criteriaSummary,
   criteriaLine,
 } from "@/lib/chatbot";
+import type { SearchCriteria } from "@/lib/nlp";
 
 interface ChatMessage {
   id: number;
@@ -86,9 +88,11 @@ export default function ChatAssistant({
   const [resultLimit, setResultLimit] = useState(4);
   const [searching, setSearching] = useState(false);
   const [input, setInput] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
   const idRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
+  const searchSeqRef = useRef(0);
 
   useEffect(() => {
     const init = initialMessage();
@@ -110,33 +114,73 @@ export default function ChatAssistant({
     if (f.maxPrice != null) params.set("maxPrice", String(f.maxPrice));
     if (f.minYear != null) params.set("minYear", String(f.minYear));
     if (f.maxKm != null) params.set("maxKm", String(f.maxKm));
+    if (f.brand) params.set("brand", f.brand);
+    if (f.bodyType) params.set("bodyType", f.bodyType);
+    if (f.fuel) params.set("fuel", f.fuel);
+    if (f.city) params.set("city", f.city);
+    if (f.transmission) params.set("transmission", f.transmission);
     return params;
   }, []);
 
-  const fetchResultsFor = useCallback(async (state: ChatState, more = false) => {
+  const fetchResultsFor = useCallback(async (state: ChatState, more = false, queryText = "") => {
     setSearching(true);
+    const seq = ++searchSeqRef.current;
     try {
       const params = reqParams(state);
       const res = await fetch(`/api/search?${params.toString()}`);
       if (!res.ok) throw new Error("Erreur réseau");
       const data = await res.json();
+      if (seq !== searchSeqRef.current) return;
       const list = (data.results || []) as ChatCar[];
+      const relaxed: string[] = data.relaxed || [];
+      const expandedBudget: boolean = data.expandedBudget || false;
       setResults(list);
       setResultLimit((n) => (more ? Math.max(n + 4, 10) : 4));
+
+      // Enregistrer dans l'historique avec les critères enrichis
+      if (queryText && !more) {
+        const top = list[0] ?? null;
+        addHistory(
+          queryText,
+          {
+            carrosserie: state.criteria.carrosserie,
+            motorisation: state.criteria.motorisation,
+            transmission: state.criteria.transmission,
+            marque: state.criteria.marque,
+            budgetMin: state.criteria.budgetMin,
+            budgetMax: state.criteria.budgetMax,
+            ville: state.criteria.ville,
+          },
+          list.length,
+          top
+            ? { thumbnail: top.image || null, id: top.id || null, score: top.score ?? null }
+            : null
+        );
+      }
+
       if (list.length === 0) {
         setMessages((prev) => [
           ...prev,
           { id: idRef.current++, role: "bot", text: recommendationText([], state) },
         ]);
+        setQuickReplies(["Voir plus de résultats", "Élargir le budget", "Changer de marque"]);
+      } else if (relaxed.length > 0) {
+        setMessages((prev) => [
+          ...prev,
+          { id: idRef.current++, role: "bot", text: relaxedText(state, relaxed, expandedBudget) },
+        ]);
+        setQuickReplies(["Voir plus de résultats", "C'est bon"]);
       }
     } catch {
+      if (seq !== searchSeqRef.current) return;
       setResults([]);
       setMessages((prev) => [
         ...prev,
         { id: idRef.current++, role: "bot", text: recommendationText([], state) },
       ]);
+    } finally {
+      if (seq === searchSeqRef.current) setSearching(false);
     }
-    setSearching(false);
   }, [reqParams]);
 
   const reset = useCallback(() => {
@@ -150,9 +194,9 @@ export default function ChatAssistant({
   }, []);
 
   const handleSend = useCallback(
-    (raw: string) => {
+    async (raw: string) => {
       const text = raw.trim();
-      if (!text || searching) return;
+      if (!text) return;
       if (text.toLowerCase() === "recommencer") {
         reset();
         return;
@@ -166,23 +210,79 @@ export default function ChatAssistant({
         startedRef.current = true;
         onStart?.();
       }
-      if (text.toLowerCase() !== "voir plus" && text.toLowerCase() !== "voir tous" && text.toLowerCase() !== "afficher plus") {
-        addHistory(text);
-      }
+      // addHistory est appelé dans fetchResultsFor avec les critères et résultats enrichis
 
-      const reply: BotReply = answer(botState, text);
-      setBotState(reply.state);
-      setQuickReplies(reply.quickReplies);
       setMessages((prev) => [
         ...prev,
         { id: idRef.current++, role: "user", text },
-        { id: idRef.current++, role: "bot", text: reply.text },
       ]);
-      if (reply.search) {
-        fetchResultsFor(reply.state, /voir (?:plus|tous)|afficher plus|plus de r.sultats|d'autres options/i.test(text));
+      setAiLoading(true);
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            history: messages.map((m) => ({ role: m.role, text: m.text })),
+          }),
+        });
+
+        if (!res.ok) throw new Error("Erreur API chat");
+
+        const data = await res.json();
+        const c = data.criteria || {};
+        const newCriteria: SearchCriteria = {
+          carrosserie: c.carrosserie ?? botState.criteria.carrosserie,
+          motorisation: c.motorisation ?? botState.criteria.motorisation,
+          transmission: c.transmission ?? botState.criteria.transmission,
+          marque: c.marque ?? botState.criteria.marque,
+          modele: c.modele ?? botState.criteria.modele,
+          budgetMin: c.budgetMin ?? botState.criteria.budgetMin,
+          budgetMax: c.budgetMax ?? botState.criteria.budgetMax,
+          budgetTolerance: botState.criteria.budgetTolerance,
+          ville: c.ville ?? botState.criteria.ville,
+          anneeMin: c.anneeMin ?? botState.criteria.anneeMin,
+          anneeMax: c.anneeMax ?? botState.criteria.anneeMax,
+          kmMax: c.kmMax ?? botState.criteria.kmMax,
+          intent: botState.criteria.intent,
+        };
+
+        const inventoryType = c.inventoryType ?? botState.inventoryType;
+        const newState: ChatState = {
+          criteria: newCriteria,
+          inventoryType,
+          stage: data.search ? "collecting" : botState.stage,
+        };
+
+        setBotState(newState);
+        setQuickReplies(data.quickReplies || ["Voir plus", "C'est bon"]);
+        setMessages((prev) => [
+          ...prev,
+          { id: idRef.current++, role: "bot", text: data.reply },
+        ]);
+
+        if (data.search) {
+          const isMore = /voir (?:plus|tous)|afficher plus|plus de r.sultats|d'autres options/i.test(text);
+          fetchResultsFor(newState, isMore, isMore ? "" : text);
+        }
+      } catch {
+        const reply: BotReply = answer(botState, text);
+        setBotState(reply.state);
+        setQuickReplies(reply.quickReplies);
+        setMessages((prev) => [
+          ...prev,
+          { id: idRef.current++, role: "bot", text: reply.text },
+        ]);
+        if (reply.search) {
+          const isMore = /voir (?:plus|tous)|afficher plus|plus de r.sultats|d'autres options/i.test(text);
+          fetchResultsFor(reply.state, isMore, isMore ? "" : text);
+        }
+      } finally {
+        setAiLoading(false);
       }
     },
-    [botState, searching, reset, fetchResultsFor, onStart]
+    [botState, messages, reset, fetchResultsFor, onStart]
   );
 
   const resultsUrl = (() => {
@@ -258,7 +358,7 @@ export default function ChatAssistant({
           )
         )}
 
-        {searching && (
+        {(searching || aiLoading) && (
           <div className="flex gap-2.5">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6d5dfc]/15 to-[#22a9f0]/15 text-primary">
               <Sparkles className="h-4 w-4" />
@@ -356,7 +456,7 @@ export default function ChatAssistant({
       </div>
 
       {/* Quick replies */}
-      {quickReplies.length > 0 && !searching && (
+      {quickReplies.length > 0 && !searching && !aiLoading && (
         <div className="flex flex-wrap gap-2 border-t border-line px-5 py-3">
           {quickReplies.map((label) => (
             <button
@@ -388,7 +488,7 @@ export default function ChatAssistant({
           <button
             onClick={() => { handleSend(input); setInput(""); }}
             className="btn-primary flex items-center gap-2"
-            disabled={searching}
+            disabled={searching || aiLoading}
           >
             <Send className="h-4 w-4" />
             Envoyer

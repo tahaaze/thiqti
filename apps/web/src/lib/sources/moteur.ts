@@ -25,10 +25,10 @@ import { telHref, displayPhone } from "./contact";
 
 const SEARCH_BASE =
   "https://www.moteur.ma/fr/voiture/achat-voiture-occasion/recherche/?per_page=30&page=";
-const SEARCH_PAGES = 15;
+const SEARCH_PAGES = 50;
 const REQUEST_TIMEOUT_MS = 5000;
-const OVERALL_BUDGET_MS = 45000;
-const DETAIL_CONCURRENCY = 10;
+const OVERALL_BUDGET_MS = 120000;
+const DETAIL_CONCURRENCY = 15;
 
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";

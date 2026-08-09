@@ -368,6 +368,9 @@ export function answer(prev: ChatState, input: string): BotReply {
   const state: ChatState = { criteria, inventoryType, stage: "collecting" };
 
   // Rien de nouveau compris ?
+  const prevIntent = new Set(prev.criteria.intent);
+  const newIntents = parsed.intent.filter((i) => !prevIntent.has(i));
+
   const somethingNew =
     parsed.carrosserie !== null ||
     parsed.motorisation !== null ||
@@ -380,7 +383,8 @@ export function answer(prev: ChatState, input: string): BotReply {
     parsed.anneeMin !== null ||
     parsed.anneeMax !== null ||
     parsed.kmMax !== null ||
-    inventoryType !== prev.inventoryType;
+    inventoryType !== prev.inventoryType ||
+    newIntents.length > 0;
 
   if (!somethingNew) {
     if (matches(GREETING_RE, raw)) {
@@ -415,6 +419,25 @@ export function answer(prev: ChatState, input: string): BotReply {
   }
 
   const ack = acknowledgment(state, prev);
+  const hasStructured = hasCriteria(state);
+
+  if (!hasStructured && newIntents.includes("achat")) {
+    return {
+      text:
+        "Très bien ! 🚗 Pour vous trouver la voiture idéale, parlez-moi de vous :\n\n" +
+        "• Quel est votre **budget** ? (ex: 200 000 DH)\n" +
+        "• Un type de voiture ? (SUV, citadine, berline…)\n" +
+        "• **Diesel**, essence, hybride ?\n" +
+        "• Une **marque** en tête ? (Toyota, Dacia…)\n" +
+        "• Dans quelle **ville** ?\n\n" +
+        "Donnez-moi ce que vous savez, même un seul critère suffit !",
+      quickReplies: ["Moins de 200 000 DH", "SUV diesel", "Toyota", "Casablanca"],
+      done: false,
+      search: false,
+      state,
+    };
+  }
+
   return {
     text: `${ack}Voici quelques options qui correspondent déjà à : ${criteriaLine(state)}\n\nVous pouvez affiner (carburant, budget, marque, boîte, ville, année...) ou me dire « Voir plus » pour d'autres résultats.`,
     quickReplies: ["Voir plus", "C'est bon", "Recommencer"],
@@ -429,6 +452,11 @@ export interface SearchRequestFilters {
   maxPrice?: number;
   minYear?: number;
   maxKm?: number;
+  brand?: string;
+  bodyType?: string;
+  fuel?: string;
+  city?: string;
+  transmission?: string;
 }
 
 export interface SearchRequest {
@@ -439,30 +467,31 @@ export interface SearchRequest {
 
 /** Construit la requete de recherche a partir de l'etat de la conversation.
  *
- * Le budget, l'annee et le kilometrage sont envoyes en filtres structurels
- * (minPrice/maxPrice/minYear/maxKm) et NON dans le texte libre : des nombres
- * dans `q` cassent la recherche par mots-cles (`searchAllSources` force chaque
- * mot a matcher chaque annonce).
+ * Les criteres structures (marque, carrosserie, carburant, boite, ville,
+ * budget, annee, kilometrage) sont envoyes en FILTRES (brand/bodyType/fuel/
+ * transmission/city/minPrice/maxPrice/minYear/maxKm) et NON dans le texte
+ * libre : une conjonction ET de mots dans `q` viderait les resultats des
+ * qu'un mot comme "SUV" n'apparait pas dans le titre des annonces.
+ * Le texte libre ne porte que le modele, que l'API cherche par mots-cles.
  */
 export function buildSearchRequest(state: ChatState): SearchRequest {
   const { criteria, inventoryType } = state;
-  const parts: string[] = [];
 
-  if (criteria.marque) parts.push(criteria.marque);
-  if (criteria.modele) parts.push(criteria.modele);
-  if (criteria.carrosserie) parts.push(criteria.carrosserie);
-  if (criteria.motorisation) parts.push(criteria.motorisation);
-  if (criteria.transmission) parts.push(criteria.transmission);
-  if (criteria.ville) parts.push(criteria.ville);
+  const q = criteria.modele ? criteria.modele : "";
 
   const filters: SearchRequestFilters = {};
+  if (criteria.marque) filters.brand = criteria.marque;
+  if (criteria.carrosserie) filters.bodyType = criteria.carrosserie;
+  if (criteria.motorisation) filters.fuel = criteria.motorisation;
+  if (criteria.transmission) filters.transmission = criteria.transmission;
+  if (criteria.ville) filters.city = criteria.ville;
   if (criteria.budgetMin !== null && criteria.budgetMin > 0) filters.minPrice = criteria.budgetMin;
   if (criteria.budgetMax !== null) filters.maxPrice = criteria.budgetMax;
   if (criteria.anneeMin !== null) filters.minYear = criteria.anneeMin;
   if (criteria.kmMax !== null) filters.maxKm = criteria.kmMax;
 
   return {
-    q: parts.join(" ").trim(),
+    q,
     type: inventoryType ?? undefined,
     filters,
   };
@@ -494,5 +523,22 @@ export function recommendationText(results: RecommendableCar[], state: ChatState
     lines.join("\n") +
     extra +
     "\n\nCliquez sur une carte pour les détails, ou « Voir tous les résultats » pour comparer."
+  );
+}
+
+/** Message quand la recherche a dû relâcher des critères. */
+/** Message quand la recherche a dû relâcher des critères. */
+export function relaxedText(
+  state: ChatState,
+  relaxed: string[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _expandedBudget: boolean
+): string {
+  const criteria = summaryText(state).replace(/\n/g, " · ");
+  const relaxedList = relaxed.map((r) => `• ${r}`).join("\n");
+  return (
+    `Aucun résultat exact pour ${criteria}, mais j'ai trouvé des alternatives proches en assouplissant :\n\n` +
+    relaxedList +
+    "\n\nVoici les voitures qui s'en rapprochent le plus :"
   );
 }
