@@ -7,6 +7,7 @@ Format base sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Sources Auto24.ma et Avito.ma **autorisees par ecrit** (encadrant Younes Boumalek / direction Zakaria Sabti, 2026-08-12) et actives dans l'agregateur; registre des sources rempli (ADR-005 et ADR-012 amendes, `collector.ts` mis a jour)
 - Authentification admin (JWT + bcrypt + cookie httpOnly)
 - Endpoints `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`
 - Page login (`/login`)
@@ -25,7 +26,7 @@ Format base sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - README simplifie pour Phase 1
 
 ### Removed
-- Collecteurs Auto24.ma, Avito.ma, SoeezAuto.ma de l'agregateur
+- Collecteur SoeezAuto.ma de l'agregateur
 - Section "Occasion populaire" du dataset fallback
 - Secrets hardcodes (Google API key, DB password fallback)
 - References Playwright dans la documentation

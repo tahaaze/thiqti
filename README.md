@@ -18,12 +18,13 @@ Ouvrir `http://localhost:3000`.
 
 ```
 Requete utilisateur --> NLP Parser --> Moteur Matching TOPSIS --> Resultats classes
-(francais/darija)     (criteres)     (196 vehicules neufs)
+(francais/darija)     (criteres)     (7 sources live + fallback secours)
 ```
 
 - **NLP**: Rule-based + dictionnaires francais/arabe (marque, budget, type, carburant)
 - **Matching**: TOPSIS avec ponderation contextuelle + score d'explication
-- **Catalogue**: Dataset statique de 196 vehicules neufs disponibles au Maroc
+- **Sources**: agregateur multi-sources marocaines (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf), Auto24.ma et Avito.ma autorisees par ecrit (ADR-005)
+- **Catalogue de secours**: dataset statique de 196 vehicules neufs disponibles au Maroc (fallback, utilise seulement si toutes les sources live echouent)
 
 ## Stack
 
@@ -34,7 +35,7 @@ Requete utilisateur --> NLP Parser --> Moteur Matching TOPSIS --> Resultats clas
 | API | Next.js API Routes |
 | Matching | TOPSIS multicritere |
 | NLP | Regex + dictionnaires FR/AR |
-| Cache | In-memory (Map + TTL 5min) |
+| Cache | In-memory (Map + TTL 10min) + cache disque |
 | Icons | lucide-react |
 
 ## Structure

@@ -2,13 +2,13 @@
 
 ## Vue d'Ensemble du Service
 
-Thiqti est un moteur de recommandation automobile pour le Maroc. Il agrege de **vraies annonces marocaines** (prix MAD, km, photos et reponsabilite reels) depuis trois sources nationales, analyse les requetes via NLP rule-based, et classe via matching TOPSIS multicritere.
+Thiqti est un moteur de recommandation automobile pour le Maroc. Il agrege de **vraies annonces marocaines** (prix MAD, km, photos et reponsabilite reels) depuis sept sources nationales, analyse les requetes via NLP rule-based, et classe via matching TOPSIS multicritere.
 
 **Composants cles (Phase 1):**
 - **Next.js 15** — Frontend + API routes (search)
-- **Sources reelles marocaines** — Autera.ma (API), Moteur.ma (annonces), ElectroDrive.ma (API)
+- **Sources reelles marocaines** — Autera.ma (API), Moteur.ma (annonces), ElectroDrive.ma (API), AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf (Auto24.ma et Avito.ma autorisees par ecrit, voir ADR-005)
 - **Catalogue hors-ligne** — fallback.ts (196 vehicules) utilise QU'EN SECOURS
-- **Cache** — In-memory (Map + TTL 10min)
+- **Cache** — In-memory (Map + TTL 10min) + cache disque
 
 ## Architecture
 
@@ -21,6 +21,10 @@ Browser -> Next.js -> API Routes -> Aggregator -> Cache (TTL 10min)
                               | Autera.ma (API JSON, occasion) |
                               | Moteur.ma (annonces, occasion) |
                               | ElectroDrive.ma (API, neuf EV) |
+                              | AutoHall.ma (annonces, occasion)|
+                              | Auto24.ma (annonces, occasion) |
+                              | Avito.ma (annonces, occasion)  |
+                              | Moteur-Neuf (annonces, neuf)   |
                               | fallback.ts (catalogue secours)|
                               +-------------------------------+
 ```
@@ -44,8 +48,10 @@ docker compose up -d postgres
 #    Deja fait : les URLs sont dans apps/web/scripts/image-cache.json.
 #    npx tsx apps/web/scripts/fetch-images.ts
 
-# 3) Les sources marocaines (Autera.ma, Moteur.ma, ElectroDrive.ma) sont
-#    gratuites et sans cle. Aucune configuration requise.
+# 3) Les sources marocaines (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma,
+#    Auto24.ma, Avito.ma, Moteur-Neuf) sont gratuites et sans cle. Aucune
+#    configuration requise. Auto24.ma et Avito.ma sont autorisees par ecrit
+#    (voir ADR-005, section "Mise a jour").
 
 npm run dev
 ```
@@ -140,6 +146,10 @@ Corriger les erreurs avant de commit.
 | Autera.ma | Occasion, verifiee | API JSON (`/api/listings`) | `apps/web/src/lib/sources/autera.ts` |
 | Moteur.ma | Occasion (115 000+) | Scraping HTML leger (15 pages de recherche) | `apps/web/src/lib/sources/moteur.ts` |
 | ElectroDrive.ma | Neuf electrique/hybride | API JSON (`action=search&limit=50`) | `apps/web/src/lib/sources/electrodrive.ts` |
+| AutoHall.ma | Occasion | Scraping HTML leger | `apps/web/src/lib/sources/autohall.ts` |
+| Auto24.ma | Occasion (autorisee 2026-08-12) | API HTML leger | `apps/web/src/lib/sources/auto24.ts` |
+| Avito.ma | Occasion (autorisee 2026-08-12) | Scraping HTML leger | `apps/web/src/lib/sources/avito.ts` |
+| Moteur-Neuf | Neuf | Scraping HTML leger | `apps/web/src/lib/sources/moteur-neuf.ts` |
 
 Chaque annonce porte sa **reputation reelle** et un **lien de contact direct**. Moteur.ma charge la **fiche detail de chaque annonce** en parallele : nom du vendeur, anciennete (« Vendeur depuis ... »), note /5 et nombre d'avis reels, telephone `tel:`, WhatsApp `wa.me`, page d'annonce. En production reelle : ~440 vehicules, 100 % avec reputation et lien de contact, ~90 % avec telephone + WhatsApp. Si Moteur.ma change son HTML, adapter les regex dans `moteur.ts` (`parseCard`, `fetchDetail`).
 

@@ -11,7 +11,7 @@
 
 SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain, développée dans le cadre d'un stage chez Volund Ventures par 2 étudiants.
 
-**Phase 1 MVP** : moteur de recherche en langage naturel, classement multicritère TOPSIS avec explicabilité, baromètre d'e-réputation et comparateur de véhicules. Le système agrège les données en temps réel depuis **3 sources live marocaines** (Moteur.ma, Autera.ma, ElectroDrive.ma) et indexe **438 véhicules** au moment de la soutenance. Un catalogue hors-ligne de **196 véhicules de démonstration** (jeu de données fictif, marqué `isDemoData`) sert de filet de secours et n'est pas une 4ᵉ source de données réelles.
+**Phase 1 MVP** : moteur de recherche en langage naturel, classement multicritère TOPSIS avec explicabilité, baromètre d'e-réputation et comparateur de véhicules. Le système agrège les données en temps réel depuis **7 sources live marocaines** (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf ; Auto24.ma et Avito.ma autorisées par écrit le 2026-08-12, ADR-005) et indexe **438 véhicules** au moment de la soutenance. Un catalogue hors-ligne de **196 véhicules de démonstration** (jeu de données fictif, marqué `isDemoData`) sert de filet de secours et n'est pas une source de données réelle.
 
 **Positionnement** : le premier moteur de recherche automobile au Maroc combinant NLP, matching adaptatif et réputation agrégée.
 
@@ -99,7 +99,7 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 | Latence NLP | < 10 ms |
 | Latence matching | < 50 ms (438 véhicules) |
 | Coût infrastructure MVP | **$0.00/mois** (Vercel Free) |
-| Sources actives | 3 live (Moteur.ma, ElectroDrive.ma, Autera.ma) + catalogue démo hors-ligne (`isDemoData`) |
+| Sources actives | 7 live (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf) + catalogue démo hors-ligne en secours (`isDemoData`) |
 | Tests unitaires | Vitest |
 | Pipeline CI/CD | GitHub Actions → Vercel |
 
@@ -109,7 +109,7 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 
 | Difficulté | Impact | Résolution |
 |-----------|--------|------------|
-| **Sites d'annonces (Auto24, SoeezAuto, Avito)** | Non validés (cahier des charges §7.3 : uniquement sources constructeur/concession/presse) | Collecteurs désactivés (ADR-005) ; sources retenues : Moteur.ma, ElectroDrive.ma, Autera.ma |
+| **Sites d'annonces (Auto24, Avito)** | Non validés initialement (cahier des charges §7.3) ; **autorisés par écrit le 2026-08-12** (encadrant Y. Boumalek / direction Z. Sabti, ADR-005 amendé) | Sources autorisées et actives dans l'agrégateur ; SoeezAuto reste rejetée |
 | **Déduplication** entre sources | Véhicules en double avec prix/année différents | Clé composite `{make}_{model}_{year}_{price}` + merge images |
 | **Google Custom Search API** | Pas de recherche image en gratuit | Images CDN autoevolution + placeholders par marque |
 | **Normalisation des scores** | Formats de prix/km différents par source | Pipeline de normalisation centralisé dans `types.ts` (`normalizeBrand`, `formatPriceDH`) avec tolérance |

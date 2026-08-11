@@ -25,8 +25,9 @@ graph TB
 
     subgraph "Couche Donnees"
         direction TB
-        CACHE[("Cache In-Memory<br>TTL 5min")]
-        CATALOG["Catalogue Constructeur<br>196 vehicules neufs<br>(code, Sprint 1)"]
+        CACHE[("Cache In-Memory<br>TTL 10min + cache disque")]
+        CATALOG["Agregateur 7 sources live<br>Autera, Moteur, ElectroDrive,<br>AutoHall, Auto24, Avito, Moteur-Neuf"]
+        FALLBACK["Fallback offline<br>196 vehicules demo<br>(secours uniquement)"]
     end
 
     subgraph "Services Externes"
@@ -58,10 +59,10 @@ graph TB
 | URL | `localhost:3000` | `thiqti-staging.vercel.app` | `thiqti.vercel.app` |
 | Branch | `fix/cdc-compliance` | `develop` | `main` (tagged) |
 | Node | 20.x | 20.x | 20.x |
-| Base de donnees | Fallback integre (196 veh.) | Fallback integre | Fallback integre |
-| Cache | In-memory TTL 5min | In-memory TTL 5min | In-memory TTL 5min |
+| Base de donnees | Sources live + fallback secours | Sources live + fallback secours | Sources live + fallback secours |
+| Cache | In-memory TTL 10min + cache disque | In-memory TTL 10min + cache disque | In-memory TTL 10min + cache disque |
 | SSL | None (local) | Vercel auto | Vercel auto |
-| Collecte donnees | Manuelle (dataset statique) | Manuelle | Manuelle |
+| Collecte donnees | Auto (sources live, a la demande) + fallback secours | Auto (sources live) + fallback secours | Auto (sources live) + fallback secours |
 | Logs | Console | Vercel Function Logs | Vercel Function Logs |
 | CDN | Local /public | Google CDN | Google CDN |
 

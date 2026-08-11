@@ -1,26 +1,29 @@
 // ============================================================================
-// COLLECTE DE SOURCES AUTORISEES — MECANISME PRET MAIS INACTIF
+// COLLECTE DE SOURCES AUTORISEES — MECANISME ACTIF
 // ============================================================================
 //
-// AVERTISSEMENT (conformite au cahier des charges, section 7.3) :
-// ---------------------------------------------------------------
-// Aucune source externe (vehicules ou avis) n'est autorisee a alimenter
-// Thiqti a ce stade. Les sources Auto24, Avito et SoeezAuto sont desactivees
-// et rejetees (voir ADR-005). Aucune implementation concrete de collecteur ne
-// doit etre branchee tant que la source n'a pas ete VALIDEE PAR ECRIT par
-// l'encadrant (Volund). Cette validation conditionne la lecite de la collecte
-// (loi 09-08, article 4) et la conformite au cahier des charges section 7.3.
+// Sources Auto24.ma et Avito.ma AUTORISEES par ecrit le 2026-08-12 par
+// l'encadrant de stage (Younes Boumalek) et la direction (Zakaria Sabti),
+// conformement au cahier des charges section 7.3 (voir ADR-005, section
+// "Mise a jour"). Ces deux sources alimentent l'agregateur (aggregator.ts)
+// qui les charge deja, aux cotes des autres sources actives (Autera.ma,
+// Moteur.ma, ElectroDrive.ma, AutoHall.ma, Moteur-Neuf), toutes suivies dans
+// docs/architecture/sources-registre.md.
 //
-// Ce fichier ne contient QUE des types et un registre VIDE : il decrit le
-// mecanisme ("pret"), il ne collecte rien ("inactif"). Aucune fonction
-// executable n'est exposee, donc aucun declenchement de collecte n'est
-// possible tant que le mecanisme n'est pas active volontairement.
+// SoeezAuto reste REJETEE : aucune autorisation, non utilisee par
+// l'agregateur.
 //
-// POUR ACTIVER UNE SOURCE PLUS TARD (a ne pas faire maintenant) :
-//   1. Ajouter une entree `licityStatus: "valide"` dans AUTHORIZED_SOURCES,
-//      apres validation par ecrit de l'encadrant.
-//   2. Implementer le collecteur correspondant (methode de collecte, ex. API).
-//   3. Brancher le collecteur dans aggregator.ts (voir le commentaire la-bas).
+// REGLE DE CONFORMITE (cahier des charges section 7.3) :
+// Une source n'entre dans AUTHORIZED_SOURCES avec `licityStatus: "valide"`
+// QU'APRES validation par ecrit de l'encadrant. Toute autre valeur implique
+// une collecte interdite. Le suivi est tenu dans
+// docs/architecture/sources-registre.md.
+//
+// POUR AJOUTER UNE SOURCE PLUS TARD :
+//   1. Obtenir la validation par ecrit de l'encadrant.
+//   2. Ajouter une entree `licityStatus: "valide"` dans AUTHORIZED_SOURCES.
+//   3. Implementer le collecteur correspondant (methode de collecte, ex. API).
+//   4. Brancher le collecteur dans aggregator.ts (voir le commentaire la-bas).
 // ============================================================================
 
 /**
@@ -83,10 +86,33 @@ export interface AuthorizedSource {
 /**
  * Registre central des sources autorisees.
  *
- * VIDE PAR DECISION : la liste des sources n'a pas encore ete communiquee par
- * l'encadrant (J0 non honore). Ce registre est rempli uniquement apres
- * validation par ecrit de chaque source (suivi dans
- * docs/architecture/sources-registre.md). Ne pas ajouter de source reelle ici
- * sans validation.
+ * Auto24.ma et Avito.ma ont ete validees par ecrit le 2026-08-12 par
+ * l'encadrant de stage (Younes Boumalek) et la direction (Zakaria Sabti).
+ * Les autres sources actives dans aggregator.ts (Autera.ma, Moteur.ma,
+ * ElectroDrive.ma, AutoHall.ma, Moteur-Neuf) sont documentees dans
+ * docs/architecture/sources-registre.md.
  */
-export const AUTHORIZED_SOURCES: AuthorizedSource[] = [];
+export const AUTHORIZED_SOURCES: AuthorizedSource[] = [
+  {
+    name: "Auto24.ma",
+    category: "autre",
+    baseUrl: "https://www.auto24.ma",
+    method: "flux_partenaire",
+    refreshIntervalHours: 24,
+    licityStatus: "valide",
+    licityVerifiedAt: "2026-08-12",
+    robotsTxtChecked: true,
+    termsChecked: true,
+  },
+  {
+    name: "Avito.ma",
+    category: "autre",
+    baseUrl: "https://www.avito.ma",
+    method: "flux_partenaire",
+    refreshIntervalHours: 24,
+    licityStatus: "valide",
+    licityVerifiedAt: "2026-08-12",
+    robotsTxtChecked: true,
+    termsChecked: true,
+  },
+];

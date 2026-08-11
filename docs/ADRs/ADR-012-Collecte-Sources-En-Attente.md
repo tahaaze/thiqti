@@ -1,6 +1,6 @@
 # ADR-012: Collecte de Sources en Attente
 
-**Statut**: Accepte
+**Statut**: Accepte (partiellement resolu le 2026-08-12)
 **Date**: 2026-08-04
 **Decideurs**: Equipe Thiqti
 **Ref**: VV-SLP-2026-001
@@ -10,9 +10,10 @@
 
 Le cahier des charges (section 7.3) subordonne toute collecte de donnees
 externe (vehicules ou avis) a une validation par ecrit des sources par
-l'encadrant. La dependance J0 n'a pas ete honoree : la liste des sources n'a
-jamais ete communiquee a l'equipe. L'ADR-005 avait deja rejete les sources
-Auto24, Avito et SoeezAuto (risque legal, loi 09-08 article 4).
+l'encadrant. La dependance J0 n'a pas ete honoree initialement : la liste des
+sources n'avait pas ete communiquee a l'equipe. L'ADR-005 (decision initiale)
+avait rejete les sources Auto24, Avito et SoeezAuto (risque legal, loi 09-08
+article 4).
 
 Sans infrastructure preparee, la reception tardive de la liste des sources
 rallongerait l'integration. Sans garde-fou, une integration prematuree
@@ -65,3 +66,15 @@ conformement a la section 7.3 du cahier des charges.
 - **Risque**: La liste des sources peut ne jamais arriver (J0 indefini);
   mitigation: suivi formel du J0, relance de l'encadrant, et procedure de
   bascule manuelle documentee.
+
+## Mise a jour (2026-08-12)
+
+La dependance J0 est partiellement levee : l'encadrant de stage (Younes
+Boumalek) et la direction (Zakaria Sabti) ont autorise par ecrit les sources
+**Auto24.ma** et **Avito.ma** (voir l'ADR-005, section "Mise a jour"). Le
+statut "en attente" est leve pour ces deux sources : elles sont declarees
+`valide` dans `apps/web/src/lib/sources/collector.ts` et inscrites au registre
+des sources (`docs/architecture/sources-registre.md`). Le mecanisme prepare
+(interface `AuthorizedSource`, registre, rafraichissement documente) reste
+inchange et sert desormais de cadre d'enregistrement des sources autorisees.
+SoeezAuto demeure non autorisee.
