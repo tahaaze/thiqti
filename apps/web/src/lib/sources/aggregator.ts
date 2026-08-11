@@ -70,6 +70,13 @@ async function writeDiskCache(cars: UnifiedCar[], fetchedAt: number): Promise<vo
 async function loadAndCache(): Promise<UnifiedCar[]> {
   const cars = await loadMergedCars();
   const fetchedAt = Date.now();
+  // Anti-régression : les sources live sont lentes et parfois instables
+  // (Moteur.ma ~100 s, AutoHall ~160 s, Auto24/Avito parfois vides). Un
+  // rechargement partiel ne doit JAMAIS remplacer un catalogue plus riche :
+  // on garde le plus grand des deux.
+  if (cache && cars.length < cache.cars.length) {
+    return cache.cars;
+  }
   cache = { cars, fetchedAt, liveSources: cars.some((c) => c.contact || c.reputation) };
   void writeDiskCache(cars, fetchedAt);
   return cars;
@@ -148,6 +155,9 @@ async function getCars(): Promise<UnifiedCar[]> {
   // Premier demarrage froid : on lance le scraping en arriere-plan et on
   // retourne les donnees fallback immediatement pour eviter de bloquer l'UI.
   void withDedup(loadAndCache).then((live) => {
+    // Anti-régression (même principe qu'au-dessus) : ne pas remplacer un
+    // catalogue plus riche par un rechargement partiel.
+    if (cache && live.length < cache.cars.length) return;
     cache = { cars: live, fetchedAt: Date.now(), liveSources: live.some((c) => c.contact || c.reputation) };
   }).catch(() => {});
   const fallback = getFallbackCars().map((c) => {

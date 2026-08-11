@@ -15,6 +15,8 @@ import Skeleton from "@/components/Skeleton";
 import SellerContact from "@/components/SellerContact";
 import { SearchFilters, SearchFacets, countActiveFilters, parseFilters } from "@/lib/searchTypes";
 import { addHistory } from "@/lib/history";
+import { saveFavorite, removeFavorite } from "@/lib/favorites";
+import { setVehicleBackUrl } from "@/lib/navigation";
 
 interface MatchExplanation {
   label: string;
@@ -183,8 +185,11 @@ export default function ResultsPage() {
     doSearch(query, type);
   };
 
-  const toggleFav = (id: string) => {
-    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+  const toggleFav = (car: CarListing) => {
+    const has = favorites.includes(car.id);
+    if (has) removeFavorite(car.id);
+    else saveFavorite(car.id, car);
+    setFavorites((prev) => (has ? prev.filter((f) => f !== car.id) : [...prev, car.id]));
   };
 
   const formatCriteriaLabel = (key: string): string => {
@@ -346,7 +351,7 @@ export default function ResultsPage() {
           <div className={view === "grid" ? "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "space-y-4"}>
             {cars.map((v) => (
               <div key={v.id} className="glass-card group flex flex-col overflow-hidden">
-                <Link href={`/vehicle/${v.id}`} className="flex-1">
+                <Link href={`/vehicle/${v.id}`} onClick={() => setVehicleBackUrl()} className="flex-1">
                   <div className="relative h-52 overflow-hidden">
                     <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
@@ -363,7 +368,7 @@ export default function ResultsPage() {
                         <span className="rounded-lg bg-green-500/20 px-2 py-1 text-xs font-medium text-green-600 backdrop-blur">{v.matchPercent}% match</span>
                       ) : null}
                     </div>
-                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v.id); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-muted backdrop-blur transition hover:text-red-600">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-muted backdrop-blur transition hover:text-red-600">
                       <FavHeart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-600 text-red-600" : ""}`} />
                     </button>
                     {v.reputation?.verified && (

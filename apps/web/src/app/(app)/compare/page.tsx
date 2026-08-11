@@ -6,6 +6,8 @@ import { X, Loader, BadgeCheck, AlertTriangle, ThumbsUp, Wallet, Gauge, Calendar
 import { ZelligeStar, ThiqtiShield, FavHeart } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SellerContact from "@/components/SellerContact";
+import { loadFavoriteIds, loadFavoriteCars } from "@/lib/favorites";
+import { setVehicleBackUrl } from "@/lib/navigation";
 
 interface CarListing {
   id: string;
@@ -118,15 +120,15 @@ export default function ComparePage() {
         .then((data) => data.results as CarListing[])
         .catch(() => [] as CarListing[]),
       Promise.resolve().then(() => {
-        try {
-          const saved = localStorage.getItem("thiqti_favorites");
-          if (saved) return JSON.parse(saved) as string[];
-        } catch {}
-        return [] as string[];
+        return loadFavoriteIds();
       }),
     ]).then(([searchResults, favIds]) => {
       setAll(searchResults);
-      const favCars = searchResults.filter((c) => favIds.includes(c.id));
+      const snap = loadFavoriteCars();
+      const favCars = [
+        ...Object.values(snap),
+        ...searchResults.filter((c) => favIds.includes(c.id) && !snap[c.id]),
+      ];
       setFavoritesCars(favCars);
       if (searchResults.length > 0) {
         setSelected(searchResults.slice(0, Math.min(MAX_COMPARE, 2)));
@@ -194,7 +196,7 @@ export default function ComparePage() {
                     <button onClick={() => removeCar(v.id)} className="absolute right-2 top-2 rounded-lg p-1 text-muted hover:bg-red-500/10 hover:text-red-600"><X className="h-4 w-4" /></button>
                     <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="mx-auto h-24 w-40 rounded-lg object-cover" />
                     <p className="mt-2 font-semibold text-sm">{v.title}</p>
-                    <div className="mt-1 flex items-center justify-center gap-2">{v.inventoryType && <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>{v.inventoryType === "new" ? "Neuf" : "Occasion"}</span>}<Link href={`/vehicle/${v.id}`} className="inline-block text-xs text-primary hover:underline">Voir détails</Link></div>
+                    <div className="mt-1 flex items-center justify-center gap-2">{v.inventoryType && <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>{v.inventoryType === "new" ? "Neuf" : "Occasion"}</span>}<Link href={`/vehicle/${v.id}`} onClick={() => setVehicleBackUrl()} className="inline-block text-xs text-primary hover:underline">Voir détails</Link></div>
                     <div className="mt-1 flex justify-center">
                       <SellerContact contact={v.contact} reputation={v.reputation} compact />
                     </div>

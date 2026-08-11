@@ -2,12 +2,15 @@
 
 import { useState, useEffect, useRef, FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MapPin, Fuel, Gauge, Calendar, ChevronLeft, Share2, CheckCircle2, MessageSquare, AlertTriangle, Clock, TrendingUp, TrendingDown, BadgeCheck, Info, Globe, ExternalLink, Facebook, Instagram, Newspaper, Store, Eye } from "lucide-react";
 import { ZelligeStar, ThiqtiShield, FavHeart } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SafetyBadge, { safetyLabelOf } from "@/components/SafetyBadge";
 import SellerContact from "@/components/SellerContact";
 import { useToast } from "@/components/Toast";
+import { saveFavorite, removeFavorite } from "@/lib/favorites";
+import { getVehicleBackUrl, setVehicleBackUrl, clearVehicleBackUrl } from "@/lib/navigation";
 
 interface CarListing {
   id: string;
@@ -124,6 +127,19 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   const [reviewError, setReviewError] = useState<string | null>(null);
   const { showToast } = useToast();
   const favLoadedRef = useRef(false);
+  const router = useRouter();
+
+  const goBack = () => {
+    const target = getVehicleBackUrl();
+    if (target) {
+      clearVehicleBackUrl();
+      router.push(target);
+    } else if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.replace("/results");
+    }
+  };
 
   useEffect(() => {
     params.then(({ slug }) => {
@@ -164,10 +180,8 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
 
   useEffect(() => {
     if (!car || !favLoadedRef.current) return;
-    const saved = localStorage.getItem("thiqti_favorites");
-    const list: string[] = saved ? JSON.parse(saved) : [];
-    const updated = fav ? (list.includes(car.id) ? list : [...list, car.id]) : list.filter((id) => id !== car.id);
-    localStorage.setItem("thiqti_favorites", JSON.stringify(updated));
+    if (fav) saveFavorite(car.id, car);
+    else removeFavorite(car.id);
   }, [fav, car]);
 
   async function submitReview(e: FormEvent) {
@@ -227,9 +241,9 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   return (
     <div className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-6xl">
-        <Link href="/results" className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-ink">
+        <button onClick={goBack} className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-ink">
           <ChevronLeft className="h-4 w-4" /> Retour aux résultats
-        </Link>
+        </button>
 
         <div className="flex flex-col gap-8 lg:flex-row">
           <div className="flex-1">

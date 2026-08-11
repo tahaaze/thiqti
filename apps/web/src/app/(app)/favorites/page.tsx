@@ -6,6 +6,8 @@ import { MapPin, Fuel, Trash2 } from "lucide-react";
 import { ZelligeStar, FavHeart, ThiqtiShield } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SellerContact from "@/components/SellerContact";
+import { loadFavoriteIds, loadFavoriteCars, removeFavorite, FavoriteCar } from "@/lib/favorites";
+import { setVehicleBackUrl } from "@/lib/navigation";
 
 interface CarListing {
   id: string;
@@ -42,13 +44,16 @@ interface CarListing {
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [snapshots, setSnapshots] = useState<Record<string, FavoriteCar>>({});
   const [cars, setCars] = useState<CarListing[]>([]);
   const [loading, setLoading] = useState(true);
   const loadedRef = useRef(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("thiqti_favorites");
-    if (saved) setFavorites(JSON.parse(saved));
+    const ids = loadFavoriteIds();
+    const snap = loadFavoriteCars();
+    setFavorites(ids);
+    setSnapshots(snap);
     loadedRef.current = true;
     setLoading(false);
   }, []);
@@ -58,21 +63,38 @@ export default function FavoritesPage() {
     localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
   }, [favorites]);
 
+  // Resolution des ids "herites" sans snapshot (ancien format) via /api/search.
   useEffect(() => {
-    if (favorites.length === 0) return;
+    const legacyIds = favorites.filter((id) => !snapshots[id]);
+    if (legacyIds.length === 0) return;
+    let cancelled = false;
     fetch("/api/search")
       .then((r) => r.json())
       .then((data) => {
-        setCars(data.results.filter((c: CarListing) => favorites.includes(c.id)));
+        if (cancelled) return;
+        setCars(data.results.filter((c: CarListing) => legacyIds.includes(c.id)));
       })
       .catch(() => {});
-  }, [favorites]);
+    return () => {
+      cancelled = true;
+    };
+  }, [favorites, snapshots]);
 
   const removeFav = (id: string) => {
-    const updated = favorites.filter((f) => f !== id);
-    setFavorites(updated);
+    removeFavorite(id);
+    setFavorites((prev) => prev.filter((f) => f !== id));
+    setSnapshots((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
     setCars((prev) => prev.filter((c) => c.id !== id));
   };
+
+  const favoriteCars = [
+    ...Object.values(snapshots),
+    ...cars.filter((c) => !snapshots[c.id]),
+  ];
 
   return (
     <div className="min-h-screen px-6 py-8">
@@ -99,8 +121,8 @@ export default function FavoritesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {cars.map((v) => (
-              <Link key={v.id} href={`/vehicle/${v.id}`} className="glass-card group block overflow-hidden">
+            {favoriteCars.map((v) => (
+              <Link key={v.id} href={`/vehicle/${v.id}`} onClick={() => setVehicleBackUrl()} className="glass-card group block overflow-hidden">
                 <div className="relative h-44 overflow-hidden">
                   <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                   <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />

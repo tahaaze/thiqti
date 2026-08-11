@@ -7,6 +7,7 @@ import { ThiqtiShield, ZelligeStar } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import VoiceInput from "@/components/VoiceInput";
 import { addHistory } from "@/lib/history";
+import { setVehicleBackUrl } from "@/lib/navigation";
 import {
   ChatState,
   BotReply,
@@ -382,7 +383,7 @@ export default function ChatAssistant({
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {visibleResults?.map((car) => (
                     <div key={car.id} className="group flex flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-[0_2px_12px_rgba(13,18,48,0.06)] backdrop-blur transition hover:shadow-[0_8px_24px_rgba(109,93,252,0.15)]">
-                      <Link href={`/vehicle/${car.id}`} className="flex-1">
+                      <Link href={`/vehicle/${car.id}`} onClick={() => setVehicleBackUrl()} className="flex-1">
                         <div className="relative h-32 overflow-hidden">
                         <CarImage src={car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                         <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/60 to-transparent" />
