@@ -18,6 +18,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { UnifiedCar, InventoryType, inferBodyType } from "./types";
 import { getFallbackCars } from "./fallback";
+import { CARS_SNAPSHOT_FETCHED_AT, CARS_SNAPSHOT_JSON } from "@/data/cars-snapshot";
 import { fetchAuteraCars } from "./autera";
 import { fetchMoteurCars } from "./moteur";
 import { fetchElectroDriveCars } from "./electrodrive";
@@ -64,6 +65,16 @@ async function writeDiskCache(cars: UnifiedCar[], fetchedAt: number): Promise<vo
     await fs.writeFile(CACHE_FILE, JSON.stringify({ cars, fetchedAt }), "utf8");
   } catch {
     // Le cache disque est optionnel : un échec d'écriture ne doit pas casser la réponse.
+  }
+}
+
+function readBundledSnapshot(): DiskCacheShape | null {
+  try {
+    const parsed = JSON.parse(CARS_SNAPSHOT_JSON) as DiskCacheShape;
+    if (!Array.isArray(parsed.cars) || parsed.cars.length === 0) return null;
+    return { cars: parsed.cars.map(withInferredBody), fetchedAt: parsed.fetchedAt ?? CARS_SNAPSHOT_FETCHED_AT };
+  } catch {
+    return null;
   }
 }
 
@@ -150,6 +161,16 @@ async function getCars(): Promise<UnifiedCar[]> {
   if (cache) {
     void withDedup(loadAndCache).catch(() => {});
     return cache.cars;
+  }
+
+  // Instantane embarque (build) : donnees REELLES disponibles des le demarrage
+  // a froid, indispensable en serverless ou le cache disque est absent. Un
+  // rafraichissement live est lance en arriere-plan quand c'est possible.
+  const bundled = readBundledSnapshot();
+  if (bundled && bundled.cars.length > getFallbackCars().length) {
+    void withDedup(loadAndCache).catch(() => {});
+    cache = { cars: bundled.cars, fetchedAt: bundled.fetchedAt, liveSources: true };
+    return bundled.cars;
   }
 
   // Premier demarrage froid : on lance le scraping en arriere-plan et on

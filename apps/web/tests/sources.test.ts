@@ -146,12 +146,12 @@ describe("catalogue de démonstration (isDemoData)", () => {
     expect(getFallbackCars().some((c) => c.inventoryType === "used")).toBe(false);
   });
 
-  it("quand les sources live échouent, le secours sert le catalogue démo marqué", async () => {
+  it("quand les sources live échouent, l'instantané embarqué (annonces réelles) est servi", async () => {
     const cars = await fetchAllSources();
-    expect(cars.length).toBe(196);
-    expect(cars.every((c) => c.isDemoData === true)).toBe(true);
+    expect(cars.length).toBeGreaterThan(196);
+    expect(cars.every((c) => c.isDemoData === true)).toBe(false);
     const used = await searchAllSources("", "used");
-    expect(used).toHaveLength(0);
+    expect(used.length).toBeGreaterThan(0);
   });
 
   it("le bug MG ZS 1.5 est corrigé (modèle 'ZS', pas 'ZS EV')", () => {
