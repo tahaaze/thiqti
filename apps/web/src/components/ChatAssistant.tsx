@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight, ExternalLink } from "lucide-react";
+import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight, ExternalLink, Heart } from "lucide-react";
 import { ThiqtiShield, ZelligeStar } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import VoiceInput from "@/components/VoiceInput";
 import { addHistory } from "@/lib/history";
+import { saveFavorite, removeFavorite, loadFavoriteIds } from "@/lib/favorites";
 import { setVehicleBackUrl } from "@/lib/navigation";
 import {
   ChatState,
@@ -94,6 +95,10 @@ export default function ChatAssistant({
   const scrollRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
   const searchSeqRef = useRef(0);
+  const [favorites, setFavorites] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    return new Set(loadFavoriteIds());
+  });
 
   useEffect(() => {
     const init = initialMessage();
@@ -194,6 +199,45 @@ export default function ChatAssistant({
     setMessages([{ id: idRef.current++, role: "bot", text: init.text }]);
   }, []);
 
+  const toggleFavorite = useCallback((car: ChatCar) => {
+    const isFav = favorites.has(car.id);
+    if (isFav) {
+      removeFavorite(car.id);
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        next.delete(car.id);
+        return next;
+      });
+    } else {
+      saveFavorite(car.id, {
+        id: car.id,
+        title: car.title,
+        make: car.make,
+        model: car.model,
+        year: car.year,
+        price: car.price,
+        priceFormatted: car.priceFormatted,
+        km: car.km,
+        fuel: car.fuel,
+        city: car.city,
+        image: car.image,
+        photos: car.photos,
+        score: car.score,
+        source: car.source,
+        url: car.url,
+        inventoryType: car.inventoryType,
+        bodyType: car.bodyType,
+        contact: car.contact,
+        reputation: car.reputation,
+      });
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        next.add(car.id);
+        return next;
+      });
+    }
+  }, [favorites]);
+
   const handleSend = useCallback(
     async (raw: string) => {
       const text = raw.trim();
@@ -220,54 +264,6 @@ export default function ChatAssistant({
       setAiLoading(true);
 
       try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: text,
-            history: messages.map((m) => ({ role: m.role, text: m.text })),
-          }),
-        });
-
-        if (!res.ok) throw new Error("Erreur API chat");
-
-        const data = await res.json();
-        const c = data.criteria || {};
-        const newCriteria: SearchCriteria = {
-          carrosserie: c.carrosserie ?? botState.criteria.carrosserie,
-          motorisation: c.motorisation ?? botState.criteria.motorisation,
-          transmission: c.transmission ?? botState.criteria.transmission,
-          marque: c.marque ?? botState.criteria.marque,
-          modele: c.modele ?? botState.criteria.modele,
-          budgetMin: c.budgetMin ?? botState.criteria.budgetMin,
-          budgetMax: c.budgetMax ?? botState.criteria.budgetMax,
-          budgetTolerance: botState.criteria.budgetTolerance,
-          ville: c.ville ?? botState.criteria.ville,
-          anneeMin: c.anneeMin ?? botState.criteria.anneeMin,
-          anneeMax: c.anneeMax ?? botState.criteria.anneeMax,
-          kmMax: c.kmMax ?? botState.criteria.kmMax,
-          intent: botState.criteria.intent,
-        };
-
-        const inventoryType = c.inventoryType ?? botState.inventoryType;
-        const newState: ChatState = {
-          criteria: newCriteria,
-          inventoryType,
-          stage: data.search ? "collecting" : botState.stage,
-        };
-
-        setBotState(newState);
-        setQuickReplies(data.quickReplies || ["Voir plus", "C'est bon"]);
-        setMessages((prev) => [
-          ...prev,
-          { id: idRef.current++, role: "bot", text: data.reply },
-        ]);
-
-        if (data.search) {
-          const isMore = /voir (?:plus|tous)|afficher plus|plus de r.sultats|d'autres options/i.test(text);
-          fetchResultsFor(newState, isMore, isMore ? "" : text);
-        }
-      } catch {
         const reply: BotReply = answer(botState, text);
         setBotState(reply.state);
         setQuickReplies(reply.quickReplies);
@@ -382,7 +378,15 @@ export default function ChatAssistant({
               <>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {visibleResults?.map((car) => (
-                    <div key={car.id} className="group flex flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/60 shadow-[0_2px_12px_rgba(13,18,48,0.06)] backdrop-blur transition hover:shadow-[0_8px_24px_rgba(109,93,252,0.15)]">
+                    <div key={car.id} className="group relative flex flex-col rounded-2xl border border-white/70 bg-white/60 shadow-[0_2px_12px_rgba(13,18,48,0.06)] backdrop-blur transition hover:shadow-[0_8px_24px_rgba(109,93,252,0.15)]">
+                      <button
+                        type="button"
+                        onClick={() => toggleFavorite(car)}
+                        className="absolute right-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 backdrop-blur transition hover:bg-black/60"
+                        aria-label={favorites.has(car.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                      >
+                        <Heart className={`h-3.5 w-3.5 transition ${favorites.has(car.id) ? "fill-red-500 text-red-500" : "text-white"}`} />
+                      </button>
                       <Link href={`/vehicle/${car.id}`} onClick={() => setVehicleBackUrl()} className="flex-1">
                         <div className="relative h-32 overflow-hidden">
                         <CarImage src={car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />

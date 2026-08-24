@@ -12,12 +12,11 @@ import { ReputationService } from "../src/reputation/reputation.service";
 
 const score = {
   vehicle_id: "v1",
-  overall: 88.5,
-  history: 90,
-  mechanical: 85,
-  reviews: 80,
-  price_value: 75,
-  analysis: "analysis",
+  avg_rating: 7.5,
+  total_reviews: 2,
+  reliability: "fiable",
+  top_pros: ["Confort"],
+  top_cons: ["Prix"],
 };
 
 function makeRepo() {
@@ -83,18 +82,15 @@ describe("ReputationService", () => {
     const result = await service.computeScore("v1");
 
     expect(result.vehicle_id).toBe("v1");
-    expect(result.reviews).toBe(null);
-    expect(result.history).toBe(null);
-    expect(result.mechanical).toBe(null);
-    expect(result.price_value).toBe(null);
-    expect(result.overall).toBe(0);
-    expect(result.analysis).toContain("0 reviews");
+    expect(result.avg_rating).toBe(0);
+    expect(result.total_reviews).toBe(0);
+    expect(result.reliability).toBeNull();
     expect(scoreRepo.create).toHaveBeenCalled();
   });
 
   it("calcule le score a partir des avis reels uniquement", async () => {
     const reviewRepo = makeRepo();
-    reviewRepo.find.mockResolvedValue([{ score: 10 }, { score: 5 }]);
+    reviewRepo.find.mockResolvedValue([{ rating: 10 }, { rating: 5 }]);
     const scoreRepo = makeRepo();
     scoreRepo.findOne.mockResolvedValue(null);
     scoreRepo.create.mockImplementation((dto: any) => dto);
@@ -103,24 +99,22 @@ describe("ReputationService", () => {
 
     const result = await service.computeScore("v1");
 
-    expect(result.reviews).toBe(75);
-    expect(result.history).toBe(null);
-    expect(result.mechanical).toBe(null);
-    expect(result.price_value).toBe(null);
-    expect(result.overall).toBe(75);
-    expect(result.analysis).toContain("2 reviews");
+    expect(result.avg_rating).toBe(7.5);
+    expect(result.total_reviews).toBe(2);
+    expect(result.reliability).toBe("fiable");
   });
 
   it("met a jour le score existant au lieu d'en creer un nouveau", async () => {
     const reviewRepo = makeRepo();
     reviewRepo.find.mockResolvedValue([]);
     const scoreRepo = makeRepo();
-    scoreRepo.findOne.mockResolvedValue(score);
+    const existingScore = { ...score };
+    scoreRepo.findOne.mockResolvedValue(existingScore);
     const service = build(reviewRepo, scoreRepo);
 
     await service.computeScore("v1");
 
-    expect(scoreRepo.save).toHaveBeenCalledWith(score);
+    expect(scoreRepo.save).toHaveBeenCalledWith(existingScore);
     expect(scoreRepo.create).not.toHaveBeenCalled();
   });
 });

@@ -114,6 +114,7 @@ export function addHistory(
   if (typeof window !== "undefined") {
     try {
       window.localStorage.setItem(KEY, JSON.stringify(next));
+      window.dispatchEvent(new CustomEvent("thiqti-history-changed"));
     } catch {
       /* stockage indisponible */
     }

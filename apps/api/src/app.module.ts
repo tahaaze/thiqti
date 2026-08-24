@@ -15,7 +15,7 @@ import { ReputationModule } from "./reputation/reputation.module";
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME || "thiqti",
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== "production",
+      synchronize: false,
     }),
     VehiclesModule,
     ReputationModule,

@@ -79,6 +79,11 @@ const FUELS: Record<string, string> = {
   "ديزل": "Diesel",
   "كاز": "Essence",
   "بنزين": "Essence",
+  "ايصانص": "Essence",
+  "ايسانس": "Essence",
+  "اسانس": "Essence",
+  "يسانس": "Essence",
+  "سانص": "Essence",
   "هجين": "Hybride",
   "هايبرد": "Hybride",
   "بطارية": "Électrique",
@@ -596,6 +601,7 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   ville: ["ville", "urbain", "urbaine", "parking", "stationnement", "مدينة"],
   route: ["autoroute", "route", "longue distance", "voyage", "سفر", "طريق", "طويلة"],
   tout_terrain: ["tout-terrain", "tout terrain", "piste", "chemin", "offroad", "boue", "وعر"],
+  mixte: ["mixte", "usage mixte", "ville et route", "ville et autoroute", "moitie ville", "moitié ville", "مختلط", "متعدد"],
 };
 
 // ---------------------------------------------------------------------------
@@ -925,7 +931,7 @@ export function isThanks(text: string): boolean {
 }
 
 export function isHelp(text: string): boolean {
-  return /aide|help|comment|aidez|besoin|exemple|شنو|فهمني|كيفاش|عاونني/.test(normalizeText(text));
+  return /aide|help|comment|aidez|besoin|exemple|فهمني|كيفاش|عاونني/.test(normalizeText(text));
 }
 
 export function isSkip(text: string): boolean {
@@ -934,4 +940,60 @@ export function isSkip(text: string): boolean {
 
 export function isYes(text: string): boolean {
   return /oui|ouais|yes|yep|ok|dac|daccord|d'accord|bien sur|نعم|ايه|اوك|واه|يه/.test(normalizeText(text));
+}
+
+// ---------------------------------------------------------------------------
+// Comparaisons / conseil : "mazot ola essence", "renault ou dacia", "شنو احسن"
+// ---------------------------------------------------------------------------
+
+export type ComparisonDimension =
+  | "motorisation"
+  | "marque"
+  | "carrosserie"
+  | "transmission"
+  | "inventory";
+
+export interface ComparisonOption {
+  dimension: ComparisonDimension;
+  value: string;
+}
+
+const COMPARISON_INTENT_RE =
+  /\b(?:cho|chno|chnou|chnoa|chnowa|which|better|best|meilleur|meilleure|hsen|hsan|mzyan|mli7|mellih|comparer|compare|versus|vs)\b|(?:احسن|الاحسن|افضل|الافضل|خير|مزيان|المزيان)/i;
+
+/** Retourne TOUTES les options de comparaison trouvées (et pas seulement la première). */
+export function parseComparisonOptions(query: string): ComparisonOption[] {
+  const normalized = normalizeText(query);
+  const normalizedAr = transliterateArabizi(normalized);
+  const out: ComparisonOption[] = [];
+  const push = (dimension: ComparisonDimension, value: string) => {
+    if (value && !out.some((o) => o.dimension === dimension && o.value === value)) {
+      out.push({ dimension, value });
+    }
+  };
+  for (const [key, value] of Object.entries(FUELS)) {
+    if (normalized.includes(key) || normalizedAr.includes(key)) push("motorisation", value);
+  }
+  for (const [alias, canonical] of BRAND_ENTRIES) {
+    if (normalized.includes(alias) || normalizedAr.includes(alias)) push("marque", canonical);
+  }
+  for (const [key, value] of Object.entries(CARROSSERIES)) {
+    if (normalized.includes(key) || normalizedAr.includes(key)) push("carrosserie", value);
+  }
+  for (const [key, value] of Object.entries(TRANSMISSIONS)) {
+    if (hasKeyword(normalized, key) || hasKeyword(normalizedAr, key)) push("transmission", value);
+  }
+  if (/neuf|neuve|nouveau|0\s?km|zero\s?km|جديد/.test(normalized)) push("inventory", "Neuf");
+  if (/occasion|d'occasion|usag|seconde main|used|مستعمل/.test(normalized)) push("inventory", "Occasion");
+  return out;
+}
+
+/** Vrai quand le message demande un conseil entre options ("lequel est mieux ? X ola Y"). */
+export function isComparisonQuestion(query: string): boolean {
+  const n = normalizeText(query);
+  const options = parseComparisonOptions(query);
+  const byDim = new Map<ComparisonDimension, number>();
+  for (const o of options) byDim.set(o.dimension, (byDim.get(o.dimension) ?? 0) + 1);
+  const hasTwoOfSame = [...byDim.values()].some((count) => count >= 2);
+  return COMPARISON_INTENT_RE.test(n) || hasTwoOfSame;
 }

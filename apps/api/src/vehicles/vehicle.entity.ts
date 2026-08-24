@@ -48,25 +48,25 @@ export class Vehicle {
   @Column("real", { nullable: true })
   consumption_l100!: number | null;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   co2_gkm!: number | null;
 
   @Column("real", { nullable: true })
   accel_0_100!: number | null;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   trunk_liters!: number | null;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   length_mm!: number | null;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   width_mm!: number | null;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   height_mm!: number | null;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   wheelbase_mm!: number | null;
 
   @Column({ nullable: true })

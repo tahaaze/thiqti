@@ -13,23 +13,20 @@ export class ReputationScore {
   @Column()
   vehicle_id!: string;
 
-  @Column("decimal", { precision: 5, scale: 1 })
-  overall!: number;
+  @Column("real", { default: 0 })
+  avg_rating!: number;
 
-  @Column("decimal", { precision: 5, scale: 1, nullable: true })
-  history!: number | null;
+  @Column("int", { default: 0 })
+  total_reviews!: number;
 
-  @Column("decimal", { precision: 5, scale: 1, nullable: true })
-  mechanical!: number | null;
+  @Column("varchar", { length: 20, nullable: true })
+  reliability!: string | null;
 
-  @Column("decimal", { precision: 5, scale: 1, nullable: true })
-  reviews!: number | null;
+  @Column("text", { array: true, nullable: true })
+  top_pros!: string[] | null;
 
-  @Column("decimal", { precision: 5, scale: 1, nullable: true })
-  price_value!: number | null;
-
-  @Column("text", { nullable: true })
-  analysis!: string | null;
+  @Column("text", { array: true, nullable: true })
+  top_cons!: string[] | null;
 
   @CreateDateColumn()
   computed_at!: Date;

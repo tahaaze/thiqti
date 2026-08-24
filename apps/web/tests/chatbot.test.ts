@@ -1,18 +1,20 @@
 import { describe, it, expect } from "vitest";
-import { answer, createInitialState, initialMessage, buildSearchRequest, recommendationText } from "@/lib/chatbot";
+import { answer, createInitialState, initialMessage, buildSearchRequest, recommendationText, detectLanguage } from "@/lib/chatbot";
 
 const car = (id: string, title: string, priceFormatted: string, score: number) => ({
   id, title, make: "Dacia", model: "Duster", year: 2024, price: 200000, priceFormatted,
   km: 0, fuel: "Essence", city: "Casablanca", image: "", source: "Données Maroc", score,
 });
 
-describe("conversation chatbot", () => {
-  it("lance une recherche dès qu'un seul critère est donné", () => {
+describe("conversation chatbot — conseiller conversationnel", () => {
+  it("ne lance PAS la recherche dès le premier critère : il pose une question", () => {
     const s = createInitialState();
     const r = answer(s, "SUV");
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
     expect(r.done).toBe(false);
     expect(r.state.criteria.carrosserie).toBe("SUV");
+    expect(r.text).toContain("Compris");
+    expect(r.text).toContain("budget");
     expect(r.state.stage).toBe("collecting");
   });
 
@@ -21,7 +23,7 @@ describe("conversation chatbot", () => {
     const r = answer(s, "200000");
     expect(r.state.criteria.budgetMax).toBe(230000);
     expect(r.state.criteria.budgetMin).toBe(170000);
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
   });
 
   it("accumule les critères dans n'importe quel ordre", () => {
@@ -32,25 +34,26 @@ describe("conversation chatbot", () => {
     expect(r.state.criteria.budgetMax).toBe(230000);
     r = answer(r.state, "Toyota");
     expect(r.state.criteria.marque).toBe("Toyota");
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
     expect(r.state.criteria.motorisation).toBe("Diesel");
   });
 
-  it("comprend une phrase complete d'un coup", () => {
+  it("comprend une phrase complete d'un coup, sans chercher immédiatement", () => {
     const s = createInitialState();
     const r = answer(s, "Dacia SUV essence 2022 moins de 250000 DH");
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
     expect(r.state.criteria.carrosserie).toBe("SUV");
     expect(r.state.criteria.motorisation).toBe("Essence");
     expect(r.state.criteria.marque).toBe("Dacia");
     expect(r.state.criteria.anneeMin).toBe(2022);
+    expect(r.text).toContain("Compris");
   });
 
   it("detecte neuf/occasion", () => {
     const s = createInitialState();
     const r = answer(s, "neuf 250000");
     expect(r.state.inventoryType).toBe("new");
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
   });
 
   it("comprend une phrase complete en darija", () => {
@@ -59,27 +62,67 @@ describe("conversation chatbot", () => {
     expect(r.state.criteria.carrosserie).toBe("SUV");
     expect(r.state.criteria.motorisation).toBe("Diesel");
     expect(r.state.criteria.budgetMax).toBe(250000);
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
     expect(/\d/.test(buildSearchRequest(r.state).q)).toBe(false);
+  });
+
+  it("ne lance la recherche que sur demande explicite des résultats", () => {
+    const s = createInitialState();
+    let r = answer(s, "SUV");
+    expect(r.search).toBe(false);
+    r = answer(r.state, "voir les résultats");
+    expect(r.search).toBe(true);
+    expect(r.state.criteria.carrosserie).toBe("SUV");
   });
 
   it("affiche plus de resultats avec les memes criteres", () => {
     const s = createInitialState();
     let r = answer(s, "SUV");
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
     r = answer(r.state, "voir plus");
     expect(r.search).toBe(true);
     expect(r.state.criteria.carrosserie).toBe("SUV");
     expect(r.state.criteria.motorisation).toBeNull();
   });
 
-  it("termine la conversation sur c'est bon", () => {
+  it("lance les résultats sur c'est bon quand des critères sont connus", () => {
     const s = createInitialState();
     let r = answer(s, "Toyota SUV diesel");
-    expect(r.done).toBe(false);
+    expect(r.search).toBe(false);
     r = answer(r.state, "c'est bon");
-    expect(r.done).toBe(true);
+    expect(r.search).toBe(true);
     expect(r.state.stage).toBe("done");
+  });
+
+  it("ne cherche pas sur c'est bon sans critères", () => {
+    const s = createInitialState();
+    const r = answer(s, "c'est bon");
+    expect(r.search).toBe(false);
+  });
+
+  it("répond à la question essence ou mazot par un avis en darija, puis pose une question", () => {
+    const s = createInitialState();
+    const r = answer(s, "chno li hsen mazot ola essence");
+    expect(r.search).toBe(false);
+    expect(r.text).toContain("مازوط");
+    expect(r.text).toContain("كاز");
+    expect(r.text).toContain("الميزانية");
+    expect(r.state.criteria.motorisation).toBeNull();
+    expect(r.state.lang).toBe("darija");
+  });
+
+  it("pose une question à la fois, dans un ordre logique", () => {
+    const s = createInitialState();
+    let r = answer(s, "200000");
+    expect(r.search).toBe(false);
+    expect(r.text).toContain("usage");
+    r = answer(r.state, "familiale");
+    expect(r.search).toBe(false);
+    expect(r.text).toContain("SUV");
+    r = answer(r.state, "voir les résultats");
+    expect(r.search).toBe(true);
+    const req = buildSearchRequest(r.state);
+    expect(req.filters.maxPrice).toBeGreaterThanOrEqual(230000);
   });
 
   it("gere la politesse et les messages incompris", () => {
@@ -111,7 +154,7 @@ describe("conversation chatbot", () => {
     expect(/\d/.test(req.q)).toBe(false);
   });
 
-  it("refine les resultats a chaque nouvel indice (filtres cumules)", () => {
+  it("refine les criteres a chaque nouvel indice (filtres cumules)", () => {
     let r = answer(createInitialState(), "SUV");
     expect(buildSearchRequest(r.state).filters.bodyType).toBe("SUV");
     r = answer(r.state, "diesel");
@@ -154,9 +197,10 @@ describe("conversation chatbot", () => {
     const s = createInitialState();
     const r = answer(s, "bghit nchri tomobil");
     expect(r.search).toBe(false);
-    expect(r.text).toContain("budget");
-    expect(r.text).toContain("type");
+    expect(r.text).toContain("الميزانية");
+    expect(r.text).toContain("نوع");
     expect(r.quickReplies.length).toBeGreaterThan(0);
+    expect(r.state.lang).toBe("darija");
   });
 
   it("comprend l'intention d'achat en français", () => {
@@ -174,12 +218,88 @@ describe("conversation chatbot", () => {
     expect(r.text).toContain("type");
   });
 
-  it("fonctionne avec acheteur + critère structuré", () => {
+  it("fonctionne avec acheteur + critère structuré, sans chercher immédiatement", () => {
     const s = createInitialState();
     const r = answer(s, "je veux acheter une voiture SUV diesel Toyota");
-    expect(r.search).toBe(true);
+    expect(r.search).toBe(false);
     expect(r.state.criteria.carrosserie).toBe("SUV");
     expect(r.state.criteria.motorisation).toBe("Diesel");
     expect(r.state.criteria.marque).toBe("Toyota");
+    expect(r.text).toContain("Compris");
+  });
+
+  describe("langue (darija / français)", () => {
+    it("détecte la darija (arabizi et arabe)", () => {
+      expect(detectLanguage("chno li hsen mazot ola essence")).toBe("darija");
+      expect(detectLanguage("بغيت ربع ديزل")).toBe("darija");
+      expect(detectLanguage("بغيت نتوما")).toBe("darija");
+    });
+
+    it("détecte le français et garde la langue précédente si ambigu", () => {
+      expect(detectLanguage("je veux acheter une voiture")).toBe("fr");
+      expect(detectLanguage("200000", "darija")).toBe("darija");
+      expect(detectLanguage("SUV", "darija")).toBe("darija");
+      expect(detectLanguage("oui", "darija")).toBe("darija");
+      expect(detectLanguage("c'est bon", "fr")).toBe("fr");
+    });
+
+    it("répond en darija dès que l'utilisateur parle darija, et accuse réception en darija", () => {
+      const s = createInitialState();
+      const r = answer(s, "بغيت ربع ديزل اقل من 250000 درهم");
+      expect(r.state.lang).toBe("darija");
+      expect(r.text).toContain("فهمت");
+      expect(r.text).toContain("ربع");
+      expect(r.text).toContain("مازوط");
+    });
+
+    it("reste en darija sur la demande de résultats", () => {
+      const s = createInitialState();
+      let r = answer(s, "بغيت ربع ديزل");
+      expect(r.state.lang).toBe("darija");
+      r = answer(r.state, "voir les résultats");
+      expect(r.search).toBe(true);
+      expect(r.text).toContain("واخا، هاهي النتائج");
+    });
+
+    it("reprend le français si l'utilisateur écrit en français", () => {
+      const s = createInitialState();
+      let r = answer(s, "بغيت ربع ديزل");
+      expect(r.state.lang).toBe("darija");
+      r = answer(r.state, "je veux une voiture sportive");
+      expect(r.state.lang).toBe("fr");
+      expect(r.text).toContain("Compris");
+    });
+  });
+
+  describe("propose « voir les résultats » à chaque réponse", () => {
+    it("ajoute la proposition et la suggestion de résultats quand un critère est connu", () => {
+      const s = createInitialState();
+      const r = answer(s, "SUV 200000");
+      expect(r.text).toContain("Voir les résultats");
+      expect(r.quickReplies).toContain("Voir les résultats");
+      expect(r.search).toBe(false);
+    });
+
+    it("n'ajoute pas la suggestion de résultats quand aucun critère n'est connu", () => {
+      const s = createInitialState();
+      const r = answer(s, "bonjour");
+      expect(r.quickReplies).not.toContain("Voir les résultats");
+    });
+
+    it("propose en darija à chaque réponse", () => {
+      const s = createInitialState();
+      const r = answer(s, "بغيت ربع ديزل");
+      expect(r.text).toContain("Voir les résultats");
+      expect(r.quickReplies).toContain("Voir les résultats");
+    });
+  });
+
+  it("genere une recommandation en darija si la conversation est en darija", () => {
+    const s = createInitialState();
+    const r = answer(s, "بغيت ربع ديزل اقل من 250000 درهم");
+    const t = recommendationText([car("a", "Duster", "200 000 DH", 92)], r.state);
+    expect(t).toContain("Duster");
+    expect(t).toContain("92/100");
+    expect(t).toContain("هاهي أحسن اقتراحاتي");
   });
 });

@@ -187,6 +187,16 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
     setHistory(getHistory());
   }, [pathname]);
 
+  useEffect(() => {
+    const refresh = () => setHistory(getHistory());
+    window.addEventListener("thiqti-history-changed", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("thiqti-history-changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
   const handleDelete = (id: string) => {
     setHistory(removeHistory(id));
   };

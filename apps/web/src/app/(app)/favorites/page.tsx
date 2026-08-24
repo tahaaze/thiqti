@@ -58,10 +58,7 @@ export default function FavoritesPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (!loadedRef.current) return;
-    localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
-  }, [favorites]);
+  // Note: localStorage is written by saveFavorite / removeFavorite — no sync effect needed here.
 
   // Resolution des ids "herites" sans snapshot (ancien format) via /api/search.
   useEffect(() => {

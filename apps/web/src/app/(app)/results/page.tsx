@@ -14,7 +14,6 @@ import EmptyState from "@/components/EmptyState";
 import Skeleton from "@/components/Skeleton";
 import SellerContact from "@/components/SellerContact";
 import { SearchFilters, SearchFacets, countActiveFilters, parseFilters } from "@/lib/searchTypes";
-import { addHistory } from "@/lib/history";
 import { saveFavorite, removeFavorite } from "@/lib/favorites";
 import { setVehicleBackUrl } from "@/lib/navigation";
 
@@ -100,14 +99,11 @@ export default function ResultsPage() {
 
   useEffect(() => {
     const saved = localStorage.getItem("thiqti_favorites");
-    if (saved) setFavorites(JSON.parse(saved));
+    if (saved) {
+      try { setFavorites(JSON.parse(saved)); } catch {}
+    }
     loadedRef.current = true;
   }, []);
-
-  useEffect(() => {
-    if (!loadedRef.current) return;
-    localStorage.setItem("thiqti_favorites", JSON.stringify(favorites));
-  }, [favorites]);
 
   const doSearch = useCallback(
     async (q: string, type: "new" | "used" | "" = invType, flt: SearchFilters = filters) => {
@@ -172,7 +168,6 @@ export default function ResultsPage() {
     setQuery(q);
     setInvType(type);
     setFilters(flt);
-    if (q) addHistory(q);
     doSearch(q, type, flt);
   }, [doSearch]);
 

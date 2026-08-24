@@ -52,14 +52,23 @@ let pool: Pool | null = null;
 
 function getPool(): Pool {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST || "localhost",
-      port: Number(process.env.DB_PORT) || 5432,
-      user: process.env.DB_USER || "thiqti",
-      password: process.env.DB_PASSWORD || "thiqti_secret",
-      database: process.env.DB_NAME || "thiqti",
-      connectionTimeoutMillis: 3000,
-    });
+    const connectionString = process.env.DATABASE_URL;
+    pool = new Pool(
+      connectionString
+        ? {
+            connectionString,
+            ssl: { rejectUnauthorized: false },
+            connectionTimeoutMillis: 5000,
+          }
+        : {
+            host: process.env.DB_HOST || "localhost",
+            port: Number(process.env.DB_PORT) || 5432,
+            user: process.env.DB_USER || "thiqti",
+            password: process.env.DB_PASSWORD || "thiqti_secret",
+            database: process.env.DB_NAME || "thiqti",
+            connectionTimeoutMillis: 3000,
+          }
+    );
   }
   return pool;
 }

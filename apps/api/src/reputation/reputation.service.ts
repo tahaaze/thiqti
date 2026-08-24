@@ -28,40 +28,58 @@ export class ReputationService {
 
   async computeScore(vehicleId: string): Promise<ReputationScore> {
     const reviews = await this.getReviews(vehicleId);
-    const avgReviewScore =
+    const avgRating =
       reviews.length > 0
-        ? reviews.reduce((sum, r) => sum + (Number(r.score) || 0), 0) / reviews.length
+        ? reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / reviews.length
         : 0;
 
-    const reviewSubscore = avgReviewScore * 10;
-    const hasReviews = reviews.length > 0;
-    const overall = hasReviews ? Number(reviewSubscore.toFixed(1)) : 0;
+    const roundedAvg = avgRating > 0 ? Math.round(avgRating * 10) / 10 : 0;
 
-    const data = {
-      overall,
-      history: null as number | null,
-      mechanical: null as number | null,
-      reviews: hasReviews ? Number(reviewSubscore.toFixed(1)) : null,
-      price_value: null as number | null,
-      analysis: `Based on ${reviews.length} reviews. Review score: ${overall}/100.`,
-    };
+    const topPros = this.topTags(reviews, "pros");
+    const topCons = this.topTags(reviews, "cons");
+
+    let reliability: string | null = null;
+    if (reviews.length > 0) {
+      if (roundedAvg >= 7) reliability = "fiable";
+      else if (roundedAvg >= 4) reliability = "moyen";
+      else reliability = "insuffisant";
+    }
 
     const existing = await this.scoreRepo.findOne({ where: { vehicle_id: vehicleId } });
 
     if (existing) {
-      existing.overall = data.overall;
-      existing.history = data.history;
-      existing.mechanical = data.mechanical;
-      existing.reviews = data.reviews;
-      existing.price_value = data.price_value;
-      existing.analysis = data.analysis;
+      existing.avg_rating = roundedAvg;
+      existing.total_reviews = reviews.length;
+      existing.reliability = reliability;
+      existing.top_pros = topPros;
+      existing.top_cons = topCons;
       return this.scoreRepo.save(existing);
     }
 
     const score = this.scoreRepo.create({
       vehicle_id: vehicleId,
-      ...data,
+      avg_rating: roundedAvg,
+      total_reviews: reviews.length,
+      reliability,
+      top_pros: topPros,
+      top_cons: topCons,
     });
     return this.scoreRepo.save(score);
+  }
+
+  private topTags(reviews: Review[], field: "pros" | "cons"): string[] {
+    const counts = new Map<string, number>();
+    for (const review of reviews) {
+      const items = field === "pros" ? review.pros : review.cons;
+      if (!items) continue;
+      for (const item of items) {
+        const key = item.trim();
+        if (key) counts.set(key, (counts.get(key) || 0) + 1);
+      }
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([tag]) => tag);
   }
 }
