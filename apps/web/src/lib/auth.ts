@@ -22,24 +22,18 @@ export interface AuthCookie {
 let pool: Pool | null = null;
 
 export function getAuthPool(): Pool {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL environment variable is required");
+  }
   if (!pool) {
-    const connectionString = process.env.DATABASE_URL;
-    pool = new Pool(
-      connectionString
-        ? {
-            connectionString,
-            ssl: { rejectUnauthorized: false },
-            connectionTimeoutMillis: 5000,
-          }
-        : {
-            host: process.env.DB_HOST || "localhost",
-            port: Number(process.env.DB_PORT) || 5432,
-            user: process.env.DB_USER || "thiqti",
-            password: process.env.DB_PASSWORD || "thiqti_secret",
-            database: process.env.DB_NAME || "thiqti",
-            connectionTimeoutMillis: 3000,
-          }
-    );
+    pool = new Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false },
+      max: 1,
+      idleTimeoutMillis: 0,
+      connectionTimeoutMillis: 10000,
+    });
   }
   return pool;
 }
@@ -105,7 +99,7 @@ export async function getAuth(request: NextRequest): Promise<AuthCookie> {
 export function attachSessionCookie(response: NextResponse, token: string): NextResponse {
   response.cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
@@ -116,7 +110,7 @@ export function attachSessionCookie(response: NextResponse, token: string): Next
 export function clearSessionCookie(response: NextResponse): NextResponse {
   response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 0,

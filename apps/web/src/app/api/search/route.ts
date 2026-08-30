@@ -55,6 +55,8 @@ export async function GET(request: NextRequest) {
       demoData,
       relaxed: fallback.relaxed,
       expandedBudget: fallback.expandedBudget,
+    }, {
+      headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" },
     });
   }
 
@@ -70,6 +72,8 @@ export async function GET(request: NextRequest) {
     sources: getSourceStats(filtered),
     facets: buildFacets(pool),
     demoData,
+  }, {
+    headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" },
   });
 }
 

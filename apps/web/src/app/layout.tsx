@@ -1,6 +1,8 @@
+import dynamic from "next/dynamic";
 import { ToastProvider } from "@/components/Toast";
-import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
+
+const ChatWidget = dynamic(() => import("@/components/ChatWidget"), { ssr: false });
 
 export const viewport = {
   width: "device-width",

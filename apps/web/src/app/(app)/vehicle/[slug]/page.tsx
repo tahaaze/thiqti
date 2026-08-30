@@ -146,18 +146,17 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
 
   useEffect(() => {
     params.then(({ slug }) => {
-      fetch("/api/search")
+      fetch(`/api/vehicles/${encodeURIComponent(slug)}`)
         .then((r) => {
           if (!r.ok) throw new Error("Erreur réseau");
           return r.json();
         })
         .then((data) => {
-          const found = data.results.find((c: CarListing) => c.id === slug);
-          if (found) {
-            setCar(found);
-            setMainImg(found.image);
-          } else {
+          if (data.error) {
             setError(true);
+          } else {
+            setCar(data);
+            setMainImg(data.image);
           }
         })
         .catch(() => setError(true));
