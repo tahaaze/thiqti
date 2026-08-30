@@ -1,5 +1,14 @@
 import { ToastProvider } from "@/components/Toast";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#eef1fb",
+};
 
 export default function RootLayout({
   children,
@@ -16,6 +25,7 @@ export default function RootLayout({
             <div className="absolute -bottom-32 left-1/3 h-[420px] w-[420px] rounded-full bg-[#f0a8ff]/15 blur-[130px]" />
           </div>
           <main className="relative z-10">{children}</main>
+          <ChatWidget />
         </ToastProvider>
       </body>
     </html>

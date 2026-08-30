@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, CarFront, ShieldCheck, ArrowRight, MapPin, ExternalLink } from "lucide-react";
+import { Sparkles, CarFront, ShieldCheck, ArrowRight, MapPin, ExternalLink, LogIn } from "lucide-react";
 import { ZelligeStar, ThiqtiShield } from "@/components/icons";
 import ChatAssistant from "@/components/ChatAssistant";
 import CarImage from "@/components/CarImage";
 import AppShell from "@/components/AppShell";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import { setVehicleBackUrl } from "@/lib/navigation";
+import { useAuth } from "@/lib/useAuth";
 
 interface HomeCar {
   id: string;
@@ -90,6 +91,7 @@ export default function HomePage() {
   const [cars, setCars] = useState<HomeCar[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<"marketing" | "app">("marketing");
+  const { user } = useAuth();
 
   useEffect(() => {
     fetch("/api/search")
@@ -113,17 +115,17 @@ export default function HomePage() {
         id="assistant"
         className={
           mode === "app"
-            ? "mx-auto w-full max-w-5xl scroll-mt-24 px-4 py-6 sm:px-6"
-            : "mx-auto w-full max-w-7xl scroll-mt-24 px-6 pt-12 pb-6"
+            ? "mx-auto flex h-[100dvh] w-full max-w-5xl flex-col px-2 pt-1 sm:px-6 sm:pt-6"
+            : "mx-auto w-full max-w-7xl scroll-mt-24 px-4 pt-8 pb-6 sm:px-6 sm:pt-12"
         }
       >
-        <div className={mode === "app" ? "" : "grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center"}>
+        <div className={mode === "app" ? "flex min-h-0 flex-1 flex-col" : "grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center"}>
           <div className={mode === "app" ? "hidden" : ""}>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/40 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" />
               IA auto
             </span>
-            <h1 className="font-display mt-5 text-5xl font-bold leading-[0.98] text-ink md:text-6xl">
+            <h1 className="font-display mt-5 text-4xl font-bold leading-[0.98] text-ink sm:text-5xl md:text-6xl">
               Trouvez <span className="gradient-text">votre</span> voiture.
             </h1>
             <p className="mt-5 max-w-md text-base text-muted">
@@ -149,12 +151,20 @@ export default function HomePage() {
                   <span className="font-display text-lg font-bold text-ink">{s.value}</span>
                 </div>
               ))}
+              {!user && (
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6d5dfc] to-[#22a9f0] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(109,93,252,0.4)] transition hover:brightness-110"
+                >
+                  <LogIn className="h-4 w-4" /> Se connecter
+                </Link>
+              )}
             </div>
           </div>
-          <div>
+          <div className={mode === "app" ? "flex min-h-0 flex-1 flex-col" : ""}>
             <ChatAssistant
               onStart={() => setMode("app")}
-              heightClassName={mode === "app" ? "h-[640px]" : "h-[600px] lg:h-[660px]"}
+              heightClassName={mode === "app" ? "h-full" : "h-[480px] sm:h-[580px] lg:h-[660px]"}
             />
           </div>
         </div>

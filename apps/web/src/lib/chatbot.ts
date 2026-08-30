@@ -99,7 +99,7 @@ export function createInitialState(): ChatState {
 // ---------------------------------------------------------------------------
 
 const DARIJA_MARKERS =
-  /\b(?:mazot|mazout|mazwot|kaz|kazwal|kazwa|banzin|benzin|bnzin|hjin|haibred|kahraba|rab3|rba3|rab3a|karosa|caroussa|madina|mdina|matik|manyal|manyouil|manwal|bghit|nchri|nechri|tomobil|tomobila|toumobil|khasni|rkhiss|ghalya|jmi3a|ryadi|chouf|choufni|3andi|walo|shi|shwiya|bzaaf|daba|ola|walaw|imma)\b/i;
+  /\b(?:mazot|mazout|mazwot|kaz|kazwal|kazwa|banzin|benzin|bnzin|hjin|haibred|kahraba|rab3|rba3|rab3a|karosa|caroussa|madina|mdina|matik|manyal|manyouil|manwal|bghit|nchri|nechri|tomobil|tomobila|toumobil|khasni|rkhiss|ghalya|jmi3a|ryadi|chouf|choufni|3andi|walo|shi|shwiya|bzaaf|daba|ola|walaw|imma|wakh|wah|bgha|bghaw|khoud|takhod|fayn|wfin|kat2bel|drari|weldi|taz|bekri|kathir|ktir)\b/i;
 const FR_MARKERS =
   /\b(?:je|j'|tu|vous|nous|mon|ma|mes|pour|avec|quelle|quel|quelles|quels|voulez|pouvez|souhaite|aimerais|cherche|cherchez|besoin|veux|pense|prefere|préfère|preferer|préférer)\b/i;
 
@@ -161,12 +161,15 @@ const COMPARISON_ADVICE: Record<string, { fr: string; darija: string }> = {
 const GREETING_RE = /\b(?:salut|bonjour|bonsoir|bonj|hello|hi|hey|salam|salamo|salam 3alikom|assalam|lhala|lachak|la chak)\b|(?:صباح|مساء|السلام|السلام عليكم|سلام)/i;
 const THANKS_RE = /\b(?:merci|choukran|chokran|chokra|choukra|shukran|thanks|thank you|thx)\b|(?:شكرا|الله يخليك|بارك الله)/i;
 const HELP_RE = /\b(?:aide|help|comment|aidez|besoin|exemple)\b|(?:فهمني|كيفاش|عاونني)/i;
-const SKIP_RE = /\b(?:passer|passe|skip|sauter|peu importe|nimporte|n'importe|aucune|aucun|je ne sais pas|jsp)\b|(?:لا فرق|غير مهم|اي شيء)/i;
+const SKIP_RE = /\b(?:passer|passe|skip|sauter|peu importe|nimporte|n'importe|aucune|aucun|je ne sais pas|jsp)\b|(?:لا فرق|غير مهم|اي شيء|ماشي مشكل|ما شي مشكل|ما في مشكل)|machi\s*m(?:o|u)ch?kil|machi\s*mushkil/i;
 const YES_RE = /\b(?:oui|ouais|yes|yep|ok|dac|daccord|d'accord|bien sur|aaah)\b|(?:نعم|ايه|اوك|واه|يه)/i;
 const SEE_MORE_RE =
   /\b(?:voir|voire)\s+(?:plus|tous|toutes|plus de)\s*(?:options|annonces|r.sultats?)?|(?:voir|voire)\s+les?\s*r.sultats?|plus de r.sultats?|tous les r.sultats?|d'autres (?:options|annonces|r.sultats?)|show more|other results/i;
 const WANTS_RESULTS_RE =
-  /\b(?:voir|voire)\s*(?:les?\s*)?r.sultats?|\b(?:montre|montrer|affiche|afficher|cherche|chercher|donne|donner|propose|proposer|je veux voir|valide|valider)\b|(?:les?|des?)\s*r.sultats?|nchof|nchouf|nata2ij|nata2ej|chouf|werini|wreni|goul\s*l[ia]|بغيت نشوف|وريني|اريني|شوف|نشوف|عطيني|نتائج|خلاص/i;
+  /\b(?:voir|voire)\s*(?:les?\s*)?r.sultats?|\b(?:montre|montrer|affiche|afficher|cherche|chercher|donne|donner|propose|proposer|je veux voir|valide|valider)\b|(?:les?|des?)\s*r.sultats?|nchof|nchouf|nata2ij|nata2ej|chouf|werini|wreni|goul\s*l[ia]|passe?\s*(?:a|aux|to|vers)\s*r.sult|بغيت نشوف|وريني|اريني|شوف|نشوف|عطيني|نتائج|خلاص/i;
+/** Demande de changement de langue (ex: « dwi meaya b arabe », « parle darija »). */
+const LANGUAGE_RE =
+  /(?:\b(?:dwi|hadr|hadar|tkallam|tkellem|tekellem|parle|parlez|speak|dis|gbili|gol)\b[^ا-ي]*\b(?:b|be|bi|en|in|a|bas)\b\s*)?(?:(?:darija|darja|darija|arabia|arabe|arabic|3arabi|3arabia|francais|francaise|français|française|fr))\b|(?:هدر|هضر|دوي|تكلم|كلم)\s*(?:معايا?|بال|ب)?\s*(?:عربية|عربي|داريجا|فرنسية|فرنسا)/i;
 const REFINE_RE = /\b(?:affiner|affinez|pr.ciser|pr.cisez|revoir|modifier|change)\b|(?:بغيت نزيد|نعدل)/i;
 const DONE_RE = /\b(?:c'?est bon|ca me va|ca va comme|ca va|parfait|suffit|fini|termin[ée]|stop|arrete|j'ai? trouv[ée]|trouv[ée] mon|ca y est|okay)\b|(?:خلاص|كفى|بلاها)/i;
 
@@ -353,7 +356,7 @@ export function nextQuestion(state: ChatState): { text: string; quickReplies: st
       quickReplies: ["Familiale", "Sportive", "Urbaine", "Mixte"],
     },
     {
-      condition: !c.carrosserie,
+      condition: !c.carrosserie && !hasUsage,
       fr: "Plutôt un SUV, une berline, une citadine ou un crossover ?",
       darija: "أشنو تفضل : ربع (SUV)، كاروسة، مدينة ولا كروسوفر ؟",
       quickReplies: ["SUV", "Berline", "Citadine", "Crossover"],
@@ -445,37 +448,51 @@ function hasCriteria(state: ChatState): boolean {
   );
 }
 
+/**
+ * Assez d'infos pour proposer les résultats : un budget est connu ET au moins
+ * un critère de profil (carburant ou type). L'usage seul (ex: « familiale »)
+ * ne suffit pas : on pose encore la question du carburant avant de proposer.
+ */
+export function hasEnoughForResults(state: ChatState): boolean {
+  const c = state.criteria;
+  const budgetKnown = c.budgetMin !== null || c.budgetMax !== null;
+  const profileKnown = !!c.motorisation || !!c.carrosserie;
+  return budgetKnown && profileKnown;
+}
+
 /** Résumé compact des critères connus, en une ligne (ex: "SUV, diesel, Toyota"). */
 export function criteriaLine(state: ChatState): string {
-  const parts: string[] = [];
+  const lang = state.lang;
   const c = state.criteria;
-  if (budgetStatus(c)) parts.push(`un budget de ${formatBudget(c)}`);
-  if (state.inventoryType) parts.push(state.inventoryType === "new" ? "du neuf" : "de l'occasion");
-  if (c.carrosserie) parts.push(c.carrosserie);
-  if (c.motorisation) parts.push(c.motorisation.toLowerCase());
+  const parts: string[] = [];
+  if (budgetStatus(c)) parts.push(pick(lang, `un budget de ${formatBudget(c)}`, `ميزانية ديال ${formatBudgetDarija(c)}`));
+  if (state.inventoryType) parts.push(state.inventoryType === "new" ? pick(lang, "du neuf", "جديدة") : pick(lang, "de l'occasion", "مستعملة"));
+  if (c.carrosserie) parts.push(BODY_LABELS[c.carrosserie]?.[lang] ?? c.carrosserie);
+  if (c.motorisation) parts.push(FUEL_LABELS[c.motorisation]?.[lang] ?? c.motorisation.toLowerCase());
   if (c.marque) parts.push(c.marque);
   if (c.modele) parts.push(c.modele);
-  if (c.transmission) parts.push(c.transmission.toLowerCase());
-  if (c.ville) parts.push(`à ${c.ville}`);
-  if (c.anneeMin) parts.push(`${c.anneeMin} et plus`);
-  if (c.kmMax) parts.push(`${c.kmMax.toLocaleString("fr-FR")} km max`);
-  return parts.length ? parts.join(", ") : "aucun critère précis";
+  if (c.transmission) parts.push(TRANS_LABELS[c.transmission]?.[lang] ?? c.transmission.toLowerCase());
+  if (c.ville) parts.push(pick(lang, `à ${c.ville}`, `فـ${c.ville}`));
+  if (c.anneeMin) parts.push(pick(lang, `${c.anneeMin} et plus`, `من عام ${c.anneeMin}`));
+  if (c.kmMax) parts.push(pick(lang, `${c.kmMax.toLocaleString("fr-FR")} km max`, `أقصى ${c.kmMax.toLocaleString("fr-FR")} كم`));
+  return parts.length ? parts.join(", ") : pick(lang, "aucun critère précis", "ما زال حتى معيار دقيق");
 }
 
 /** Liste de puces pour l'interface (ex: ["Budget : 150 000 à 250 000 DH", "Type : SUV"]). */
 export function criteriaSummary(state: ChatState): string[] {
+  const lang = state.lang;
   const c = state.criteria;
   const out: string[] = [];
-  if (budgetStatus(c)) out.push(`Budget : ${formatBudget(c)}`);
-  if (state.inventoryType) out.push(state.inventoryType === "new" ? "Neuf" : "Occasion");
-  if (c.carrosserie) out.push(`Type : ${c.carrosserie}`);
-  if (c.motorisation) out.push(`Carburant : ${c.motorisation}`);
-  if (c.marque) out.push(`Marque : ${c.marque}`);
-  if (c.modele) out.push(`Modèle : ${c.modele}`);
-  if (c.transmission) out.push(`Boîte : ${c.transmission}`);
-  if (c.ville) out.push(`Ville : ${c.ville}`);
-  if (c.anneeMin) out.push(`Année : ${c.anneeMin} et plus`);
-  if (c.kmMax) out.push(`Km max : ${c.kmMax.toLocaleString("fr-FR")} km`);
+  if (budgetStatus(c)) out.push(pick(lang, `Budget : ${formatBudget(c)}`, `الميزانية : ${formatBudgetDarija(c)}`));
+  if (state.inventoryType) out.push(state.inventoryType === "new" ? pick(lang, "Neuf", "جديدة") : pick(lang, "Occasion", "مستعملة"));
+  if (c.carrosserie) out.push(pick(lang, `Type : ${c.carrosserie}`, `النوع : ${BODY_LABELS[c.carrosserie]?.darija ?? c.carrosserie}`));
+  if (c.motorisation) out.push(pick(lang, `Carburant : ${c.motorisation}`, `الكاز : ${FUEL_LABELS[c.motorisation]?.darija ?? c.motorisation}`));
+  if (c.marque) out.push(pick(lang, `Marque : ${c.marque}`, `الماركة : ${c.marque}`));
+  if (c.modele) out.push(pick(lang, `Modèle : ${c.modele}`, `الموديل : ${c.modele}`));
+  if (c.transmission) out.push(pick(lang, `Boîte : ${c.transmission}`, `الماتيك : ${TRANS_LABELS[c.transmission]?.darija ?? c.transmission}`));
+  if (c.ville) out.push(pick(lang, `Ville : ${c.ville}`, `المدينة : ${c.ville}`));
+  if (c.anneeMin) out.push(pick(lang, `Année : ${c.anneeMin} et plus`, `السنة : ${c.anneeMin} فأكثر`));
+  if (c.kmMax) out.push(pick(lang, `Km max : ${c.kmMax.toLocaleString("fr-FR")} km`, `أقصى كم : ${c.kmMax.toLocaleString("fr-FR")}`));
   return out;
 }
 
@@ -523,6 +540,31 @@ export function answer(prev: ChatState, input: string): BotReply {
   const criteriaKnown = hasCriteria(prev);
 
   // Politesse / meta
+  if (matches(LANGUAGE_RE, raw)) {
+    const wantsFr =
+      /\b(?:francais|francaise|français|française|fr|french)\b|(?:فرنسية|فرنسا)/i.test(raw);
+    const target: ChatLanguage = wantsFr ? "fr" : "darija";
+    const replyFr =
+      "D'accord ! Je vous parle en français désormais 😊\n" +
+      (criteriaKnown
+        ? "Nous gardons vos critères, dites-moi ce que vous voulez ajouter (ex : « 250 000 DH », « Toyota », « SUV »)."
+        : "Comment puis-je vous aider ? Dites-moi votre budget, le type de voiture ou la marque.");
+    const replyDarija =
+      "واخا خاصك بالداريجة ! 😊\n" +
+      (criteriaKnown
+        ? "حافظنا على المعايير ديالك، قول ليا شنو بغيتي تزيد (مثلا : « 250000 درهم », « Toyota », « ربع »)."
+        : "كيفاش نقدر نعاونك ؟ قول ليا الميزانية، نوع الطوموبيل ولا الماركة.");
+    return {
+      text: wantsFr ? replyFr : replyDarija,
+      quickReplies: criteriaKnown
+        ? ["Voir les résultats", "Recommencer"]
+        : ["SUV", "Moins de 150 000 DH", "Toyota", "Diesel"],
+      done: false,
+      search: false,
+      state: { ...prev, lang: target },
+    };
+  }
+
   if (matches(HELP_RE, raw)) {
     return {
       text: pick(
@@ -556,31 +598,38 @@ export function answer(prev: ChatState, input: string): BotReply {
   }
 
   if (matches(SEE_MORE_RE, raw) || matches(WANTS_RESULTS_RE, raw)) {
-    if (criteriaKnown) {
+    // « voir les résultats » / « je cherche » : si la phrase contient en fait de
+    // nouveaux critères (ex. « Je cherche un SUV autour de 200000 DH »), on ne
+    // court-circuite pas : on laisse le traitement normal les appliquer.
+    const mayContainCriteria = /(?:de |d[e']|a |à |un |une )?\d|\b(?:SUV|berline|citadine|diesel|essence|hybride|toyota|renault|dacia|automatique|manuel|rabat|casablanca)\b/i.test(raw);
+    const shouldResolve = !mayContainCriteria;
+    if (shouldResolve) {
+      if (criteriaKnown) {
+        return {
+          text: pick(
+            lang,
+            `Parfait, voici vos résultats pour : ${criteriaLine(prev)} 🚗`,
+            `واخا، هاهي النتائج ديالك على حساب : ${criteriaLine(prev)} 🚗`
+          ),
+          quickReplies: ["C'est bon", "Recommencer"],
+          done: false,
+          search: true,
+          state: { ...prev, lang },
+        };
+      }
+      const q = nextQuestion({ ...prev, lang });
       return {
         text: pick(
           lang,
-          `Parfait, voici vos résultats pour : ${criteriaLine(prev)} 🚗`,
-          `واخا، هاهي النتائج ديالك على حساب : ${criteriaLine(prev)} 🚗`
+          `Bien sûr ! Avant de chercher, j'ai besoin de quelques infos.\n\n${q.text}`,
+          `بلا مشكل ! قبل ما نقلب، خاصني شي معلومات.\n\n${q.text}`
         ),
-        quickReplies: ["C'est bon", "Recommencer"],
+        quickReplies: q.quickReplies,
         done: false,
-        search: true,
+        search: false,
         state: { ...prev, lang },
       };
     }
-    const q = nextQuestion({ ...prev, lang });
-    return {
-      text: pick(
-        lang,
-        `Bien sûr ! Avant de chercher, j'ai besoin de quelques infos.\n\n${q.text}`,
-        `بلا مشكل ! قبل ما نقلب، خاصني شي معلومات.\n\n${q.text}`
-      ),
-      quickReplies: q.quickReplies,
-      done: false,
-      search: false,
-      state: { ...prev, lang },
-    };
   }
 
   if (matches(REFINE_RE, raw)) {
@@ -804,6 +853,30 @@ export function answer(prev: ChatState, input: string): BotReply {
           "عطيني اللي كتعرف، حتى معيار واحد كافي !"
       ),
       quickReplies: ["Moins de 200 000 DH", "SUV diesel", "Toyota", "Casablanca"],
+      done: false,
+      search: false,
+      state,
+    };
+  }
+
+  // Assez d'infos (budget + carburant/type) : on résume et on met en avant
+  // le bouton « Voir les résultats », avec les critères restants en option.
+  if (hasEnoughForResults(state)) {
+    const summary = summaryText(state).replace(/\n/g, " · ");
+    const nq = nextQuestion(state);
+    const optionalReplies = nq.quickReplies.filter((x) => x !== "Voir les résultats").slice(0, 3);
+    const text = `${ack}\n\n${pick(
+      lang,
+      `Récapitulatif : ${summary}`,
+      `الخلاصة : ${summary}`
+    )}\n\n${pick(
+      lang,
+      "Vous pouvez appuyer sur « Voir les résultats » pour lancer la recherche maintenant, ou continuer à préciser (neuf/occasion, marque, boîte, ville...).",
+      "تقدر تضغط « Voir les résultats » باش نطلقو البحث دابا، ولا نكمّل نزيدو (جديدة/مستعملة، الماركة، الماتيك، المدينة...)."
+    )}`;
+    return {
+      text,
+      quickReplies: ["Voir les résultats", ...optionalReplies],
       done: false,
       search: false,
       state,

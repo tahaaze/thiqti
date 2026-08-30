@@ -118,7 +118,7 @@ describe("conversation chatbot — conseiller conversationnel", () => {
     expect(r.text).toContain("usage");
     r = answer(r.state, "familiale");
     expect(r.search).toBe(false);
-    expect(r.text).toContain("SUV");
+    expect(r.text.toLowerCase()).toContain("diesel");
     r = answer(r.state, "voir les résultats");
     expect(r.search).toBe(true);
     const req = buildSearchRequest(r.state);
@@ -235,6 +235,13 @@ describe("conversation chatbot — conseiller conversationnel", () => {
       expect(detectLanguage("بغيت نتوما")).toBe("darija");
     });
 
+    it("détecte la darija avec marqueurs étendus (sans coller au français)", () => {
+      expect(detectLanguage("wakh bghit nchri tomobil fkaza")).toBe("darija");
+      expect(detectLanguage("khasni SUV rkhiss")).toBe("darija");
+      expect(detectLanguage("واخا بغيت نتوما")).toBe("darija");
+      expect(detectLanguage("chouf lih hadik caroussa")).toBe("darija");
+    });
+
     it("détecte le français et garde la langue précédente si ambigu", () => {
       expect(detectLanguage("je veux acheter une voiture")).toBe("fr");
       expect(detectLanguage("200000", "darija")).toBe("darija");
@@ -301,5 +308,130 @@ describe("conversation chatbot — conseiller conversationnel", () => {
     expect(t).toContain("Duster");
     expect(t).toContain("92/100");
     expect(t).toContain("هاهي أحسن اقتراحاتي");
+  });
+
+  describe("compréhension élargie (darija / commandes comme Jeep)", () => {
+    it("comprend « riyadia » / « رياضية » comme une voiture sportive", () => {
+      const r = answer(createInitialState(), "riyadia");
+      expect(r.search).toBe(false);
+      expect(r.state.criteria.intent).toContain("sportif");
+      expect(r.text).toContain("Compris");
+    });
+
+    it("ne repose pas la question du type de carrosserie quand un usage est donné", () => {
+      const s = createInitialState();
+      s.criteria.budgetMax = 400000; // budget déjà renseigné
+      const r = answer(s, "بغيت طوموبيل رياضية");
+      expect(r.state.criteria.intent).toContain("sportif");
+      expect(r.text).not.toContain("أشنو تفضل : ربع");
+      expect(r.text).not.toMatch(/SUV, une berline, une citadine/);
+    });
+
+    it("comprend « bghit tiomobil mazot » comme un achat de voiture diesel", () => {
+      const r = answer(createInitialState(), "bghit tiomobil mazot");
+      expect(r.search).toBe(false);
+      expect(r.state.lang).toBe("darija");
+      expect(r.state.criteria.motorisation).toBe("Diesel");
+      expect(r.state.criteria.intent).toContain("achat");
+    });
+
+    it("change de langue sur « dwi meaya b arabe » et répond en darija", () => {
+      const s = createInitialState();
+      const r = answer(s, "dwi meaya b arabe");
+      expect(r.state.lang).toBe("darija");
+      expect(r.text).toContain("داريجة");
+      expect(r.search).toBe(false);
+    });
+
+    it("change de langue sur « dwi meaya b francais »", () => {
+      const s = createInitialState();
+      const r = answer(s, "dwi meaya b francais");
+      expect(r.state.lang).toBe("fr");
+      expect(r.text).toContain("français");
+    });
+
+    it("ne considère pas « machi mochkil » comme du texte libre", () => {
+      let r = answer(createInitialState(), "بغيت ربع");
+      expect(r.state.lang).toBe("darija");
+      r = answer(r.state, "machi mochkil");
+      expect(r.search).toBe(false);
+      expect(r.text).toContain("لا مشكل");
+    });
+
+    it("déclenche les résultats sur « passe a result » avec des critères", () => {
+      let r = answer(createInitialState(), "SUV 200000");
+      expect(r.search).toBe(false);
+      r = answer(r.state, "passe a result");
+      expect(r.search).toBe(true);
+    });
+  });
+
+  describe("résumé + bouton quand assez d'infos (budget + carburant ou type)", () => {
+    it("exemple de l'utilisateur : budget + mazot + sport → résumé et « Voir les résultats » en avant", () => {
+      const r = answer(createInitialState(), "salam bghit tomobil b 200000dh mazot sport");
+      expect(r.search).toBe(false);
+      expect(r.state.criteria.motorisation).toBe("Diesel");
+      expect(r.state.criteria.intent).toContain("sportif");
+      expect(r.quickReplies[0]).toBe("Voir les résultats");
+      expect(r.text).toContain("Voir les résultats");
+      // On ne pose plus « neuf ou occasion » en tant que blocage.
+      expect(r.text).not.toContain("بغيتي جديدة ولا مستعملة");
+    });
+
+    it("propose le bouton quand budget + type sont connus", () => {
+      const r = answer(createInitialState(), "SUV 200000");
+      expect(r.search).toBe(false);
+      expect(r.quickReplies[0]).toBe("Voir les résultats");
+      expect(r.quickReplies).toContain("Voir les résultats");
+    });
+
+    it("reste en darija et met le bouton en avant", () => {
+      const r = answer(createInitialState(), "بغيت ربع ديزل 200000 درهم");
+      expect(r.state.lang).toBe("darija");
+      expect(r.quickReplies[0]).toBe("Voir les résultats");
+      expect(r.text).toContain("الخلاصة");
+    });
+
+    it("pose encore la question du carburant quand seul budget + usage sont donnés", () => {
+      let r = answer(createInitialState(), "200000");
+      r = answer(r.state, "familiale");
+      // Pas assez d'infos (pas de carburant/type) : on repose la question du carburant.
+      expect(r.text.toLowerCase()).toContain("diesel");
+      expect(r.text).not.toContain("Récapitulatif");
+      expect(r.text).not.toContain("الخلاصة");
+    });
+
+    it("n'active pas le résumé sans budget (pose encore la question du budget)", () => {
+      const r = answer(createInitialState(), "بغيت ربع ديزل");
+      expect(r.text).toContain("الميزانية");
+      expect(r.text).not.toContain("الخلاصة");
+      expect(r.text).not.toContain("Récapitulatif");
+    });
+  });
+});
+
+describe("phrases naturelles « je cherche ... » (régression)", () => {
+  it("extrait SUV + budget + ville dans « Je cherche un SUV autour de 200000 DH à Rabat »", () => {
+    const r = answer(createInitialState(), "Je cherche un SUV autour de 200000 DH à Rabat");
+    expect(r.state.criteria.carrosserie).toBe("SUV");
+    expect(r.state.criteria.ville).toBe("Rabat");
+    expect(r.state.criteria.budgetMin).toBe(160000);
+    expect(r.state.criteria.budgetMax).toBe(240000);
+    expect(r.search).toBe(false);
+  });
+
+  it("extrait le budget dans « Je cherche une voiture familiale 200000 DH »", () => {
+    const r = answer(createInitialState(), "Je cherche une voiture familiale 200000 DH");
+    expect(r.state.criteria.budgetMax).toBe(230000);
+    expect(r.state.criteria.budgetMin).toBe(170000);
+  });
+
+  it("garde « Voir les résultats » comme lancement de recherche quand il n'y a pas de critère", () => {
+    const s = createInitialState();
+    let r = answer(s, "SUV");
+    r = answer(r.state, "200000");
+    const res = answer(r.state, "Voir les résultats");
+    expect(res.search).toBe(true);
+    expect(res.state.criteria.budgetMax).toBe(230000);
   });
 });

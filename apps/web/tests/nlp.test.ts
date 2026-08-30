@@ -199,6 +199,26 @@ describe("parseQuery - intentions", () => {
     expect(c.intent).toContain("familial");
   });
 
+  it("tolere les fautes de frappe de familial (famillial, fammile, famil)", () => {
+    expect(parseQuery("famillial").intent).toContain("familial");
+    expect(parseQuery("pour la fammile").intent).toContain("familial");
+    expect(parseQuery("famil").intent).toContain("familial");
+    expect(parseQuery("pour la famille").intent).toContain("familial");
+  });
+
+  it("detecte l'usage familial en arabizi (ea2ilia, 3a2ila, 3ayla)", () => {
+    expect(parseQuery("ea2ilia").intent).toContain("familial");
+    expect(parseQuery("3a2ila").intent).toContain("familial");
+    expect(parseQuery("3ayla").intent).toContain("familial");
+    expect(parseQuery("عائلية").intent).toContain("familial");
+  });
+
+  it("ne confond pas des mots non familiaux avec familial", () => {
+    expect(parseQuery("une voiture compacte en ville")).not.toContain("familial");
+    expect(parseQuery("il me faut une voiture rapide")).not.toContain("familial");
+  });
+
+
   it("detecte l'intention sportive en darija", () => {
     const c = parseQuery("سيارة سريعة");
     expect(c.intent).toContain("sportif");

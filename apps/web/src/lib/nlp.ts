@@ -591,11 +591,11 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
     "je veux acheter", "je souhaite acheter", "j'aimerais acheter", "je veux prendre",
     "bghit nchri", "bghit nchri", "nchri", "ghadi nchri", "bghit nechri", "bghit nechri",
     "buy", "want to buy", "looking for", "interested in",
-    "nchri tomobil", "nchri tomobila", "tomobil", "tomobila", "toumobil",
+    "nchri tomobil", "nchri tomobila", "tomobil", "tomobila", "toumobil", "tiomobil", "tiamobil", "tyomobil",
     "عندني", "بغيت نشري",
   ],
   familial: ["famille", "familial", "familiale", "enfant", "enfants", "bébé", "bebe", "pratique", "7aml", "عائلة", "اولاد", "دراري", "صغار", "عائلي"],
-  sportif: ["sport", "sportif", "sportive", "puissant", "puissance", "vitesse", "performance", "sari3", "سريع", "قوي"],
+  sportif: ["sport", "sportif", "sportive", "puissant", "puissance", "vitesse", "performance", "sari3", "riyadi", "riyadia", "ryadi", "سريع", "قوي", "رياضي", "رياضية"],
   economique: ["économique", "economique", "petit budget", "abordable", "pas cher", "moins cher", "pas trop cher", "budget serré", "رخيص", "رخص", "اقتصادي"],
   confort: ["confort", "confortable", "luxueux", "luxe", "premium", "haut de gamme", "مرتاح", "فخم", "راحة", "هادئ"],
   ville: ["ville", "urbain", "urbaine", "parking", "stationnement", "مدينة"],
@@ -603,6 +603,32 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   tout_terrain: ["tout-terrain", "tout terrain", "piste", "chemin", "offroad", "boue", "وعر"],
   mixte: ["mixte", "usage mixte", "ville et route", "ville et autoroute", "moitie ville", "moitié ville", "مختلط", "متعدد"],
 };
+
+// ---------------------------------------------------------------------------
+// Détection « usage familial » tolérante aux fautes de frappe et à l'arabizi.
+// Couvre : famille/familial/famillial/fammille, familya, 3a2ila / 3aila / 3a7la,
+// aaila, et l'arabe (عائلة، عائلي، عائلية، اولاد، عائله).
+// ---------------------------------------------------------------------------
+
+const FAMILY_STEMS: RegExp[] = [
+  /(?:^|[^a-z])famil/i,       // famille, familial, familiale, famillial(le)
+  /(?:^|[^a-z])famm/i,        // fammile / fammill (fautes de frappe)
+  /(?:^|[^a-z])familya/i,     // familya
+  /(?:^|[^a-z])family/i,      // family
+  /(?:^|[^a-z])famel/i,       // famella / famile
+  /(?:^|[^a-z])3a2?[iy]l/i,   // 3a2il, 3a2la, 3ail, 3ayl, 3ayla
+  /(?:^|[^a-z])3a7l/i,        // 3a7la
+  /(?:^|[^a-z])ea2[iy]l/i,    // ea2ila
+  /(?:^|[^a-z])a[yi]l/i,      // ayl / aila (عيلة en arabizi)
+];
+
+function hasFamilyIntent(text: string): boolean {
+  const n = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  for (const re of FAMILY_STEMS) {
+    if (re.test(n)) return true;
+  }
+  return /عا[يئ]ل[تةه]?|اولاد|دراري|صغار|الاولاد/i.test(n);
+}
 
 // ---------------------------------------------------------------------------
 // Normalisation
@@ -898,6 +924,9 @@ export function parseQuery(query: string): SearchCriteria {
     for (const kw of keywords) {
       if (normalized.includes(kw.toLowerCase()) || normalizedAr.includes(kw.toLowerCase())) { intent.push(key); break; }
     }
+  }
+  if (!intent.includes("familial") && hasFamilyIntent(normalized)) {
+    intent.push("familial");
   }
 
   return {

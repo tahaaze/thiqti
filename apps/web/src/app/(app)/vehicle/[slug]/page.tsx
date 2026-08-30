@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MapPin, Fuel, Gauge, Calendar, ChevronLeft, Share2, CheckCircle2, MessageSquare, AlertTriangle, Clock, TrendingUp, TrendingDown, BadgeCheck, Info, Globe, ExternalLink, Facebook, Instagram, Newspaper, Store, Eye } from "lucide-react";
+import { MapPin, Fuel, Gauge, Calendar, ChevronLeft, Share2, CheckCircle2, MessageSquare, AlertTriangle, Clock, TrendingUp, TrendingDown, BadgeCheck, Info, Globe, ExternalLink, Facebook, Instagram, Newspaper, Store, Eye, Loader2 } from "lucide-react";
 import { ZelligeStar, ThiqtiShield, FavHeart } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SafetyBadge, { safetyLabelOf } from "@/components/SafetyBadge";
@@ -11,6 +11,7 @@ import SellerContact from "@/components/SellerContact";
 import { useToast } from "@/components/Toast";
 import { saveFavorite, removeFavorite } from "@/lib/favorites";
 import { getVehicleBackUrl, setVehicleBackUrl, clearVehicleBackUrl } from "@/lib/navigation";
+import type { LLMReputationResult } from "@/lib/reputation/types";
 
 interface CarListing {
   id: string;
@@ -119,7 +120,9 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
   const [fav, setFav] = useState(false);
   const [error, setError] = useState(false);
   const [reputation, setReputation] = useState<ReputationData | null>(null);
+  const [scrapedRep, setScrapedRep] = useState<LLMReputationResult | null>(null);
   const [loadingRep, setLoadingRep] = useState(false);
+  const [loadingScrape, setLoadingScrape] = useState(false);
   const [mainImg, setMainImg] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewScore, setReviewScore] = useState(8);
@@ -176,6 +179,13 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
       .then((data) => setReputation(data))
       .catch(() => {})
       .finally(() => setLoadingRep(false));
+    // Fetch la réputation scrapée (web + réseaux sociaux)
+    setLoadingScrape(true);
+    fetch(`/api/reputation/scrape?make=${encodeURIComponent(car.make)}&model=${encodeURIComponent(car.model)}`)
+      .then((r) => r.json())
+      .then((data) => { if (!data.error) setScrapedRep(data); })
+      .catch(() => {})
+      .finally(() => setLoadingScrape(false));
   }, [car]);
 
   useEffect(() => {
@@ -237,6 +247,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
     );
 
   const hasEnoughReviews = reputation && reputation.dataAvailable === true;
+  const hasScrapedRep = scrapedRep && scrapedRep.reviewCount > 0;
 
   return (
     <div className="min-h-screen px-6 py-8">
@@ -379,77 +390,132 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                   <div className="mt-6 border-t border-line pt-6">
                     <h2 className="mb-4 flex items-center gap-2 text-base font-bold">
                       <ThiqtiShield className="h-5 w-5 text-primary" />
-                      Avis des utilisateurs du site
+                      Réputation réelle du modèle
                     </h2>
-                    <p className="mb-4 text-xs text-muted">
-                      Avis réellement déposés sur Thiqti par les acheteurs. Aucune note n&apos;est inventée :
-                      le score n&apos;est publié qu&apos;à partir de {MIN_REVIEWS} avis réels.
-                    </p>
 
-                  {loadingRep ? (
-                    <div className="space-y-4">
-                      {[1, 2, 3].map((i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-line/60" />)}
-                    </div>
-                  ) : !reputation ? (
-                    <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
-                      <p className="text-sm text-yellow-700">Données indisponibles pour ce modèle.</p>
-                    </div>
-                  ) : !hasEnoughReviews ? (
-                    <ReputationInsufficient reputation={reputation} />
-                  ) : (
-                    <ReputationSummary reputation={reputation} />
-                  )}
-
-                  <div className="mt-6 border-t border-line pt-6">
-                    <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                      <MessageSquare className="h-4 w-4 text-primary" />
-                      Donner votre avis
-                    </h3>
-                    <form onSubmit={submitReview} className="space-y-3">
+                  {loadingScrape && !scrapedRep ? (
+                    <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
                       <div>
-                        <p className="mb-2 text-xs text-muted">Votre note sur 10</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                            <button
-                              key={n}
-                              type="button"
-                              onClick={() => setReviewScore(n)}
-                              className={`h-9 w-9 rounded-lg text-xs font-bold transition ${reviewScore === n ? "btn-gold" : "bg-line/60 text-muted hover:text-ink"}`}
-                            >
-                              {n}
-                            </button>
-                          ))}
+                        <p className="text-sm font-semibold text-ink">Analyse en cours...</p>
+                        <p className="text-xs text-muted">Collecte d&apos;avis depuis le web et les réseaux sociaux.</p>
+                      </div>
+                    </div>
+                  ) : !hasScrapedRep ? (
+                    <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+                      <p className="mb-2 text-sm text-yellow-700">Pas encore de données pour ce modèle.</p>
+                      <button
+                        onClick={() => {
+                          if (!car) return;
+                          setLoadingScrape(true);
+                          fetch("/api/reputation/scrape", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ make: car.make, model: car.model }),
+                          })
+                            .then((r) => r.json())
+                            .then((data) => { if (!data.error) setScrapedRep(data); })
+                            .catch(() => {})
+                            .finally(() => setLoadingScrape(false));
+                        }}
+                        className="text-xs font-semibold text-primary hover:underline"
+                      >
+                        Lancer l&apos;analyse
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Score global + fiabilité */}
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6d5dfc]/15 to-[#22a9f0]/15">
+                          <span className="text-2xl font-bold text-primary">{scrapedRep!.score}</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-ink">Score / 100</p>
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            scrapedRep!.reliability === "elevee" ? "bg-green-100 text-green-700" :
+                            scrapedRep!.reliability === "moyenne" ? "bg-yellow-100 text-yellow-700" :
+                            "bg-red-100 text-red-700"
+                          }`}>
+                            {scrapedRep!.reliability === "elevee" ? "Fiable" :
+                             scrapedRep!.reliability === "moyenne" ? "Moyen" : "À vérifier"}
+                          </span>
                         </div>
                       </div>
-                      <textarea
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                        rows={3}
-                        maxLength={1000}
-                        placeholder="Votre expérience avec ce modèle (fiabilité, consommation, confort, points forts/faibles...)"
-                        className="w-full rounded-xl bg-line/60 px-3 py-2.5 text-sm outline-none ring-1 ring-line focus:ring-primary/50"
-                      />
-                      {reviewError && <p className="text-xs text-red-600">{reviewError}</p>}
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="submit"
-                          disabled={reviewSubmitting}
-                          className="btn-gold rounded-xl px-4 py-2.5 text-sm"
-                        >
-                          {reviewSubmitting ? "Envoi en cours..." : "Publier mon avis"}
-                        </button>
-                        {reputation && (
-                          <span className="text-[11px] text-muted">
-                            Aujourd&apos;hui : {reputation.volume.total} avis collectés sur {MIN_REVIEWS}
-                          </span>
-                        )}
+
+                      {/* Sentiment */}
+                      <div className="flex gap-4">
+                        <div className="flex items-center gap-1.5">
+                          <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                          <span className="text-sm font-bold text-green-600">{scrapedRep!.sentiment.positive}%</span>
+                          <span className="text-[10px] text-muted">Positif</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <TrendingDown className="h-3.5 w-3.5 text-red-600" />
+                          <span className="text-sm font-bold text-red-600">{scrapedRep!.sentiment.negative}%</span>
+                          <span className="text-[10px] text-muted">Négatif</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-gray-500">{scrapedRep!.sentiment.neutral}%</span>
+                          <span className="text-[10px] text-muted">Neutre</span>
+                        </div>
                       </div>
-                    </form>
+
+                      {/* Catégories */}
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                        {[
+                          { key: "fiabilite", label: "Fiabilité" },
+                          { key: "confort", label: "Confort" },
+                          { key: "cout", label: "Coût" },
+                          { key: "securite", label: "Sécurité" },
+                          { key: "performance", label: "Performance" },
+                        ].map(({ key, label }) => {
+                          const cat = (scrapedRep!.categories as Record<string, { score: number; label: string }>)[key];
+                          return (
+                            <div key={key} className="flex flex-col items-center rounded-xl bg-line/40 p-2">
+                              <span className="text-sm font-bold text-ink">{cat.score}</span>
+                              <span className="text-[9px] text-muted">{label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Pros / Cons */}
+                      {(scrapedRep!.topPros.length > 0 || scrapedRep!.topCons.length > 0) && (
+                        <div className="flex flex-wrap gap-4">
+                          {scrapedRep!.topPros.length > 0 && (
+                            <div>
+                              <p className="mb-1 text-[10px] font-bold text-green-600">Points forts</p>
+                              <div className="flex flex-wrap gap-1">
+                                {scrapedRep!.topPros.map((p: string) => (
+                                  <span key={p} className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-semibold text-green-700">{p}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {scrapedRep!.topCons.length > 0 && (
+                            <div>
+                              <p className="mb-1 text-[10px] font-bold text-red-600">Points faibles</p>
+                              <div className="flex flex-wrap gap-1">
+                                {scrapedRep!.topCons.map((c: string) => (
+                                  <span key={c} className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-700">{c}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Résumé */}
+                      {scrapedRep!.summary && (
+                        <p className="rounded-xl bg-primary/5 p-3 text-xs text-muted">{scrapedRep!.summary}</p>
+                      )}
+                    </div>
+                  )}
                   </div>
 
                   <div className="mt-6 border-t border-line pt-6">
                     <MarocReputationBlock maroc={reputation?.maroc ?? null} make={car.make} />
-                  </div>
                   </div>
                 </div>
               )}

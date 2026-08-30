@@ -10,58 +10,19 @@ import {
   Search,
   GitCompareArrows,
   Heart,
-  Trash2,
-  Clock,
-  Sparkles,
-  ExternalLink,
+  LogIn,
+  LogOut,
+  UserCircle2,
+  History,
 } from "lucide-react";
-import {
-  getHistory,
-  clearHistory,
-  removeHistory,
-  relativeTime,
-  criteriaTags,
-  type HistoryEntry,
-} from "@/lib/history";
+import { useAuth } from "@/lib/useAuth";
 
 const NAV_ITEMS = [
   { href: "/", label: "Assistant", icon: CarFront },
   { href: "/results", label: "Rechercher", icon: Search },
   { href: "/compare", label: "Comparer", icon: GitCompareArrows },
   { href: "/favorites", label: "Favoris", icon: Heart },
-];
-
-const SUGGESTIONS: HistoryEntry[] = [
-  {
-    id: "__sug1",
-    query: "SUV familial hybride",
-    criteria: { carrosserie: "SUV", motorisation: "Hybride" },
-    resultCount: 0,
-    topResultThumbnail: null,
-    topResultId: null,
-    topResultScore: null,
-    timestamp: 0,
-  },
-  {
-    id: "__sug2",
-    query: "Citadine économique essence",
-    criteria: { carrosserie: "Citadine", motorisation: "Essence" },
-    resultCount: 0,
-    topResultThumbnail: null,
-    topResultId: null,
-    topResultScore: null,
-    timestamp: 0,
-  },
-  {
-    id: "__sug3",
-    query: "Berline automatique diesel",
-    criteria: { carrosserie: "Berline", motorisation: "Diesel", transmission: "Automatique" },
-    resultCount: 0,
-    topResultThumbnail: null,
-    topResultId: null,
-    topResultScore: null,
-    timestamp: 0,
-  },
+  { href: "/history", label: "Historique", icon: History },
 ];
 
 function Brand() {
@@ -82,134 +43,13 @@ function Brand() {
   );
 }
 
-function HistoryCard({
-  entry,
-  onNavigate,
-  onDelete,
-}: {
-  entry: HistoryEntry;
-  onNavigate?: () => void;
-  onDelete: (id: string) => void;
-}) {
-  const tags = criteriaTags(entry.criteria);
-  const isSuggestion = entry.id.startsWith("__sug");
-  const hasThumbnail = !!entry.topResultThumbnail;
-
-  return (
-    <div className="group relative">
-      <Link
-        href={`/results?q=${encodeURIComponent(entry.query)}`}
-        onClick={onNavigate}
-        className="flex gap-3 rounded-xl px-3 py-2.5 transition hover:bg-sidebar-hover"
-      >
-        {/* Thumbnail */}
-        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-sidebar-surface">
-          {hasThumbnail ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={entry.topResultThumbnail!}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <CarFront className="h-5 w-5 text-sidebar-muted/40" />
-            </div>
-          )}
-          {/* Badge score zellige */}
-          {entry.topResultScore != null && entry.topResultScore >= 80 && (
-            <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#6d5dfc] to-[#22a9f0] text-[7px] font-bold text-white shadow-sm">
-              {entry.topResultScore}
-            </div>
-          )}
-        </div>
-
-        {/* Contenu */}
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1">
-            {tags.length > 0 ? (
-              tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-block rounded-full bg-sidebar-hover px-2 py-0.5 text-[9px] font-semibold text-sidebar-accent"
-                >
-                  {tag}
-                </span>
-              ))
-            ) : (
-              <span className="inline-block rounded-full bg-sidebar-hover px-2 py-0.5 text-[9px] font-semibold text-sidebar-accent">
-                {isSuggestion ? "Suggestion" : entry.query}
-              </span>
-            )}
-          </div>
-
-          {/* Ligne du bas : nb résultats + timestamp */}
-          <div className="flex items-center gap-1.5 text-[10px] text-sidebar-muted">
-            {isSuggestion ? (
-              <Sparkles className="h-2.5 w-2.5 text-sidebar-accent" />
-            ) : entry.resultCount > 0 ? (
-              <span>{entry.resultCount} véhicules</span>
-            ) : null}
-            {!isSuggestion && entry.timestamp > 0 && (
-              <>
-                <span>·</span>
-                <Clock className="h-2.5 w-2.5" />
-                <span>{relativeTime(entry.timestamp)}</span>
-              </>
-            )}
-          </div>
-        </div>
-      </Link>
-
-      {/* Bouton supprimer (au hover, pas sur les suggestions) */}
-      {!isSuggestion && (
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            onDelete(entry.id);
-          }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-sidebar-muted/0 opacity-0 transition hover:bg-sidebar-hover hover:text-error group-hover:text-sidebar-muted group-hover:opacity-100"
-          title="Supprimer"
-        >
-          <Trash2 className="h-3 w-3" />
-        </button>
-      )}
-    </div>
-  );
-}
-
 function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const { user, logout } = useAuth();
 
-  useEffect(() => {
-    setHistory(getHistory());
-  }, [pathname]);
-
-  useEffect(() => {
-    const refresh = () => setHistory(getHistory());
-    window.addEventListener("thiqti-history-changed", refresh);
-    window.addEventListener("storage", refresh);
-    return () => {
-      window.removeEventListener("thiqti-history-changed", refresh);
-      window.removeEventListener("storage", refresh);
-    };
-  }, []);
-
-  const handleDelete = (id: string) => {
-    setHistory(removeHistory(id));
-  };
-
-  const handleClear = () => {
-    clearHistory();
-    setHistory([]);
-  };
+  const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-
-  const displayItems = history.length > 0 ? history.slice(0, 3) : SUGGESTIONS;
-  const hasMore = history.length > 3;
 
   return (
     <div className="flex h-full flex-col">
@@ -232,47 +72,39 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
             );
           })}
         </div>
-
-        {/* Section "Reprendre" */}
-        <div className="mt-5">
-          <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-sidebar-muted">
-            {history.length > 0 ? "Reprendre" : "Idées de recherche"}
-          </p>
-          <div className="flex flex-col gap-0.5">
-            {displayItems.map((entry) => (
-              <HistoryCard
-                key={entry.id}
-                entry={entry}
-                onNavigate={onNavigate}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-
-          {/* Lien "Voir tout" ou "Effacer" */}
-          {history.length > 0 && (
-            <div className="mt-1 flex items-center gap-2 px-3">
-              {hasMore && (
-                <Link
-                  href="/results"
-                  onClick={onNavigate}
-                  className="flex items-center gap-1 text-[10px] font-semibold text-sidebar-accent transition hover:underline"
-                >
-                  <ExternalLink className="h-2.5 w-2.5" />
-                  Voir tout
-                </Link>
-              )}
-              <button
-                onClick={handleClear}
-                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-sidebar-muted transition hover:text-error"
-              >
-                <Trash2 className="h-2.5 w-2.5" />
-                Effacer
-              </button>
-            </div>
-          )}
-        </div>
       </nav>
+
+      {/* Auth footer */}
+      <div className="shrink-0 border-t border-sidebar-line px-4 py-4">
+        {user ? (
+          <div className="flex flex-col gap-2">
+            <Link
+              href="/profile"
+              onClick={onNavigate}
+              className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-sidebar-ink transition hover:bg-white/60"
+            >
+              <UserCircle2 className="h-5 w-5 shrink-0 text-primary" />
+              <span className="truncate">{user.fullName || user.email.split("@")[0]}</span>
+            </Link>
+            <button
+              onClick={() => logout()}
+              title="Se déconnecter"
+              className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-sidebar-muted transition hover:bg-white/60 hover:text-error"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Déconnexion</span>
+            </button>
+          </div>
+        ) : (
+          <Link
+            href={loginHref}
+            onClick={onNavigate}
+            className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6d5dfc] to-[#22a9f0] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(109,93,252,0.4)] transition hover:brightness-110"
+          >
+            <LogIn className="h-4 w-4" /> Se connecter
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
@@ -285,6 +117,8 @@ interface AppShellProps {
 export default function AppShell({ sidebar = true, children }: AppShellProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
+  const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
 
   useEffect(() => {
     setOpen(false);
@@ -301,17 +135,27 @@ export default function AppShell({ sidebar = true, children }: AppShellProps) {
             <SidebarInner />
           </aside>
 
-          <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-sidebar-line bg-sidebar-bg px-4 py-3 backdrop-blur-xl lg:hidden">
+          <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-sidebar-line bg-sidebar-bg px-4 pb-3 pt-safe backdrop-blur-xl lg:hidden">
             <Brand />
-            <button onClick={() => setOpen(true)} className="rounded-full border border-sidebar-line p-2 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Ouvrir le menu">
-              <Menu className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {!user && (
+                <Link
+                  href={loginHref}
+                  className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#6d5dfc] to-[#22a9f0] px-3 py-1.5 text-xs font-bold text-white shadow-[0_2px_8px_rgba(109,93,252,0.4)] transition hover:brightness-110"
+                >
+                  <LogIn className="h-3.5 w-3.5" /> Se connecter
+                </Link>
+              )}
+              <button onClick={() => setOpen(true)} className="rounded-full border border-sidebar-line p-2 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Ouvrir le menu">
+                <Menu className="h-5 w-5" />
+              </button>
+            </div>
           </header>
 
           {open && (
             <div className="fixed inset-0 z-50 lg:hidden">
               <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
-                <div className="absolute inset-y-0 left-0 flex w-[260px] flex-col overflow-y-auto bg-sidebar-bg shadow-2xl backdrop-blur-xl">
+                <div className="absolute inset-y-0 left-0 flex w-[260px] flex-col overflow-y-auto bg-sidebar-bg pb-safe shadow-2xl backdrop-blur-xl">
                 <div className="flex items-center justify-between border-b border-sidebar-line px-4 py-3.5">
                   <Brand />
                   <button onClick={() => setOpen(false)} className="rounded-full border border-sidebar-line p-2 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Fermer le menu">
@@ -324,7 +168,7 @@ export default function AppShell({ sidebar = true, children }: AppShellProps) {
           )}
         </>
       )}
-      <div className={`flex-1 ${sidebar ? "pt-14 lg:pt-0 lg:pl-0" : ""}`}>
+      <div className={`flex-1 ${sidebar ? "pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 lg:pl-0" : ""}`}>
         {children}
       </div>
     </div>

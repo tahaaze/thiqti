@@ -3,20 +3,55 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CarFront, Menu, X } from "lucide-react";
+import { CarFront, Menu, X, LogIn, LogOut, UserCircle2 } from "lucide-react";
+import { useAuth } from "@/lib/useAuth";
 
 const NAV_LINKS = [
   { href: "/", label: "Assistant" },
   { href: "/results", label: "Rechercher" },
   { href: "/compare", label: "Comparer" },
   { href: "/favorites", label: "Favoris" },
+  { href: "/history", label: "Historique" },
 ];
 
 export default function MarketingNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  const loginHref =
+    pathname && pathname !== "/"
+      ? `/login?next=${encodeURIComponent(pathname)}`
+      : "/login";
+
+  const AuthButton = (
+    <>
+      {user ? (
+        <div className="hidden items-center gap-2 md:flex">
+          <span className="flex items-center gap-2 rounded-full border border-line bg-white/50 px-3 py-2 text-sm font-semibold text-ink">
+            <UserCircle2 className="h-4 w-4 text-primary" />
+            {user.email.split("@")[0]}
+          </span>
+          <button
+            onClick={() => logout()}
+            title="Se déconnecter"
+            className="rounded-full border border-line bg-white/50 p-2 text-muted hover:text-red-500"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      ) : (
+        <Link
+          href={loginHref}
+          className="hidden items-center gap-1.5 rounded-full bg-gradient-to-r from-[#6d5dfc] to-[#22a9f0] px-4 py-2 text-sm font-bold text-white shadow-[0_4px_16px_rgba(109,93,252,0.4)] transition hover:brightness-110 md:flex"
+        >
+          <LogIn className="h-4 w-4" /> Se connecter
+        </Link>
+      )}
+    </>
+  );
 
   return (
     <nav className="sticky top-0 z-50 px-4 pt-4">
@@ -44,6 +79,7 @@ export default function MarketingNavbar() {
               {link.label}
             </Link>
           ))}
+          {AuthButton}
         </div>
         <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-full border border-line bg-white/50 p-2 text-muted hover:text-ink md:hidden">
           {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -62,6 +98,30 @@ export default function MarketingNavbar() {
                 {link.label}
               </Link>
             ))}
+            <div className="mt-2 border-t border-line pt-2">
+              {user ? (
+                <div className="flex items-center justify-between px-2">
+                  <span className="truncate text-sm font-semibold text-ink">
+                    <UserCircle2 className="mr-1 inline h-4 w-4 text-primary" />
+                    {user.email}
+                  </span>
+                  <button
+                    onClick={() => logout()}
+                    className="rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-red-500"
+                  >
+                    Déconnexion
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href={loginHref}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#6d5dfc] to-[#22a9f0] px-4 py-2 text-sm font-bold text-white"
+                >
+                  <LogIn className="h-4 w-4" /> Se connecter
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}

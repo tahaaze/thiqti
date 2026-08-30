@@ -1,5 +1,5 @@
 const KEY = "thiqti_history";
-const MAX = 4;
+const MAX = 20;
 
 export interface HistoryEntry {
   /** Identifiant unique de l'entrée */
@@ -183,4 +183,24 @@ export function criteriaTags(criteria: HistoryEntry["criteria"]): string[] {
     else tags.push(`${Math.round(max / 1000)}k DH`);
   }
   return tags.slice(0, 3);
+}
+
+/**
+ * Construit l'URL de la page résultats pour une entrée d'historique, à partir
+ * des critères structurés de la conversation, pour afficher exactement les
+ * résultats de cette recherche (et pas une simple recherche texte libre).
+ */
+export function historyEntryRoute(entry: HistoryEntry): string {
+  const params = new URLSearchParams();
+  const c = entry.criteria;
+  if (c.budgetMin != null) params.set("minPrice", String(c.budgetMin));
+  if (c.budgetMax != null) params.set("maxPrice", String(c.budgetMax));
+  if (c.carrosserie) params.set("bodyType", c.carrosserie);
+  if (c.motorisation) params.set("fuel", c.motorisation);
+  if (c.marque) params.set("brand", c.marque);
+  if (c.ville) params.set("city", c.ville);
+  if (c.transmission) params.set("transmission", c.transmission);
+  if (!params.toString()) params.set("q", entry.query);
+  params.set("from", "history");
+  return `/results?${params.toString()}`;
 }
