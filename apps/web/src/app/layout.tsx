@@ -1,8 +1,6 @@
-import dynamic from "next/dynamic";
 import { ToastProvider } from "@/components/Toast";
+import ChatWidgetClient from "@/components/ChatWidgetClient";
 import "./globals.css";
-
-const ChatWidget = dynamic(() => import("@/components/ChatWidget"), { ssr: false });
 
 export const viewport = {
   width: "device-width",
@@ -27,7 +25,7 @@ export default function RootLayout({
             <div className="absolute -bottom-32 left-1/3 h-[420px] w-[420px] rounded-full bg-[#f0a8ff]/15 blur-[130px]" />
           </div>
           <main className="relative z-10">{children}</main>
-          <ChatWidget />
+          <ChatWidgetClient />
         </ToastProvider>
       </body>
     </html>
