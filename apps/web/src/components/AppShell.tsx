@@ -146,7 +146,7 @@ export default function AppShell({ sidebar = true, children }: AppShellProps) {
                   <LogIn className="h-3.5 w-3.5" /> Se connecter
                 </Link>
               )}
-              <button onClick={() => setOpen(true)} className="rounded-full border border-sidebar-line p-2 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Ouvrir le menu">
+              <button onClick={() => setOpen(true)} className="rounded-full border border-sidebar-line p-3 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Ouvrir le menu">
                 <Menu className="h-5 w-5" />
               </button>
             </div>
@@ -155,10 +155,10 @@ export default function AppShell({ sidebar = true, children }: AppShellProps) {
           {open && (
             <div className="fixed inset-0 z-50 lg:hidden">
               <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
-                <div className="absolute inset-y-0 left-0 flex w-[260px] flex-col overflow-y-auto bg-sidebar-bg pb-safe shadow-2xl backdrop-blur-xl">
+                <div className="absolute inset-y-0 left-0 flex w-[80vw] max-w-[280px] flex-col overflow-y-auto bg-sidebar-bg pb-safe shadow-2xl backdrop-blur-xl">
                 <div className="flex items-center justify-between border-b border-sidebar-line px-4 py-3.5">
                   <Brand />
-                  <button onClick={() => setOpen(false)} className="rounded-full border border-sidebar-line p-2 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Fermer le menu">
+                  <button onClick={() => setOpen(false)} className="rounded-full border border-sidebar-line p-3 text-sidebar-muted transition hover:text-sidebar-ink" aria-label="Fermer le menu">
                     <X className="h-5 w-5" />
                   </button>
                 </div>

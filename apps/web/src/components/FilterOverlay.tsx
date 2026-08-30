@@ -65,7 +65,7 @@ export default function FilterOverlay({ open, onClose, activeCount, onReset, chi
             )}
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/10 text-muted transition hover:bg-muted/20 hover:text-ink"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/10 text-muted transition hover:bg-muted/20 hover:text-ink"
             >
               <X className="h-4 w-4" />
             </button>

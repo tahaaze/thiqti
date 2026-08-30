@@ -482,9 +482,9 @@ export default function ChatAssistant({
         })()}
       </div>
 
-      {/* Quick replies — masquées sur mobile ET dans le widget */}
+      {/* Quick replies */}
       {!chatOnly && quickReplies.length > 0 && !searching && !aiLoading && (
-        <div className="hidden border-t border-line px-3 py-2 sm:flex sm:flex-wrap sm:gap-2 sm:px-5 sm:py-3">
+        <div className="flex overflow-x-auto border-t border-line px-3 py-2 sm:flex-wrap sm:gap-2 sm:px-5 sm:py-3">
           {quickReplies.map((label) => {
             const isPrimary = /voir les r.sultats|tous les r.sultats|voir tous|c est bon|c'est bon/i.test(label);
             return (

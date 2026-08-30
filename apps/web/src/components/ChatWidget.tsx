@@ -58,7 +58,7 @@ export default function ChatWidget() {
               </span>
               <button
                 onClick={() => setOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-muted transition hover:text-ink"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition hover:text-ink"
                 aria-label="Fermer"
               >
                 <X className="h-4 w-4" />

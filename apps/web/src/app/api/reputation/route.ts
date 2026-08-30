@@ -342,7 +342,8 @@ export async function GET(request: NextRequest) {
     data.safety = safetyInfoFor(make, model);
     data.maroc = marocBlockFor(make, model);
     return NextResponse.json(data);
-  } catch {
+  } catch (err) {
+    console.error("[reputation] GET error:", err);
     const fallback = insufficientData(getModelKey(make, model));
     fallback.safety = safetyInfoFor(make, model);
     fallback.maroc = marocBlockFor(make, model);

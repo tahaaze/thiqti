@@ -164,7 +164,7 @@ export default function HomePage() {
           <div className={mode === "app" ? "flex min-h-0 flex-1 flex-col" : ""}>
             <ChatAssistant
               onStart={() => setMode("app")}
-              heightClassName={mode === "app" ? "h-full" : "h-[480px] sm:h-[580px] lg:h-[660px]"}
+              heightClassName={mode === "app" ? "h-full" : "h-[380px] sm:h-[480px] md:h-[580px] lg:h-[660px]"}
             />
           </div>
         </div>

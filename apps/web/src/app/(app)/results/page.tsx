@@ -311,14 +311,14 @@ export default function ResultsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/compare" className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-2 text-xs font-medium text-muted transition hover:text-primary">
+            <Link href="/compare" className="flex items-center gap-1.5 rounded-xl border border-line px-3 py-2.5 text-xs font-medium text-muted transition hover:text-primary">
               <GitCompareArrows className="h-3.5 w-3.5" />
               Comparer
             </Link>
-            <button onClick={() => setView("grid")} className={`rounded-xl p-2 transition ${view === "grid" ? "bg-primary/15 text-primary" : "text-muted hover:text-ink"}`}>
+            <button onClick={() => setView("grid")} className={`rounded-xl p-2.5 transition ${view === "grid" ? "bg-primary/15 text-primary" : "text-muted hover:text-ink"}`}>
               <Grid3X3 className="h-4 w-4" />
             </button>
-            <button onClick={() => setView("list")} className={`rounded-xl p-2 transition ${view === "list" ? "bg-primary/15 text-primary" : "text-muted hover:text-ink"}`}>
+            <button onClick={() => setView("list")} className={`rounded-xl p-2.5 transition ${view === "list" ? "bg-primary/15 text-primary" : "text-muted hover:text-ink"}`}>
               <List className="h-4 w-4" />
             </button>
           </div>
@@ -363,7 +363,7 @@ export default function ResultsPage() {
                         <span className="rounded-lg bg-green-500/20 px-2 py-1 text-xs font-medium text-green-600 backdrop-blur">{v.matchPercent}% match</span>
                       ) : null}
                     </div>
-                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2 text-muted backdrop-blur transition hover:text-red-600">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v); }} className="absolute right-2 top-10 rounded-lg bg-black/40 p-2.5 text-muted backdrop-blur transition hover:text-red-600">
                       <FavHeart className={`h-4 w-4 ${favorites.includes(v.id) ? "fill-red-600 text-red-600" : ""}`} />
                     </button>
                     {v.reputation?.verified && (

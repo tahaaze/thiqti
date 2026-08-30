@@ -81,7 +81,7 @@ export default function MarketingNavbar() {
           ))}
           {AuthButton}
         </div>
-        <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-full border border-line bg-white/50 p-2 text-muted hover:text-ink md:hidden">
+        <button onClick={() => setMenuOpen(!menuOpen)} className="rounded-full border border-line bg-white/50 p-3 text-muted hover:text-ink md:hidden">
           {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
@@ -93,7 +93,7 @@ export default function MarketingNavbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${isActive(link.href) ? "bg-brand-tint text-primary" : "text-muted hover:text-ink"}`}
+                className={`rounded-full px-4 py-3 text-sm font-semibold ${isActive(link.href) ? "bg-brand-tint text-primary" : "text-muted hover:text-ink"}`}
               >
                 {link.label}
               </Link>
@@ -107,7 +107,7 @@ export default function MarketingNavbar() {
                   </span>
                   <button
                     onClick={() => logout()}
-                    className="rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-red-500"
+                    className="rounded-full border border-line px-4 py-2 text-xs font-semibold text-red-500"
                   >
                     Déconnexion
                   </button>
