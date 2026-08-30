@@ -246,7 +246,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
     );
 
   const hasEnoughReviews = reputation && reputation.dataAvailable === true;
-  const hasScrapedRep = scrapedRep && scrapedRep.reviewCount > 0;
+  const hasScrapedRep = scrapedRep && scrapedRep.score > 0;
 
   return (
     <div className="min-h-screen px-6 py-8">
@@ -414,7 +414,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                           })
                             .then((r) => r.json())
                             .then((data) => { if (!data.error) setScrapedRep(data); })
-                            .catch(() => {})
+                            .catch((e) => console.error("Scrape error:", e))
                             .finally(() => setLoadingScrape(false));
                         }}
                         className="text-xs font-semibold text-primary hover:underline"
@@ -431,14 +431,19 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                         </div>
                         <div>
                           <p className="text-sm font-bold text-ink">Score / 100</p>
-                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                            scrapedRep!.reliability === "elevee" ? "bg-green-100 text-green-700" :
-                            scrapedRep!.reliability === "moyenne" ? "bg-yellow-100 text-yellow-700" :
-                            "bg-red-100 text-red-700"
-                          }`}>
-                            {scrapedRep!.reliability === "elevee" ? "Fiable" :
-                             scrapedRep!.reliability === "moyenne" ? "Moyen" : "À vérifier"}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              scrapedRep!.reliability === "elevee" ? "bg-green-100 text-green-700" :
+                              scrapedRep!.reliability === "moyenne" ? "bg-yellow-100 text-yellow-700" :
+                              "bg-red-100 text-red-700"
+                            }`}>
+                              {scrapedRep!.reliability === "elevee" ? "Fiable" :
+                               scrapedRep!.reliability === "moyenne" ? "Moyen" : "À vérifier"}
+                            </span>
+                            {scrapedRep!.reviewCount > 0 && (
+                              <span className="text-[10px] text-muted">{scrapedRep!.reviewCount} avis analysés</span>
+                            )}
+                          </div>
                         </div>
                       </div>
 

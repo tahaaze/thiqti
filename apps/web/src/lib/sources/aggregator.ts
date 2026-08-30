@@ -78,6 +78,18 @@ function readBundledSnapshot(): DiskCacheShape | null {
   }
 }
 
+// Pre-parse at module level to avoid re-parsing 1.9MB on every cold start
+let _preParsed: DiskCacheShape | null = null;
+let _preParsedAttempted = false;
+
+function getBundledSnapshot(): DiskCacheShape | null {
+  if (!_preParsedAttempted) {
+    _preParsedAttempted = true;
+    _preParsed = readBundledSnapshot();
+  }
+  return _preParsed;
+}
+
 async function loadAndCache(): Promise<UnifiedCar[]> {
   const cars = await loadMergedCars();
   const fetchedAt = Date.now();
@@ -166,7 +178,7 @@ async function getCars(): Promise<UnifiedCar[]> {
   // Instantane embarque (build) : donnees REELLES disponibles des le demarrage
   // a froid, indispensable en serverless ou le cache disque est absent. Un
   // rafraichissement live est lance en arriere-plan quand c'est possible.
-  const bundled = readBundledSnapshot();
+  const bundled = getBundledSnapshot();
   if (bundled && bundled.cars.length > getFallbackCars().length) {
     void withDedup(loadAndCache).catch(() => {});
     cache = { cars: bundled.cars, fetchedAt: bundled.fetchedAt, liveSources: true };

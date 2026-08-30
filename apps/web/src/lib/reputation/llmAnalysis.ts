@@ -182,7 +182,7 @@ export async function analyzeReviewsLLM(
   reviews: ScrapedReview[]
 ): Promise<LLMReputationResult> {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
-  if (!apiKey || reviews.length === 0) {
+  if (!apiKey) {
     return analyzeReviewsLocal(make, model, reviews);
   }
 
@@ -191,21 +191,21 @@ export async function analyzeReviewsLLM(
     const genAI = new GoogleGenerativeAI(apiKey);
     const llm = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const reviewsText = reviews
-      .slice(0, 20)
-      .map((r, i) => `[${i + 1}] (${r.source}, ${r.rating ?? "?"}/5) ${r.text}`)
-      .join("\n");
+    const reviewsText = reviews.length > 0
+      ? reviews.slice(0, 20)
+          .map((r, i) => `[${i + 1}] (${r.source}, ${r.rating ?? "?"}/5) ${r.text}`)
+          .join("\n")
+      : "(Aucun avis trouvé sur le web pour ce modèle)";
 
-    const prompt = `Tu es un expert automobiles au Maroc. Analyse ces avis pour la ${make} ${model}.
+    const prompt = `Tu es un expert automobiles au Maroc. Évalue la réputation de la ${make} ${model}.
 
-AVIS:
-${reviewsText}
+${reviews.length > 0 ? `AVIS TROUVÉS:\n${reviewsText}` : `Aucun avis n'a été trouvé sur le web. Basé sur ta connaissance du marché automobile marocain, évalue cette voiture.`}
 
 Réponds UNIQUEMENT avec un JSON valide (pas de markdown, pas de commentaire):
 {
-  "score": <nombre 0-100>,
+  "score": <nombre 0-100, note globale>,
   "reliability": "<elevee|moyenne|faible>",
-  "sentiment": { "positive": <%>, "negative": <%>, "neutral": <> },
+  "sentiment": { "positive": <% positif>, "negative": <% négatif>, "neutral": <% neutre> },
   "categories": {
     "fiabilite": { "score": <0-100>, "label": "<Élevée|Moyenne|Faible>" },
     "confort": { "score": <0-100>, "label": "<Élevée|Moyenne|Faible>" },
@@ -215,7 +215,7 @@ Réponds UNIQUEMENT avec un JSON valide (pas de markdown, pas de commentaire):
   },
   "topPros": ["<avantage1>", "<avantage2>", "<avantage3>"],
   "topCons": ["<inconvénient1>", "<inconvénient2>", "<inconvénient3>"],
-  "summary": "<résumé 2-3 phrases en français>"
+  "summary": "<résumé 2-3 phrases en français sur la réputation de ce modèle au Maroc>"
 }`;
 
     const result = await llm.generateContent(prompt);
