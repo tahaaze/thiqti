@@ -123,7 +123,7 @@ export default function FavoritesPage() {
                 <div className="relative h-44 overflow-hidden">
                   <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                   <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute left-2 top-2 flex gap-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span>{v.inventoryType && <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>{v.inventoryType === "new" ? "Neuf" : "Occasion"}</span>}</div>
+                  <div className="absolute left-2 top-2 flex gap-2">{v.inventoryType && <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${v.inventoryType === "new" ? "badge-new" : "badge-used"}`}>{v.inventoryType === "new" ? "Neuf" : "Occasion"}</span>}</div>
                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeFav(v.id); }} className="absolute right-2 top-2 rounded-lg bg-black/40 p-2 text-muted backdrop-blur hover:text-red-600">
                     <Trash2 className="h-4 w-4" />
                   </button>

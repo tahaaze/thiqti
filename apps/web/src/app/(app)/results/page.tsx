@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Search, MapPin, Fuel, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows, ExternalLink, SlidersHorizontal } from "lucide-react";
+import { Search, MapPin, Fuel, Grid3X3, List, Brain, CheckCircle2, AlertTriangle, MessageSquare, X, GitCompareArrows, SlidersHorizontal } from "lucide-react";
 import { ZelligeStar, FavHeart, ThiqtiShield } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import SafetyBadge from "@/components/SafetyBadge";
@@ -350,7 +350,6 @@ export default function ResultsPage() {
                   <div className="relative h-52 overflow-hidden">
                     <CarImage src={v.image} sources={v.photos} alt={v.title} make={v.make} model={v.model} bodyType={v.bodyType} className="h-full w-full object-cover transition group-hover:scale-105" />
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute left-2 top-2"><span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{v.source}</span></div>
                     {v.isDemoData && (
                       <div className="absolute left-2 top-9">
                         <span className="rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-black backdrop-blur">Démo</span>
@@ -428,19 +427,7 @@ export default function ResultsPage() {
                     )}
                   </div>
                 </Link>
-                {v.url && (
-                  <div className="border-t border-line px-5 py-2.5">
-                    <a
-                      href={v.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      Voir sur {v.source || "la source"}
-                    </a>
-                  </div>
-                )}
+
               </div>
             ))}
           </div>

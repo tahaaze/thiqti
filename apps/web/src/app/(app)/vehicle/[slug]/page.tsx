@@ -262,7 +262,6 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                 <CarImage src={mainImg || car.image} sources={car.photos} alt={car.title} make={car.make} model={car.model} bodyType={car.bodyType} className="h-full w-full object-cover" />
                 <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute left-3 top-3 flex gap-2">
-                  <span className="rounded-lg bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">{car.source}</span>
                   {car.inventoryType && (
                     <span className={`rounded-lg px-2 py-1 text-xs font-semibold backdrop-blur ${car.inventoryType === "new" ? "badge-new" : "badge-used"}`}>
                       {car.inventoryType === "new" ? "Neuf" : "Occasion"}
@@ -353,7 +352,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                       Réputation réelle de l&apos;annonce
                     </h2>
                     <p className="mb-3 text-xs text-muted">
-                      Informations vérifiées directement sur {car.source} pour cette annonce précise.
+                      Informations vérifiées par Thiqti pour cette annonce.
                     </p>
                     <div className="mb-4 flex flex-wrap gap-1.5">
                       {car.reputation?.verified && (
@@ -571,12 +570,12 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                       {typeof car.reputation?.rating5 === "number" && car.reputation.rating5 > 0 && (car.reputation.reviews ?? 0) > 0 ? (
                         <>
                           <ZelligeStar className="h-3 w-3 text-amber-600" />
-                          <span>{car.reputation.reviews} avis réels sur {car.source}</span>
+                          <span>{car.reputation.reviews} avis vérifiés</span>
                         </>
                       ) : car.reputation?.verified && typeof car.reputation.views === "number" && car.reputation.views > 0 ? (
                         <>
                           <Eye className="h-3 w-3" />
-                          <span>{car.reputation.views.toLocaleString("fr-FR")} vues réelles sur {car.source}</span>
+                          <span>{car.reputation.views.toLocaleString("fr-FR")} vues</span>
                         </>
                       ) : (reputation.maroc?.tests?.length ?? 0) > 0 ? (
                         <>
@@ -586,7 +585,7 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                       ) : (
                         <>
                           <Info className="h-3 w-3" />
-                          <span>Annonce vérifiée sur {car.source}</span>
+                          <span>Annonce vérifiée par Thiqti</span>
                         </>
                       )}
                     </div>

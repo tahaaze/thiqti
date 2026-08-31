@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, CarFront, ShieldCheck, ArrowRight, MapPin, ExternalLink, LogIn } from "lucide-react";
+import { Sparkles, CarFront, ShieldCheck, ArrowRight, MapPin, LogIn } from "lucide-react";
 import { ZelligeStar, ThiqtiShield } from "@/components/icons";
 import ChatAssistant from "@/components/ChatAssistant";
 import CarImage from "@/components/CarImage";
@@ -70,19 +70,6 @@ function CarCard({ car }: { car: HomeCar }) {
           </div>
         </div>
       </Link>
-      {car.url && (
-        <div className="border-t border-line px-4 py-2.5">
-          <a
-            href={car.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-xs font-semibold text-primary transition hover:text-primary-dark"
-          >
-            <ExternalLink className="h-3 w-3" />
-            Voir sur {car.source || "la source"}
-          </a>
-        </div>
-      )}
     </div>
   );
 }

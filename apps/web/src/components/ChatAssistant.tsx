@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight, ExternalLink, Heart } from "lucide-react";
+import { CarFront, Fuel, Gauge, MapPin, MessageCircle, RefreshCw, Send, Sparkles, ArrowRight, Heart } from "lucide-react";
 import { ThiqtiShield, ZelligeStar } from "@/components/icons";
 import CarImage from "@/components/CarImage";
 import VoiceInput from "@/components/VoiceInput";
@@ -460,20 +460,7 @@ export default function ChatAssistant({
                         </div>
                       </div>
                       </Link>
-                      {car.url && (
-                        <div className="border-t border-line px-3 py-2.5">
-                          <a
-                            href={car.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[11px] font-semibold text-primary transition hover:text-primary-dark"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Voir sur {car.source || "la source"}
-                          </a>
-                        </div>
-                      )}
-                    </div>
+                      </div>
                   ))}
                 </div>
               </>
