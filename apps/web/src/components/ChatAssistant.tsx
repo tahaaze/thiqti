@@ -108,8 +108,8 @@ export default function ChatAssistant({
       results,
       resultLimit,
       quickReplies,
-    }, chatOnly);
-  }, [messages, botState, results, resultLimit, quickReplies, chatOnly]);
+    });
+  }, [messages, botState, results, resultLimit, quickReplies]);
 
   const reqParams = useCallback((state: ChatState) => {
     const req = buildSearchRequest(state);

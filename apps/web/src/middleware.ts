@@ -7,26 +7,42 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(process.env.JWT_SECRET || "dev_secret_change_me");
 }
 
-async function hasValidSession(request: NextRequest): Promise<boolean> {
+async function getSessionPayload(request: NextRequest): Promise<{ sub?: string; emailVerified?: boolean } | null> {
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  if (!token) return false;
+  if (!token) return null;
   try {
-    await jwtVerify(token, getSecret());
-    return true;
+    const { payload } = await jwtVerify(token, getSecret());
+    return { sub: payload.sub as string | undefined, emailVerified: payload.emailVerified as boolean | undefined };
   } catch {
-    return false;
+    return null;
   }
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Bloquer les pages de véhicule si l'utilisateur n'est pas connecté.
-  if (!(await hasValidSession(request))) {
+  const session = await getSessionPayload(request);
+
+  // Pages publiques accessibles sans connexion ni vérification
+  const isPublicPage = pathname === "/" || pathname === "/login" || pathname.startsWith("/api/auth/");
+
+  if (!session) {
+    // Non connecté : bloquer les pages protégées
+    if (!isPublicPage) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.search = "";
+      loginUrl.searchParams.set("next", pathname + request.nextUrl.search);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
+  }
+
+  // Connecté mais email non vérifié : rediriger vers /login (qui affichera l'écran de vérification)
+  if (session.emailVerified === false && !isPublicPage) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
-    loginUrl.search = "";
-    loginUrl.searchParams.set("next", pathname + request.nextUrl.search);
+    loginUrl.searchParams.set("verify", "1");
     return NextResponse.redirect(loginUrl);
   }
 
@@ -34,7 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Gating des pages de détail véhicule (et comparaison/favoris peuvent être
-  // ajoutés ici : "/vehicle/:path*" uniquement pour l'instant).
-  matcher: ["/vehicle/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth/).*)"],
 };

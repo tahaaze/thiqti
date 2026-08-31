@@ -62,9 +62,12 @@ export async function POST(request: NextRequest) {
     const token = await signSessionToken(session);
     const response = NextResponse.json(
       {
-        message: "Compte créé. Vérifiez votre email pour confirmer.",
+        message: mail.ok
+          ? "Compte créé. Vérifiez votre email pour confirmer."
+          : "Compte créé mais l'email n'a pas pu être envoyé. " + (mail.error || ""),
         requiresVerification: true,
         devCode: mail.ok && mail.devCode ? mail.devCode : undefined,
+        emailError: !mail.ok ? mail.error : undefined,
         email: session.email,
       },
       { status: 201 }

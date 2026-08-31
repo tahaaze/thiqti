@@ -1,5 +1,17 @@
-const KEY = "thiqti_history";
+const KEY_ANON = "thiqti_history";
+const KEY_PREFIX = "thiqti_history_";
 const MAX = 20;
+
+let _currentUserId: string | null = null;
+
+/** Change l'utilisateur courant (appelé quand login/logout). */
+export function setHistoryUser(userId: string | null): void {
+  _currentUserId = userId;
+}
+
+function storageKey(): string {
+  return _currentUserId ? `${KEY_PREFIX}${_currentUserId}` : KEY_ANON;
+}
 
 export interface HistoryEntry {
   /** Identifiant unique de l'entrée */
@@ -43,7 +55,7 @@ function makeId(): string {
 export function getHistory(): HistoryEntry[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = window.localStorage.getItem(storageKey());
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -71,7 +83,7 @@ export function getHistory(): HistoryEntry[] {
 
     // Sauvegarder la migration si on a trouvé de l'ancien format
     if (parsed.some((x: unknown) => typeof x === "string")) {
-      window.localStorage.setItem(KEY, JSON.stringify(migrated));
+      window.localStorage.setItem(storageKey(), JSON.stringify(migrated));
     }
 
     return migrated.slice(0, MAX);
@@ -113,7 +125,7 @@ export function addHistory(
 
   if (typeof window !== "undefined") {
     try {
-      window.localStorage.setItem(KEY, JSON.stringify(next));
+      window.localStorage.setItem(storageKey(), JSON.stringify(next));
       window.dispatchEvent(new CustomEvent("thiqti-history-changed"));
     } catch {
       /* stockage indisponible */
@@ -130,7 +142,7 @@ export function removeHistory(id: string): HistoryEntry[] {
   const existing = getHistory().filter((e) => e.id !== id);
   if (typeof window !== "undefined") {
     try {
-      window.localStorage.setItem(KEY, JSON.stringify(existing));
+      window.localStorage.setItem(storageKey(), JSON.stringify(existing));
     } catch {
       /* stockage indisponible */
     }
@@ -144,7 +156,7 @@ export function removeHistory(id: string): HistoryEntry[] {
 export function clearHistory(): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.removeItem(KEY);
+    window.localStorage.removeItem(storageKey());
   } catch {
     /* stockage indisponible */
   }

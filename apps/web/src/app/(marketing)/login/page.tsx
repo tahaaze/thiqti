@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -28,6 +28,7 @@ function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
+  const forceVerify = searchParams.get("verify") === "1";
 
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
@@ -39,6 +40,20 @@ function LoginInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (forceVerify) {
+      setInfo("Votre email n'est pas encore confirmé. Veuillez entrer le code de vérification.");
+      setLoading(true);
+      fetch("/api/auth/me").then(r => r.json()).then(d => {
+        if (d.user?.email) setVerifyEmail(d.user.email);
+        setLoading(false);
+        fetch("/api/auth/resend", { method: "POST" }).then(r => r.json()).then(data => {
+          if (data.devCode) setDevCode(data.devCode);
+        });
+      }).catch(() => setLoading(false));
+    }
+  }, [forceVerify]);
 
   function goAfterAuth() {
     router.push(next);
@@ -73,7 +88,9 @@ function LoginInner() {
         setInfo(
           data.devCode
             ? "Mode dev : aucun email configuré. Votre code est affiché ci-dessous."
-            : `Un code de confirmation a été envoyé à ${data.email}.`
+            : data.emailError
+              ? `Email non envoyé (${data.emailError}). Demandez un nouveau code.`
+              : `Un code de confirmation a été envoyé à ${data.email}.`
         );
         setError(null);
         setLoading(false);
@@ -138,7 +155,7 @@ function LoginInner() {
     }
   }
 
-  const showVerify = verifyEmail !== "";
+  const showVerify = verifyEmail !== "" || forceVerify;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">

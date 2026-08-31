@@ -53,10 +53,12 @@ L'équipe Thiqti
       text,
     });
     if (error) {
+      console.error("[Email] Resend error:", error.message);
       return { ok: false, error: error.message };
     }
-    return { ok: true, previewUrl: data?.id ? undefined : undefined };
+    return { ok: true };
   } catch (e) {
+    console.error("[Email] Send failed:", e);
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 }

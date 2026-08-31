@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { setHistoryUser } from "@/lib/history";
 
 export interface ClientUser {
   id: string;
@@ -23,9 +24,12 @@ export function useAuth() {
     try {
       const res = await fetch("/api/auth/me", { cache: "no-store" });
       const data = await res.json();
-      setUser(data.user || null);
+      const u = data.user || null;
+      setUser(u);
+      setHistoryUser(u?.id ?? null);
     } catch {
       setUser(null);
+      setHistoryUser(null);
     } finally {
       setLoading(false);
     }
@@ -38,6 +42,7 @@ export function useAuth() {
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
+    setHistoryUser(null);
     router.refresh();
   }
 
