@@ -46,7 +46,7 @@ L'équipe Thiqti
 
   try {
     const resend = new Resend(API_KEY);
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM,
       to,
       subject,

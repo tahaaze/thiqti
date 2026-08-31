@@ -34,4 +34,15 @@ copyDir(srcStatic, staticDest);
 console.log(`Copying ${srcPublic} -> ${publicDest}`);
 copyDir(srcPublic, publicDest);
 
+// Copy cars-snapshot.json (read by aggregator at runtime)
+const snapshotSrc = path.join(webDir, "src", "data", "cars-snapshot.json");
+const snapshotDest = path.join(standaloneApp, "src", "data", "cars-snapshot.json");
+if (fs.existsSync(snapshotSrc)) {
+  fs.mkdirSync(path.dirname(snapshotDest), { recursive: true });
+  console.log(`Copying ${snapshotSrc} -> ${snapshotDest}`);
+  fs.copyFileSync(snapshotSrc, snapshotDest);
+} else {
+  console.warn("cars-snapshot.json not found, skipping");
+}
+
 console.log("Static assets copied successfully.");

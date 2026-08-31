@@ -65,7 +65,7 @@ export default function ChatWidget() {
               </button>
             </div>
             <div className="flex-1 min-h-0">
-              <ChatAssistant chatOnly heightClassName="h-full" onClose={() => setOpen(false)} />
+              <ChatAssistant chatOnly onClose={() => setOpen(false)} />
             </div>
           </div>
         </div>

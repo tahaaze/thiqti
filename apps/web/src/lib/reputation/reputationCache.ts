@@ -27,7 +27,7 @@ async function ensureCacheDir(): Promise<void> {
 export async function getCachedReputation(
   make: string,
   model: string,
-  ttlDays = TTL_DAYS_DEFAULT
+  _ttlDays?: number,
 ): Promise<CachedReputation | null> {
   const key = makeKey(make, model);
   const now = new Date();

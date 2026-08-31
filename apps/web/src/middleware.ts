@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   const session = await getSessionPayload(request);
 
   // Pages publiques accessibles sans connexion ni vérification
-  const isPublicPage = pathname === "/" || pathname === "/login" || pathname.startsWith("/api/auth/");
+  const isPublicPage = pathname === "/" || pathname === "/login" || pathname.startsWith("/api/auth/") || pathname.startsWith("/api/pipeline") || pathname.startsWith("/api/search") || pathname.startsWith("/api/reputation");
 
   if (!session) {
     // Non connecté : bloquer les pages protégées

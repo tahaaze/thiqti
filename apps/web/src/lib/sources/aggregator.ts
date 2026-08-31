@@ -18,7 +18,6 @@ import { promises as fs } from "fs";
 import path from "path";
 import { UnifiedCar, InventoryType, inferBodyType } from "./types";
 import { getFallbackCars } from "./fallback";
-import { CARS_SNAPSHOT_FETCHED_AT, CARS_SNAPSHOT_JSON } from "@/data/cars-snapshot";
 import { fetchAuteraCars } from "./autera";
 import { fetchMoteurCars } from "./moteur";
 import { fetchElectroDriveCars } from "./electrodrive";
@@ -68,26 +67,32 @@ async function writeDiskCache(cars: UnifiedCar[], fetchedAt: number): Promise<vo
   }
 }
 
-function readBundledSnapshot(): DiskCacheShape | null {
+async function readBundledSnapshot(): Promise<DiskCacheShape | null> {
   try {
-    const parsed = JSON.parse(CARS_SNAPSHOT_JSON) as DiskCacheShape;
+    const jsonPath = path.join(process.cwd(), "src", "data", "cars-snapshot.json");
+    const raw = await fs.readFile(jsonPath, "utf8");
+    const parsed = JSON.parse(raw) as { fetchedAt: number; cars: UnifiedCar[] };
     if (!Array.isArray(parsed.cars) || parsed.cars.length === 0) return null;
-    return { cars: parsed.cars.map(withInferredBody), fetchedAt: parsed.fetchedAt ?? CARS_SNAPSHOT_FETCHED_AT };
+    return { cars: parsed.cars.map(withInferredBody), fetchedAt: parsed.fetchedAt ?? Date.now() };
   } catch {
     return null;
   }
 }
 
-// Pre-parse at module level to avoid re-parsing 1.9MB on every cold start
-let _preParsed: DiskCacheShape | null = null;
-let _preParsedAttempted = false;
+// Cache le snapshot parsé au démarrage pour éviter de relire à chaque requête
+let _cachedSnapshot: DiskCacheShape | null = null;
+let _snapshotLoading: Promise<DiskCacheShape | null> | null = null;
 
-function getBundledSnapshot(): DiskCacheShape | null {
-  if (!_preParsedAttempted) {
-    _preParsedAttempted = true;
-    _preParsed = readBundledSnapshot();
+async function getBundledSnapshot(): Promise<DiskCacheShape | null> {
+  if (_cachedSnapshot) return _cachedSnapshot;
+  if (!_snapshotLoading) {
+    _snapshotLoading = readBundledSnapshot().then((s) => {
+      _cachedSnapshot = s;
+      _snapshotLoading = null;
+      return s;
+    });
   }
-  return _preParsed;
+  return _snapshotLoading;
 }
 
 async function loadAndCache(): Promise<UnifiedCar[]> {
@@ -178,7 +183,7 @@ async function getCars(): Promise<UnifiedCar[]> {
   // Instantane embarque (build) : donnees REELLES disponibles des le demarrage
   // a froid, indispensable en serverless ou le cache disque est absent. Un
   // rafraichissement live est lance en arriere-plan quand c'est possible.
-  const bundled = getBundledSnapshot();
+  const bundled = await getBundledSnapshot();
   if (bundled && bundled.cars.length > getFallbackCars().length) {
     void withDedup(loadAndCache).catch(() => {});
     cache = { cars: bundled.cars, fetchedAt: bundled.fetchedAt, liveSources: true };

@@ -49,12 +49,10 @@ function InventoryBadge({ type }: { type?: "new" | "used" }) {
 
 export default function ChatAssistant({
   onStart,
-  heightClassName = "h-[560px] lg:h-[640px]",
   chatOnly = false,
-  onClose,
+  onClose, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: {
   onStart?: () => void;
-  heightClassName?: string;
   chatOnly?: boolean;
   onClose?: () => void;
 }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Star, Shield, ThumbsUp, ThumbsDown, AlertTriangle } from "lucide-react";
+import { ChevronDown, ChevronUp, Shield, ThumbsUp, ThumbsDown } from "lucide-react";
 import type { LLMReputationResult } from "@/lib/reputation/types";
 
 function ScoreRing({ score, size = 48 }: { score: number; size?: number }) {

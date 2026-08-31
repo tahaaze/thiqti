@@ -20,19 +20,37 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-md border border-ink bg-surface p-6"
-        style={{ animation: "fade-in 0.2s ease-out" }}
+        className="absolute inset-0 bg-ink/30 backdrop-blur-md"
+        style={{ animation: "fade-in 0.15s ease-out" }}
+        onClick={onClose}
+      />
+      <div
+        className="relative w-full max-w-md overflow-hidden rounded-[22px] border border-white/60 bg-white/55 p-6 shadow-[0_24px_80px_rgba(13,18,48,0.18)] backdrop-blur-xl backdrop-saturate-150"
+        style={{ animation: "slide-up 0.25s ease-out" }}
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">{title}</h2>
-          <button onClick={onClose} className="border border-line p-1 text-muted hover:border-ink hover:text-ink">
-            <X className="h-5 w-5" />
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="font-display text-xl font-bold tracking-tight text-ink">
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/50 bg-white/40 text-muted transition-all hover:border-brand/40 hover:bg-brand/10 hover:text-brand-strong"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
         {children}

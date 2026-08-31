@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 export default function SearchPage({
-  searchParams,
+  searchParams: _searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {

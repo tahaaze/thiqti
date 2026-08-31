@@ -1,6 +1,6 @@
 import type { LLMReputationResult, CachedReputation, ScrapedReview } from "./types";
 import { scrapeAllReviews } from "./scrapeReviews";
-import { analyzeReviewsLLM, analyzeReviewsLocal } from "./llmAnalysis";
+import { analyzeReviewsLLM } from "./llmAnalysis";
 import { getCachedReputation, setCachedReputation, getStaleReputation } from "./reputationCache";
 
 export type { LLMReputationResult, CachedReputation, ScrapedReview };

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Clock, Trash2, CarFront, ExternalLink, MapPin, ArrowRight } from "lucide-react";
+import { Clock, Trash2, CarFront, ArrowRight } from "lucide-react";
 import {
   getHistory,
   clearHistory,
