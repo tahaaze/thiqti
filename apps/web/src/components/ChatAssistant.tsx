@@ -26,6 +26,12 @@ import type {
   ChatMessage,
   ChatCar,
 } from "@/lib/chatSession";
+import {
+  saveChatSession,
+  loadChatSession,
+  clearChatSession,
+  maxMessageId,
+} from "@/lib/chatSession";
 
 function InventoryBadge({ type }: { type?: "new" | "used" }) {
   if (!type) return null;
@@ -69,19 +75,41 @@ export default function ChatAssistant({
     return new Set(loadFavoriteIds());
   });
 
-  // Toujours commencer avec le message d'accueil — la conversation est dans l'historique
+  // Restaurer la session sauvegardée ou commencer avec le message d'accueil
   useEffect(() => {
-    const init = initialMessage();
-    setMessages([{ id: idRef.current++, role: "bot", text: init.text }]);
-    setQuickReplies(init.quickReplies);
-    setBotState(init.state);
-    setResults(null);
-    setResultLimit(4);
+    const saved = loadChatSession();
+    if (saved && saved.messages.length > 0) {
+      setMessages(saved.messages);
+      setBotState(saved.botState);
+      setQuickReplies(saved.quickReplies);
+      setResults(saved.results);
+      setResultLimit(saved.resultLimit);
+      idRef.current = maxMessageId(saved.messages);
+    } else {
+      const init = initialMessage();
+      setMessages([{ id: idRef.current++, role: "bot", text: init.text }]);
+      setQuickReplies(init.quickReplies);
+      setBotState(init.state);
+      setResults(null);
+      setResultLimit(4);
+    }
   }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, results, searching]);
+
+  // Sauvegarder la session à chaque changement d'état
+  useEffect(() => {
+    if (messages.length === 0) return;
+    saveChatSession({
+      messages,
+      botState,
+      results,
+      resultLimit,
+      quickReplies,
+    }, chatOnly);
+  }, [messages, botState, results, resultLimit, quickReplies, chatOnly]);
 
   const reqParams = useCallback((state: ChatState) => {
     const req = buildSearchRequest(state);
@@ -149,6 +177,17 @@ export default function ChatAssistant({
           { id: idRef.current++, role: "bot", text: relaxedText(state, relaxed, expandedBudget) },
         ]);
         setQuickReplies(["Voir plus de résultats", "C'est bon"]);
+      } else {
+        const followUp = state.lang === "darija"
+          ? `هاهي ${list.length} طوموبيلات مطابقة للمعايير ديالك. بغيتي تزيد معايير ولا هاك هذو كفاهم ؟`
+          : `Voici ${list.length} voitures qui correspondent à vos critères. Vous voulez affiner ou ces options vous conviennent ?`;
+        setMessages((prev) => [
+          ...prev,
+          { id: idRef.current++, role: "bot", text: followUp },
+        ]);
+        setQuickReplies(state.lang === "darija"
+          ? ["زيد معايير", "C'est bon"]
+          : ["Affiner", "C'est bon"]);
       }
     } catch {
       if (seq !== searchSeqRef.current) return;
@@ -170,6 +209,7 @@ export default function ChatAssistant({
     setResultLimit(4);
     setSearching(false);
     setMessages([{ id: idRef.current++, role: "bot", text: init.text }]);
+    clearChatSession();
   }, []);
 
   const toggleFavorite = useCallback((car: ChatCar) => {
@@ -483,7 +523,7 @@ export default function ChatAssistant({
       </div>
 
       {/* Quick replies */}
-      {!chatOnly && quickReplies.length > 0 && !searching && !aiLoading && (
+      {quickReplies.length > 0 && !searching && !aiLoading && (
         <div className="flex overflow-x-auto border-t border-line px-3 py-2 sm:flex-wrap sm:gap-2 sm:px-5 sm:py-3">
           {quickReplies.map((label) => {
             const isPrimary = /voir les r.sultats|tous les r.sultats|voir tous|c est bon|c'est bon/i.test(label);
