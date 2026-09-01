@@ -362,7 +362,7 @@ export default function ResultsPage() {
                       ) : null}
                     </div>
                     <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(v); }} className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 ${favorites.includes(v.id) ? "bg-red-500 shadow-[0_4px_16px_rgba(239,68,68,0.4)] scale-110" : "bg-white/80 shadow-[0_2px_12px_rgba(0,0,0,0.1)] hover:bg-white hover:scale-110"} backdrop-blur-sm`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`h-4.5 w-4.5 transition-all duration-200 ${favorites.includes(v.id) ? "fill-white text-white" : "fill-none text-gray-500 hover:text-red-400"}`} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" className={`transition-all duration-200 ${favorites.includes(v.id) ? "fill-white text-white" : "fill-none text-muted hover:text-red-400"}`} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                     </button>
                     {v.reputation?.verified && (
                       <div className="absolute bottom-2 left-2">
