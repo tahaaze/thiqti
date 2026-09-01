@@ -7,9 +7,16 @@ node_modules/
 .next/
 out/
 
+# Runtime cache
+.cache/
+
+# Scratch / debug
+apps/web/_dbcheck.js
+
 # Build
 dist/
 build/
+apps/web/tsconfig.tsbuildinfo
 
 # Environment
 .env
@@ -48,3 +55,5 @@ venv/
 
 # Misc
 *.log
+.vercel
+.env*

@@ -1,4 +1,4 @@
-name: SLEIPNIR CI/CD
+name: Thiqti CI/CD
 
 on:
   push:
@@ -24,14 +24,15 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npx next lint
+        run: npm run lint --workspace=apps/web
 
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npm run typecheck --workspace=apps/web
 
       - name: Build
-        run: npx next build
+        run: npm run build --workspace=apps/web
 
       - name: Test
-        run: npx vitest run
+        run: npm run test --workspace=apps/web
+        # Temporaire : à retirer une fois les tests d'intégration HTTP avec PostgreSQL en place.
         continue-on-error: true

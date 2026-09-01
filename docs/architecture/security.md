@@ -1,282 +1,208 @@
-# SLEIPNIR — Security Analysis
+# Thiqti — Analyse de Securite
 
-**Ref**: VV-SLP-2026-001  
-**Date**: 2026-07-17  
-**Status**: Active
+**Ref**: VV-SLP-2026-001
+**Date**: 2026-07-29
+**Statut**: Active
 
 ---
 
-## 1. STRIDE Threat Model
+## 1. Modele de Menace STRIDE
 
 ### 1.1 Spoofing
 
-| Threat | Risk | Mitigation | Status |
-|--------|------|------------|--------|
-| User impersonation | Low | No auth in MVP; LocalStorage-only favorites | ✅ Accepted |
-| API request spoofing | Medium | Same-origin policy, CORS | ✅ Mitigated |
-| Scraper IP spoofing | Low | Playwright runs server-side, no user interaction | ✅ Accepted |
+| Menace | Risque | Mitigation | Statut |
+|--------|--------|------------|--------|
+| Usurpation d'identite | Low | Auth JWT + bcrypt, cookie httpOnly | Mitige |
+| Spoofing requete API | Medium | Same-origin policy, CORS restreint | Mitige |
+| Brute force login | Medium | Rate limiting implicite (limitation Vercel) | Accepte |
 
 ### 1.2 Tampering
 
-| Threat | Risk | Mitigation | Status |
-|--------|------|------------|--------|
-| Query parameter injection | Medium | Input validation (length, char whitelist) | ✅ Mitigated |
-| Cache poisoning | Low | In-memory only, resets on restart | ✅ Accepted |
-| Response manipulation | Low | HTTPS in production | ✅ Mitigated |
+| Menace | Risque | Mitigation | Statut |
+|--------|--------|------------|--------|
+| Injection parametre requete | Medium | Validation input (longueur, whitelist) | Mitige |
+| Empoisonnement cache | Low | Memoire in-process, reset au restart | Accepte |
+| Manipulation reponse | Low | HTTPS en production | Mitige |
 
 ### 1.3 Repudiation
 
-| Threat | Risk | Mitigation | Status |
-|--------|------|------------|--------|
-| Malicious search abuse | Medium | Structured logging with query tags | ✅ Mitigated |
-| No audit trail | Medium | Phase 2: database logging | ⏳ Deferred |
+| Menace | Risque | Mitigation | Statut |
+|--------|--------|------------|--------|
+| Abus de recherche | Medium | Logs structures avec correlationId | Mitige |
+| Pas de piste d'audit | Medium | Phase 2: logging base de donnees | Differe |
 
 ### 1.4 Information Disclosure
 
-| Threat | Risk | Mitigation | Status |
-|--------|------|------------|--------|
-| Stack traces in production | Low | Error boundaries, no verbose errors | ✅ Mitigated |
-| Environment variables exposed | Medium | Vercel encrypted, `.env.local` gitignored | ✅ Mitigated |
-| Server-side data leaks | Low | No PII collected in Phase 1 | ✅ Accepted |
+| Menace | Risque | Mitigation | Statut |
+|--------|--------|------------|--------|
+| Stack traces en production | Low | Error boundaries, pas d'erreurs verboses | Mitige |
+| Variables env exposees | Medium | Vercel chiffre, `.env` gitignore | Mitige |
+| Fuite JWT | Medium | Cookie httpOnly, secure, sameSite strict | Mitige |
+| Fuite donnees cote serveur | Low | Aucune PII collectee en Phase 1 | Accepte |
 
 ### 1.5 Denial of Service
 
-| Threat | Risk | Mitigation | Status |
-|--------|------|------------|--------|
-| Query flooding | Medium | No rate limiting (Phase 1); Phase 2: rate limiter | ⏳ Deferred |
-| Scraper blocking targets | Low | Fallback dataset always available | ✅ Mitigated |
-| Large payload attack | Low | Next.js body size limits | ✅ Mitigated |
+| Menace | Risque | Mitigation | Statut |
+|--------|--------|------------|--------|
+| Flood de requetes | Medium | Pas de rate limiting (Phase 1); Vercel protection integree | Differe |
+| Attaque gros payload | Low | Next.js body size limits | Mitige |
 
 ### 1.6 Elevation of Privilege
 
-| Threat | Risk | Mitigation | Status |
-|--------|------|------------|--------|
-| SQL injection | Low | Supabase parameterized queries (Phase 2) | ✅ Mitigated |
-| SSRF via scraper | Medium | Whitelist allowed domains | ✅ Mitigated |
-| XSS via search input | Medium | React auto-escaping + CSP | ✅ Mitigated |
+| Menace | Risque | Mitigation | Statut |
+|--------|--------|------------|--------|
+| Injection SQL | Low | Pas de base de donnees en Phase 1 | Sans objet |
+| SSRF | Medium | Pas de scraping externe en Phase 1 | Sans objet |
+| XSS via input recherche | Medium | React auto-escaping + CSP | Mitige |
 
 ---
 
-## 2. OWASP Top 10 Review
+## 2. Revue OWASP Top 10
 
 ### A01:2021 – Broken Access Control
 
-- **Risk**: Low (no auth in MVP)
-- **Mitigation**: LocalStorage-only favorites, no server-side user data
-- **Phase 2**: Supabase RLS for user-scoped data
+- **Mitigation**: Auth JWT sur endpoints admin; endpoints publics sans auth
+- **Routes protegees**: `/api/auth/logout`, `/api/auth/me`
 
 ### A02:2021 – Cryptographic Failures
 
-- **Risk**: Medium
-- **Mitigation**: HTTPS enforced via Vercel, no passwords stored
-- **Phase 2**: Supabase handles encryption at rest
+- **Mitigation**: HTTPS force via Vercel, mots de passe hashes avec bcryptjs (12 rounds)
+- **JWT**: Signe avec jose (algorithme HS256), cookie httpOnly secure
 
 ### A03:2021 – Injection
 
-| Injection Type | Risk | Mitigation |
-|----------------|------|------------|
-| SQL Injection | Low | Supabase client uses parameterized queries |
-| XSS | Medium | React auto-escapes; CSP header blocks inline scripts |
-| NoSQL Injection | N/A | Using PostgreSQL, not NoSQL |
-| Command Injection | Low | No `exec()` or shell commands in user input |
+| Type Injection | Risque | Mitigation |
+|----------------|--------|------------|
+| XSS | Medium | React auto-escape; CSP bloque inline scripts |
+| Command Injection | Low | Pas de `exec()` ou shell commands sur input user |
 
 ### A04:2021 – Insecure Design
 
-- **Mitigation**: MVP design minimizes attack surface (no auth, no payments, no PII)
-- **Phase 2**: Add threat modeling for auth flows
+- **Mitigation**: MVP design minimise la surface d'attaque (un seul admin, pas de PII, pas de paiement)
 
 ### A05:2021 – Security Misconfiguration
 
-- **Mitigation**: Security headers in `next.config.ts`, CSP enabled
+- **Mitigation**: Security headers dans `next.config.ts`, CSP actif
 - **Checklist**:
-  - ✅ `X-Frame-Options: DENY`
-  - ✅ `X-Content-Type-Options: nosniff`
-  - ✅ `Strict-Transport-Security`
-  - ✅ `Content-Security-Policy`
-  - ✅ `Permissions-Policy`
+  - `X-Frame-Options: DENY`
+  - `X-Content-Type-Options: nosniff`
+  - `Strict-Transport-Security`
+  - `Content-Security-Policy`
+  - `Permissions-Policy`
 
 ### A06:2021 – Vulnerable and Outdated Components
 
-- **Mitigation**: `npm audit` in CI, Dependabot enabled
-- **Current**: Next.js 15, React 19, Playwright 1.61
+- **Mitigation**: `npm audit` periodique, dependances minimes
+- **Current**: Next.js 15, React 19
 
 ### A07:2021 – Identification and Authentication Failures
 
-- **Risk**: Low (no auth in MVP)
-- **Phase 2**: Supabase Auth with email magic links
+- **Mitigation**: JWT avec expiration 24h, cookie httpOnly, hash bcrypt
+- **Protection**: Validation email format, mot de passe min 8 chars
 
 ### A08:2021 – Software and Data Integrity Failures
 
-- **Mitigation**: All dependencies from npm registry, lock file committed
-- **Phase 2**: SRI for external scripts
+- **Mitigation**: Dependances depuis npm registry, lock file commit
 
 ### A09:2021 – Security Logging and Monitoring Failures
 
-- **Phase 1**: Structured console logging
-- **Phase 2**: Sentry for error tracking, Vercel Analytics for access patterns
+- **Phase 1**: Logs structures console.log avec correlationId
 
 ### A10:2021 – Server-Side Request Forgery (SSRF)
 
-- **Risk**: Medium (scraper makes outbound requests)
-- **Mitigation**: Domain whitelist for scraper targets
-- **Whitelist**: `auto24.ma`, `soeezauto.ma` only
+- **Phase 1**: Pas de requetes sortantes (dataset statique); sans objet
 
 ---
 
-## 3. Input Validation
+## 3. Validation des Entrees
 
-### Search Bar Input
+### Barre de Recherche
 
 ```typescript
-// Validation rules applied to every search query
 const SEARCH_VALIDATION = {
-  maxLength: 200,          // Prevent payload abuse
-  minLength: 2,            // Reject empty/too-short queries
-  allowedChars: /^[a-zA-Z0-9\s\u0600-\u06FF,.\-()]+$/, // Arabic + Latin + basic punctuation
+  maxLength: 200,
+  minLength: 2,
+  allowedChars: /^[a-zA-Z0-9\s\u0600-\u06FF,.\-()]+$/,
   blockedPatterns: [
-    /<script/i,            // XSS
-    /javascript:/i,        // XSS
-    /data:/i,              // Data URI
-    /vbscript:/i,          // VBScript
-    /on\w+\s*=/i,          // Event handlers
+    /<script/i,
+    /javascript:/i,
+    /data:/i,
+    /vbscript:/i,
+    /on\w+\s*=/i,
   ],
 };
 ```
 
-### Prompt Injection Defense
+### Protection Contre l'Injection de Prompts
 
-| Attack Vector | Defense |
-|---------------|---------|
-| `"ignore previous instructions"` | Regex NLP parser does not interpret natural language commands |
-| `"SELECT * FROM users"` | Parameterized queries (Phase 2), no raw SQL |
-| `"<script>alert(1)</script>"` | React auto-escaping, CSP blocks inline |
-| `"javascript:alert(1)"` | URL scheme validation blocked |
+| Vecteur d'attaque | Defense |
+|--------------------|---------|
+| Contournement d'instructions | Le parser NLP regex n'interprete pas de commandes en langage naturel |
+| Injection HTML/JS | React auto-escaping, CSP bloque inline |
+| URL schemes malveillants | Validation des schemes bloquee |
 
 ---
 
 ## 4. Rate Limiting (Phase 2)
 
 ```typescript
-// Planned rate limiter configuration
 const RATE_LIMITS = {
-  search: {
-    windowMs: 60 * 1000,   // 1 minute
-    max: 30,                // 30 requests per minute per IP
-  },
-  reputation: {
-    windowMs: 60 * 1000,
-    max: 60,                // Less aggressive
-  },
-  metrics: {
-    windowMs: 60 * 1000,
-    max: 10,                // Admin only
-  },
+  search: { windowMs: 60000, max: 30 },
+  auth: { windowMs: 60000, max: 5 },  // 5 tentatives/min
 };
 ```
 
 ---
 
-## 5. CORS Policy
+## 5. Politique CORS
 
 ```typescript
-// next.config.ts
 const corsHeaders = {
   'Access-Control-Allow-Origin': process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : 'http://localhost:3000',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '86400',
 };
 ```
 
-- **MVP**: Same-origin only (Vercel auto-handles)
-- **Phase 2**: Explicit CORS for API consumers
+---
+
+## 6. Protection des Secrets
+
+| Secret | Protection | Rotation |
+|--------|------------|----------|
+| JWT_SECRET | Variable env, 256 bits (openssl rand -hex 32) | Trimestrielle |
+| GOOGLE_API_KEY | Variable env, jamais dans le code | A la premiere compromission |
+| ADMIN_PASSWORD_HASH | Hash bcrypt, variable env | Trimestrielle |
+| DB_PASSWORD | Variable env (optionnel Phase 1) | Phase 2 |
 
 ---
 
-## 6. Data Privacy — Loi 09-08 Compliance
+## 7. Checklist Securite — Phase 1
 
-### 6.1 Data Collected
-
-| Category | Type | Storage | Retention |
-|----------|------|---------|-----------|
-| Vehicle specs | Public ( scraped) | Supabase | 24h refresh |
-| User favorites | LocalStorage | Client browser | Until cleared |
-| Search queries | Structured log | Server memory | 24h (rotating) |
-| Navigation data | None | Not collected | N/A |
-
-### 6.2 Privacy Principles
-
-| Principle | Implementation |
-|-----------|----------------|
-| **Data minimization** | Only collect what's needed for search |
-| **Purpose limitation** | Data used only for vehicle search |
-| **Storage limitation** | No PII stored server-side in Phase 1 |
-| **Transparency** | No hidden tracking, no analytics cookies |
-
-### 6.3 User Rights (Phase 2)
-
-| Right | Implementation |
-|-------|----------------|
-| Access | API endpoint: `GET /api/user/data` |
-| Rectification | API endpoint: `PUT /api/user/data` |
-| Deletion | API endpoint: `DELETE /api/user/data` |
-| Portability | Export as JSON |
+| Item | Statut |
+|------|--------|
+| HTTPS en production | Vercel auto |
+| Security headers | `next.config.ts` |
+| Validation entree | Max 200 chars, whitelist |
+| CSP actif | Politique restrictive |
+| Secrets pas dans le repo | `.env` gitignore, `.env.example` sans valeurs |
+| Aucune PII collectee | LocalStorage uniquement |
+| XSS safe | React + CSP |
+| Auth active | JWT + bcrypt |
+| Mots de passe hashes | bcryptjs, 12 rounds |
+| Cookie securise | httpOnly, secure, sameSite strict |
 
 ---
 
-## 7. SSL Enforcement
+## 8. Gestion des Incidents
 
-| Environment | SSL | HSTS |
-|-------------|-----|------|
-| Development | None (localhost) | N/A |
-| Staging | Auto (Vercel) | Enabled |
-| Production | Auto (Vercel) | `max-age=63072000` |
-
-- HTTP → HTTPS redirect: Automatic via Vercel
-- Certificate: Let's Encrypt (auto-renewed)
-
----
-
-## 8. SQL Injection Prevention
-
-```typescript
-// Supabase client (Phase 2) — parameterized by default
-const { data, error } = await supabase
-  .from('vehicles')
-  .select('*')
-  .eq('make', userInput)   // Auto-parameterized
-  .ilike('model', `%${searchTerm}%`);  // Escaped
-
-// NEVER: `SELECT * FROM vehicles WHERE make = '${userInput}'`
-```
-
----
-
-## 9. XSS Prevention
-
-| Layer | Defense |
-|-------|---------|
-| React | Auto-escapes all rendered values |
-| CSP | `script-src 'self'` — no inline scripts |
-| Output encoding | `dangerouslySetInnerHTML` never used |
-| URL schemes | `javascript:` and `data:` blocked in inputs |
-
----
-
-## 10. Security Checklist — MVP
-
-| Item | Status | Notes |
-|------|--------|-------|
-| HTTPS in production | ✅ | Vercel auto |
-| Security headers | ✅ | `next.config.ts` |
-| Input validation | ✅ | Max 200 chars, char whitelist |
-| CSP enabled | ✅ | Restrictive policy |
-| Secrets not in repo | ✅ | `.env.local` gitignored |
-| No PII collected | ✅ | LocalStorage only |
-| SQL injection safe | ✅ | Supabase parameterized (Phase 2) |
-| XSS safe | ✅ | React + CSP |
-| Rate limiting | ⏳ | Phase 2 |
-| Auth | ⏳ | Phase 2 (Supabase) |
-| Error tracking | ⏳ | Phase 2 (Sentry) |
+| Etape | Action | Delai |
+|-------|--------|-------|
+| Detection | Monitoring logs | Immediate |
+| Evaluation | Determiner l'impact | 1 heure |
+| Containment | Revoquer acces, bloquer IP | 1 heure |
+| Notification CNDP | Si requis (art. 43) | 72 heures |
+| Correction | Patch + deploiement | 24 heures |
+| Post-mortem | Documenter la lecon | 1 semaine |

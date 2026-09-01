@@ -36,7 +36,7 @@ CREATE INDEX idx_vehicles_make ON vehicles(make);
 CREATE INDEX idx_vehicles_body ON vehicles(body_type);
 CREATE INDEX idx_vehicles_fuel ON vehicles(fuel_type);
 CREATE INDEX idx_vehicles_price ON vehicles(price_mad);
-CREATE INDEX idx_vehicles_embedding ON ivfflat_ops(embedding vector_cosine_ops) WITH (lists = 10);
+CREATE INDEX idx_vehicles_embedding ON vehicles USING ivfflat (embedding vector_cosine_ops) WITH (lists = 10);
 
 -- Full text search
 ALTER TABLE vehicles ADD COLUMN search_vector tsvector;
@@ -90,6 +90,14 @@ CREATE TABLE reputation_scores (
 );
 
 -- ===================== USERS (via Supabase Auth) =====================
+-- En local (docker compose) le schema auth n'existe pas : on cree une table
+-- minimale pour que la foreign key soit valide. En production (Supabase) le
+-- schema et la table existent deja et l'instruction ne fait rien.
+CREATE SCHEMA IF NOT EXISTS auth;
+CREATE TABLE IF NOT EXISTS auth.users (
+  id UUID PRIMARY KEY
+);
+
 CREATE TABLE user_favorites (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,

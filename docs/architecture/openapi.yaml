@@ -1,0 +1,535 @@
+openapi: 3.1.0
+info:
+  title: Thiqti API
+  description: API de recherche intelligente de vehicules neufs au Maroc
+  version: 1.0.0
+  contact:
+    name: Thiqti Team
+    url: https://thiqti.ma
+
+servers:
+  - url: http://localhost:3000
+    description: Developpement
+  - url: https://thiqti.vercel.app
+    description: Production
+
+paths:
+  /api/search:
+    get:
+      summary: Rechercher des vehicules
+      description: Recherche intelligente avec NLP et matching TOPSIS
+      operationId: searchVehicles
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Requete en langage naturel (francais, arabe, darija)
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 200
+            example: SUV essence moins de 300000 DH
+      responses:
+        "200":
+          description: Resultats de recherche avec classement
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - results
+                  - total
+                  - criteria
+                  - sources
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ScoredCar"
+                    description: Vehicules classes par score TOPSIS
+                  total:
+                    type: integer
+                    description: Nombre total de resultats
+                    example: 12
+                  criteria:
+                    $ref: "#/components/schemas/SearchCriteria"
+                    nullable: true
+                  sources:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                    example:
+                      "Donnees Maroc": 196
+              example:
+                results:
+                  - id: "src_abc123"
+                    title: "Dacia Duster Essential 2024"
+                    make: "Dacia"
+                    model: "Duster"
+                    year: 2024
+                    price: 219000
+                    priceFormatted: "219 000 DH"
+                    km: 0
+                    fuel: "Essence"
+                    transmission: "Manuelle"
+                    bodyType: "SUV"
+                    city: "Casablanca"
+                    image: "https://..."
+                    score: 91
+                    source: "Donnees Maroc"
+                    url: "#"
+                    matchScore: 0.87
+                    matchPercent: 87
+                    explanations:
+                      - label: "Budget"
+                        value: "219 000 DH"
+                        impact: "positive"
+                        reason: "Dans votre budget"
+                      - label: "Carrosserie"
+                        value: "SUV"
+                        impact: "positive"
+                        reason: "Correspond a votre recherche"
+                    meetsBudget: true
+                    meetsBody: true
+                    meetsFuel: true
+                total: 12
+                criteria:
+                  carrosserie: "SUV"
+                  motorisation: null
+                  transmission: null
+                  marque: null
+                  budgetMin: 0
+                  budgetMax: 300000
+                  budgetTolerance: 0.15
+                  ville: null
+                  anneeMin: null
+                  anneeMax: null
+                  kmMax: null
+                  intent:
+                    - "SUV"
+                    - "essence"
+                sources:
+                  "Donnees Maroc": 196
+        "400":
+          description: Requete invalide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/reputation:
+    get:
+      summary: Obtenir le score de reputation d'un modele
+      operationId: getReputation
+      parameters:
+        - name: make
+          in: query
+          required: true
+          schema:
+            type: string
+            example: Dacia
+        - name: model
+          in: query
+          required: true
+          schema:
+            type: string
+            example: Duster
+      responses:
+        "200":
+          description: Donnees de reputation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReputationData"
+        "400":
+          description: Parametres manquants
+    post:
+      summary: Ajouter un avis utilisateur
+      operationId: addReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - make
+                - model
+                - text
+                - score
+              properties:
+                make:
+                  type: string
+                model:
+                  type: string
+                text:
+                  type: string
+                score:
+                  type: number
+                  minimum: 0
+                  maximum: 10
+                sentiment:
+                  type: string
+                  enum: [positive, negative, neutral]
+      responses:
+        "200":
+          description: Reputation mise a jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReputationData"
+
+  /api/auth/login:
+    post:
+      summary: Authentification administrateur
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@thiqti.ma
+                password:
+                  type: string
+                  format: password
+                  example: "********"
+      responses:
+        "200":
+          description: Connexion reussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    enum: [true]
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                description: Cookie httpOnly JWT (thiqti_session)
+        "401":
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Authentification non configuree
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/auth/logout:
+    post:
+      summary: Deconnexion administrateur
+      operationId: logout
+      responses:
+        "200":
+          description: Deconnexion reussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    enum: [true]
+
+  /api/auth/me:
+    get:
+      summary: Verifier la session active
+      operationId: checkSession
+      responses:
+        "200":
+          description: Session valide
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: admin@thiqti.ma
+                  role:
+                    type: string
+                    example: admin
+        "401":
+          description: Non authentifie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: "Message d'erreur descriptif"
+
+    UnifiedCar:
+      type: object
+      required:
+        - id
+        - title
+        - make
+        - model
+        - year
+        - price
+        - priceFormatted
+        - km
+        - fuel
+        - transmission
+        - bodyType
+        - city
+        - source
+        - score
+      properties:
+        id:
+          type: string
+          example: "src_abc123"
+        title:
+          type: string
+          example: "Dacia Duster Essential 2024"
+        make:
+          type: string
+          example: "Dacia"
+        model:
+          type: string
+          example: "Duster"
+        year:
+          type: integer
+          example: 2024
+        price:
+          type: integer
+          example: 219000
+        priceFormatted:
+          type: string
+          example: "219 000 DH"
+        km:
+          type: integer
+          example: 0
+          description: Toujours 0 pour les vehicules neufs (Phase 1)
+        fuel:
+          type: string
+          enum: [Diesel, Essence, Hybride, Electrique]
+        transmission:
+          type: string
+          enum: [Manuelle, Automatique]
+        bodyType:
+          type: string
+          enum: [SUV, Berline, Citadine, Compacte, Crossover, Utilitaire, Monospace, Pickup, Coupe]
+        city:
+          type: string
+          example: "Casablanca"
+        image:
+          type: string
+          format: uri
+        source:
+          type: string
+          example: "Donnees Maroc"
+        sourceUrl:
+          type: string
+          format: uri
+        url:
+          type: string
+          format: uri
+        score:
+          type: number
+          example: 91
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    ScoredCar:
+      allOf:
+        - $ref: "#/components/schemas/UnifiedCar"
+        - type: object
+          required:
+            - matchScore
+            - matchPercent
+            - explanations
+            - meetsBudget
+            - meetsBody
+            - meetsFuel
+          properties:
+            matchScore:
+              type: number
+              example: 0.87
+            matchPercent:
+              type: integer
+              example: 87
+            explanations:
+              type: array
+              items:
+                $ref: "#/components/schemas/MatchExplanation"
+            meetsBudget:
+              type: boolean
+            meetsBody:
+              type: boolean
+            meetsFuel:
+              type: boolean
+
+    MatchExplanation:
+      type: object
+      required:
+        - label
+        - value
+        - impact
+        - reason
+      properties:
+        label:
+          type: string
+          example: "Budget"
+        value:
+          type: string
+          example: "219 000 DH"
+        impact:
+          type: string
+          enum: [positive, negative, neutral]
+        reason:
+          type: string
+          example: "Dans votre budget"
+
+    SearchCriteria:
+      type: object
+      properties:
+        carrosserie:
+          type: string
+          nullable: true
+          example: "SUV"
+        motorisation:
+          type: string
+          nullable: true
+          example: "Essence"
+        transmission:
+          type: string
+          nullable: true
+        marque:
+          type: string
+          nullable: true
+          example: "Dacia"
+        budgetMin:
+          type: integer
+          nullable: true
+        budgetMax:
+          type: integer
+          nullable: true
+        budgetTolerance:
+          type: number
+          example: 0.15
+        ville:
+          type: string
+          nullable: true
+        anneeMin:
+          type: integer
+          nullable: true
+        anneeMax:
+          type: integer
+          nullable: true
+        kmMax:
+          type: integer
+          nullable: true
+        intent:
+          type: array
+          items:
+            type: string
+          example: ["SUV", "essence"]
+
+    ReputationData:
+      type: object
+      required:
+        - modelKey
+        - totalReviews
+        - avgScore
+        - windowMonths
+        - lastUpdated
+        - positiveTags
+        - negativeTags
+        - categories
+        - excerpts
+        - volume
+        - reliability
+        - reliabilityLabel
+      properties:
+        modelKey:
+          type: string
+          example: "dacia_duster"
+        totalReviews:
+          type: integer
+          example: 42
+        avgScore:
+          type: number
+          nullable: true
+          example: 7.5
+        windowMonths:
+          type: integer
+          example: 18
+        lastUpdated:
+          type: string
+          format: date
+        positiveTags:
+          type: array
+          items:
+            type: string
+          example: ["Confort", "Fiabilite"]
+        negativeTags:
+          type: array
+          items:
+            type: string
+          example: ["Consommation elevee"]
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              score:
+                type: number
+                nullable: true
+        excerpts:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+              sentiment:
+                type: string
+                enum: [positive, negative, neutral]
+              score:
+                type: number
+        volume:
+          type: object
+          properties:
+            total:
+              type: integer
+            positive:
+              type: integer
+            negative:
+              type: integer
+            neutral:
+              type: integer
+        reliability:
+          type: string
+          enum: [elevee, moyenne, faible]
+        reliabilityLabel:
+          type: string

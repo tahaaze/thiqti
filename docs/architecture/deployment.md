@@ -1,49 +1,41 @@
-# SLEIPNIR — Deployment Architecture
+# Thiqti — Architecture de Deploiement
 
 **Ref**: VV-SLP-2026-001  
-**Date**: 2026-07-17  
+**Date**: 2026-07-29  
 **Status**: Active
 
 ---
 
-## 1. Deployment Diagram
+## 1. Diagramme de Deploiement (Phase 1)
 
 ```mermaid
 graph TB
-    subgraph "Users"
-        U1[🌐 Browser]
-        U2[📱 Mobile Browser]
+    subgraph "Utilisateurs"
+        U1[" Navigateur"]
+        U2[" Mobile Navigateur"]
     end
 
-    subgraph "Vercel (Primary Host)"
+    subgraph "Vercel (Hebergement Principal)"
         direction TB
         VER[Next.js 15 App]
-        VER --> API["API Routes<br>/api/search<br>/api/reputation<br>/api/metrics"]
-        VER --> STATIC["Static Assets<br>/_next/static/*"]
-        VER --> SSR["SSR Pages<br>/results<br>/vehicle/[slug]"]
+        VER --> APP["Pages<br>/ /results /vehicle /compare"]
+        VER --> API["API Routes<br>/api/search<br>/api/reputation"]
+        VER --> STATIC["Assets statiques<br>/_next/static/*"]
     end
 
-    subgraph "Data Layer"
+    subgraph "Couche Donnees"
         direction TB
-        DB[(PostgreSQL 16<br>pgvector)]
-        CACHE[("In-Memory Cache<br>TTL 5min")]
+        CACHE[("Cache In-Memory<br>TTL 10min + cache disque")]
+        CATALOG["Agregateur 7 sources live<br>Autera, Moteur, ElectroDrive,<br>AutoHall, Auto24, Avito, Moteur-Neuf"]
+        FALLBACK["Fallback offline<br>196 vehicules demo<br>(secours uniquement)"]
     end
 
-    subgraph "Data Collection"
-        CRON["Playwright Scraper<br>Cron: daily 03:00 UTC"]
-        A24[Auto24.ma API]
-        SZ[SoeezAuto.ma]
-        FB[Fallback Dataset]
-    end
-
-    subgraph "External Services"
-        CDN["Google CDN<br>Vehicle Images"]
-        EMAIL["Email Service<br>(Phase 2)"]
+    subgraph "Services Externes"
+        CDN["Google CDN<br>Images vehicules"]
     end
 
     subgraph "Monitoring"
-        LOGS["Structured Logs<br>console.log"]
-        METRICS["Metrics Counter<br>/api/metrics"]
+        LOGS["Logs<br>console.log"]
     end
 
     U1 -->|HTTPS| VER
@@ -60,43 +52,39 @@ graph TB
 
 ---
 
-## 2. Environment Matrix
+## 2. Matrice d'Environnements
 
 | Aspect | Development | Staging | Production |
 |--------|-------------|---------|------------|
-| **URL** | `localhost:3000` | `thiqti-staging.vercel.app` | `thiqti.vercel.app` |
-| **Branch** | `main` | `develop` | `main` (tagged release) |
-| **Node** | 20.x | 20.x | 20.x |
-| **Database** | Local Docker (`thiqti-db`) | Supabase Pro | Supabase Pro |
-| **Cache** | In-memory | In-memory | In-memory |
-| **SSL** | None (local) | Vercel auto | Vercel auto |
-| **Playwright** | Manual run | Scheduled daily | Scheduled daily 03:00 UTC |
-| **Logs** | Console | Vercel Function Logs | Vercel Function Logs |
-| **Error Tracking** | Console | Console | Console (Sentry Phase 2) |
-| **Rate Limiting** | None | None | None (Phase 2) |
-| **CDN** | Local `/public` | Google CDN | Google CDN |
+| URL | `localhost:3000` | `thiqti-staging.vercel.app` | `thiqti.vercel.app` |
+| Branch | `fix/cdc-compliance` | `develop` | `main` (tagged) |
+| Node | 20.x | 20.x | 20.x |
+| Base de donnees | Sources live + fallback secours | Sources live + fallback secours | Sources live + fallback secours |
+| Cache | In-memory TTL 10min + cache disque | In-memory TTL 10min + cache disque | In-memory TTL 10min + cache disque |
+| SSL | None (local) | Vercel auto | Vercel auto |
+| Collecte donnees | Auto (sources live, a la demande) + fallback secours | Auto (sources live) + fallback secours | Auto (sources live) + fallback secours |
+| Logs | Console | Vercel Function Logs | Vercel Function Logs |
+| CDN | Local /public | Google CDN | Google CDN |
 
 ---
 
-## 3. Secrets Management
+## 3. Gestion des Secrets
 
-### Required Environment Variables
+### Variables d'Environnement Requises
 
-| Secret | Where Used | Phase | Vercel Project Setting |
-|--------|-----------|-------|------------------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | DB connection | Phase 2 | ✅ |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client-side DB | Phase 2 | ✅ |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-side DB | Phase 2 | ✅ (server only) |
-| `AUTO24_API_KEY` | Data collection | Phase 1 | ✅ |
-| `PLAYWRIGHT_BROWSERS_PATH` | Scraper | Phase 2 | ✅ |
+| Secret | Usage | Source |
+|--------|-------|--------|
+| `GOOGLE_API_KEY` | Google Custom Search (images) | Google Cloud Console |
+| `GOOGLE_CX` | Google Custom Search Engine ID | Google Cloud Console |
+| `DB_PASSWORD` | Mot de passe PostgreSQL | Defini par l'equipe (optionnel Phase 1) |
 
-### Secrets Rules
+### Regles de Secrets
 
-1. **Never** commit `.env*` files (`.gitignore` enforced)
-2. **Never** expose `SUPABASE_SERVICE_ROLE_KEY` to client bundle
-3. Use `NEXT_PUBLIC_*` prefix only for truly public values
-4. Rotate keys quarterly
-5. Use Vercel Environment Variables (encrypted at rest)
+1. **Ne jamais** commit `.env*` fichiers (`.gitignore` enforce)
+2. Utiliser `.env.example` comme template (commit)
+3. Copier vers `.env` avec valeurs reelles (gitignore)
+4. Faire tourner les cles API si compromise
+5. Utiliser Vercel Environment Variables (chiffrees au repos) en production
 
 ---
 

@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   postgres:
     image: pgvector/pgvector:pg16
@@ -7,7 +6,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_USER: thiqti
-      POSTGRES_PASSWORD: thiqti_secret
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-thiqti_secret}
       POSTGRES_DB: thiqti
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -36,7 +35,7 @@ services:
     ports:
       - "7700:7700"
     environment:
-      MEILI_MASTER_KEY: thiqti_meili_key
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-changeme}
       MEILI_ENV: development
     volumes:
       - meilidata:/meili_data

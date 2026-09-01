@@ -1,190 +1,174 @@
-# SLEIPNIR Runbook
+# Thiqti — Runbook
 
-## Service Overview
+## Vue d'Ensemble du Service
 
-SLEIPNIR is an AI-powered vehicle search engine for Morocco. It aggregates listings from Auto24.ma, SoeezAuto.ma, Avito.ma, and a fallback dataset, then ranks results using NLP parsing + TOPSIS multi-criteria matching. An e-reputation barometer provides sentiment scores per vehicle model.
+Thiqti est un moteur de recommandation automobile pour le Maroc. Il agrege de **vraies annonces marocaines** (prix MAD, km, photos et reponsabilite reels) depuis sept sources nationales, analyse les requetes via NLP rule-based, et classe via matching TOPSIS multicritere.
 
-**Key components:**
-- **Next.js 15 app** — Frontend + API routes (search, reputation)
-- **NestJS API** — Vehicle CRUD, reputation service (Phase 2)
-- **Python AI** — FastAPI for reputation analysis (Phase 2)
-- **PostgreSQL** — Vehicle storage + pgvector (Phase 2)
+**Composants cles (Phase 1):**
+- **Next.js 15** — Frontend + API routes (search)
+- **Sources reelles marocaines** — Autera.ma (API), Moteur.ma (annonces), ElectroDrive.ma (API), AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf (Auto24.ma et Avito.ma autorisees par ecrit, voir ADR-005)
+- **Catalogue hors-ligne** — fallback.ts (196 vehicules) utilise QU'EN SECOURS
+- **Cache** — In-memory (Map + TTL 10min) + cache disque
 
-## Architecture Diagram
+## Architecture
 
-See `docs/architecture/deployment.md` for the full Mermaid diagram.
+Voir `docs/architecture/deployment.md` pour le diagramme Mermaid.
 
 ```
-Browser → Next.js (Vercel) → API Routes → In-Memory Cache
-                ↓                              ↓
-        SSR Pages                     Aggregator → Sources
-                                          ↓
-                                   [Auto24 | SoeezAuto | Avito | Fallback]
+Browser -> Next.js -> API Routes -> Aggregator -> Cache (TTL 10min)
+                                              |
+                              +---------------|---------------+
+                              | Autera.ma (API JSON, occasion) |
+                              | Moteur.ma (annonces, occasion) |
+                              | ElectroDrive.ma (API, neuf EV) |
+                              | AutoHall.ma (annonces, occasion)|
+                              | Auto24.ma (annonces, occasion) |
+                              | Avito.ma (annonces, occasion)  |
+                              | Moteur-Neuf (annonces, neuf)   |
+                              | fallback.ts (catalogue secours)|
+                              +-------------------------------+
 ```
 
-## Common Issues and Fixes
-
-### Dev Server Won't Start
-
-**Symptom:** `npm run dev` fails or port 3000 in use.
+## Demarrage Rapide
 
 ```bash
-# Kill process on port 3000
-netstat -ano | findstr :3000
-taskkill /PID <pid> /F
-
-# Reinstall dependencies
-rm -rf node_modules
+git clone https://github.com/your-org/thiqti.git
+cd thiqti
 npm install
+cp .env.example .env
+# IMPORTANT : `next dev` ne charge QUE .env situe dans le repertoire de l'app.
+# Copier aussi vers apps/web/.env :
+cp .env apps/web/.env
 
-# Try again
+# 1) Base de donnees reelle (avis, concessionnaires, offres) : Docker + PostgreSQL
+#    Demarre le conteneur et applique schema.sql + seed.sql automatiquement.
+docker compose up -d postgres
+
+# 2) (Optionnel) Regenerer les photos reelles par modele depuis Wikimedia Commons
+#    Deja fait : les URLs sont dans apps/web/scripts/image-cache.json.
+#    npx tsx apps/web/scripts/fetch-images.ts
+
+# 3) Les sources marocaines (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma,
+#    Auto24.ma, Avito.ma, Moteur-Neuf) sont gratuites et sans cle. Aucune
+#    configuration requise. Auto24.ma et Avito.ma sont autorisees par ecrit
+#    (voir ADR-005, section "Mise a jour").
+
 npm run dev
 ```
 
-### Build Errors
+## Lancement en production (standalone)
 
-**Symptom:** `npm run build` fails with TypeScript errors.
+`next start` echoue sur ce projet ; utiliser le serveur standalone genere par le build.
 
-```bash
-# Check types first
-npx tsc --noEmit -p apps/web/tsconfig.json
+```powershell
+# Build
+npm run build -w apps/web
 
-# Fix lint issues
-npm run lint
-
-# Then rebuild
-npm run build
+# Lancer (les variables .env sont chargees via --env-file ; le standalone ne
+# charge PAS .env automatiquement)
+node --env-file=.env apps/web/.next/standalone/apps/web/server.js
 ```
 
-### Data Collection Failures
+`Start-Process`/`Start-Job` sont tues quand la session PowerShell se termine.
+Pour un serveur **persistant** (survit aux sessions, redemarrage automatique),
+lancer ce script dans un PowerShell WMI-detache (niveau utilisateur, pas d'admin) :
 
-**Symptom:** Search returns only fallback data, no live scraping results.
+```powershell
+$ps = @'
+$ErrorActionPreference = "SilentlyContinue"
+Set-Location "C:\Users\user\Documents\GitHub\thiqti"
+$env:HOSTNAME = "0.0.0.0"
+$env:PORT = "3000"
+while ($true) {
+  Add-Content -Path "C:\Users\user\Documents\GitHub\thiqti\server.log" -Value ("[serverloop] starting " + (Get-Date -Format "HH:mm:ss"))
+  node --env-file="C:\Users\user\Documents\GitHub\thiqti\.env" "apps/web/.next/standalone/apps/web/server.js" 2>&1 | Out-File -FilePath "C:\Users\user\Documents\GitHub\thiqti\server.log" -Append
+  Add-Content -Path "C:\Users\user\Documents\GitHub\thiqti\server.log" -Value ("[serverloop] exited " + (Get-Date -Format "HH:mm:ss"))
+  Start-Sleep -Seconds 5
+}
+'@
+$enc = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($ps))
+Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = "powershell -NoProfile -EncodedCommand $enc" }
+```
+
+En dev, `npm run dev` charge `.env` automatiquement (clé incluse) et reste
+stable tant que le terminal reste ouvert.
+
+## Problemes Courants
+
+### Le serveur Dev ne demarre pas
+
+**Symptome:** `npm run dev` echoue ou port 3000 occupe.
+
+```bash
+netstat -ano | findstr :3000
+taskkill /PID <pid> /F
+npm run dev
+```
+
+### La compilation TypeScript echoue
+
+**Symptome:** Erreurs TypeScript lors du build.
+
+```bash
+npm run typecheck
+```
+
+Corriger les erreurs avant de commit.
+
+### Le serveur retourne "Donnees Maroc" au lieu des vraies annonces
+
+**Symptome:** `/api/search` renvoie uniquement les vehicules du catalogue (fallback) au lieu des annonces reelles d'Autera/Moteur/ElectroDrive.
 
 **Causes:**
-- Source websites changed HTML structure (selector breakage)
-- Rate limiting / IP blocking
-- Network timeout
+- En `npm run dev`, Next ne charge que `apps/web/.env`. Copier `.env` vers `apps/web/.env`.
+- En standalone, le serveur ne charge pas `.env` : lancer avec `node --env-file=.env ...`
+- Une source est temporairement indisponible (ex. ElectroDrive.ma est instable : 503/timeout). Le systeme est resilient : les autres sources continuent, et si TOUTES echouent, le catalogue de secours est servi.
+- Moteur.ma peut bloquer les requetes trop rapides (changer d'User-Agent ou ralentir). Le scraping est non officiel : si le HTML change, la source renvoie une liste vide sans casser le reste.
 
-**Fixes:**
-1. Check source site manually — verify pages load
-2. Run Playwright scraper in debug mode:
-   ```bash
-   npx playwright test --headed
-   ```
-3. If blocked, increase delay between requests in collector files
-4. Fallback dataset always works — users still get results
+**Solution:** relancer le build apres toute modification des fichiers `apps/web/src/lib/sources/*.ts`, puis le serveur standalone avec `--env-file`, ou le dev avec `apps/web/.env`.
 
-### TOPSIS Returns NaN Scores
+### Pas de resultats de recherche
 
-**Symptom:** Match percentages show as NaN or 0.
+**Symptome:** Page de resultats vide.
 
-**Cause:** All vehicles have identical values in a dimension (division by zero in normalization).
+**Causes:**
+- Filtres trop restrictifs
+- Toutes les sources live sont vides ET le catalogue de secours ne contient pas de correspondance
 
-**Fix:** Already handled — `normalize()` returns 0.5 when min equals max. If recursing, check that the vehicle array is not empty before ranking.
+**Solution:** Verifier le flux `/api/search` (sources : Autera.ma, Moteur.ma, ElectroDrive.ma). Si toutes les sources renvoient une liste vide, le catalogue de 196 vehicules prend le relais. Essayer une recherche plus large (ex: "Toyota" au lieu de "Toyota Corolla 2022 essence").
 
-### Memory Leak in Production
+## Maintenance
 
-**Symptom:** Vercel function memory usage climbs steadily.
+### Sources marocaines (aggregation)
 
-**Cause:** In-memory cache (`cachedAllCars`) never clears in long-running functions.
+| Source | Type | Methode | Fichier |
+|--------|------|---------|---------|
+| Autera.ma | Occasion, verifiee | API JSON (`/api/listings`) | `apps/web/src/lib/sources/autera.ts` |
+| Moteur.ma | Occasion (115 000+) | Scraping HTML leger (15 pages de recherche) | `apps/web/src/lib/sources/moteur.ts` |
+| ElectroDrive.ma | Neuf electrique/hybride | API JSON (`action=search&limit=50`) | `apps/web/src/lib/sources/electrodrive.ts` |
+| AutoHall.ma | Occasion | Scraping HTML leger | `apps/web/src/lib/sources/autohall.ts` |
+| Auto24.ma | Occasion (autorisee 2026-08-12) | API HTML leger | `apps/web/src/lib/sources/auto24.ts` |
+| Avito.ma | Occasion (autorisee 2026-08-12) | Scraping HTML leger | `apps/web/src/lib/sources/avito.ts` |
+| Moteur-Neuf | Neuf | Scraping HTML leger | `apps/web/src/lib/sources/moteur-neuf.ts` |
 
-**Fix:** Vercel serverless functions restart automatically. For persistent issues, add a `MAX_CACHE_SIZE` limit or switch to Redis (Phase 2).
+Chaque annonce porte sa **reputation reelle** et un **lien de contact direct**. Moteur.ma charge la **fiche detail de chaque annonce** en parallele : nom du vendeur, anciennete (« Vendeur depuis ... »), note /5 et nombre d'avis reels, telephone `tel:`, WhatsApp `wa.me`, page d'annonce. En production reelle : ~440 vehicules, 100 % avec reputation et lien de contact, ~90 % avec telephone + WhatsApp. Si Moteur.ma change son HTML, adapter les regex dans `moteur.ts` (`parseCard`, `fetchDetail`).
 
-## Health Checks
+### Mettre a jour le catalogue de secours
 
-### Quick Check
+1. Editer `apps/web/src/lib/sources/fallback.ts`
+2. Ajouter/modifier les entrees vehicles
+3. Verifier le format (tous les champs requis)
+4. Commiter avec message descriptif
 
-```bash
-# API responds
-curl http://localhost:3000/api/search?q=test
+## Monitoring
 
-# Reputation endpoint
-curl http://localhost:3000/api/reputation?make=Toyota&model=Corolla
-```
+| Aspect | Methode |
+|--------|---------|
+| Sante | `GET /api/health` (status, uptime, version, count) |
+| Erreurs | Vercel Function Logs |
+| Performance | Timing dans les logs |
 
-### Vercel Production
+## Securite
 
-```
-GET https://thiqti.vercel.app/api/search?q=SUV
-```
-
-Expected: JSON with `results` array, `total` count, `sources` breakdown.
-
-### Docker Services
-
-```bash
-docker-compose ps
-
-# Expected: postgres (healthy), redis (healthy), meilisearch (running)
-```
-
-## Scaling Notes
-
-| Load | Action |
-|------|--------|
-| < 100 searches/day | Free tier, no changes needed |
-| ~1,000 searches/day | Upgrade Vercel to Pro ($20/mo) |
-| ~10,000 searches/day | Add Supabase Pro ($25/mo), CDN caching |
-| 50,000+ searches/day | Edge functions, Redis cache, DB read replicas |
-
-**Current capacity:** In-memory cache handles ~500 concurrent users comfortably.
-
-## Rollback Procedure
-
-### Vercel (Primary)
-
-1. Go to Vercel Dashboard → Deployments
-2. Find the last working deployment
-3. Click "Promote to Production"
-4. Instant rollback, zero downtime
-
-### Database (Phase 2)
-
-```bash
-# Restore from Supabase backup
-# Dashboard → Database → Backups → Restore to point-in-time
-```
-
-### Scraper Failure
-
-1. Disable broken collector by commenting it out in `apps/web/src/lib/sources/aggregator.ts`
-2. Fallback dataset continues to serve results
-3. Fix the collector and redeploy
-
-## Emergency Contacts
-
-| Role | Name | Contact |
-|------|------|---------|
-| Lead Developer | Adam Chouikh | [Insert contact] |
-| Backend Engineer | Mohamed Taha Ait Ouahammi | [Insert contact] |
-| Frontend Engineer | Younes Boumalek | [Insert contact] |
-| Supervisor | [Insert name] | [Insert contact] |
-
-## On-Call Playbook
-
-### P1: Site Down
-
-1. Check Vercel status: `https://vercel-status.com`
-2. Check deployment logs in Vercel Dashboard
-3. If Vercel is down — wait (out of our control)
-4. If our code broke — rollback to previous deployment
-
-### P2: Search Returns Empty Results
-
-1. Test API directly: `curl /api/search?q=SUV`
-2. Check server logs for `[Sources]` errors
-3. If all sources failed, fallback dataset should still work
-4. If fallback is missing, check `apps/web/src/lib/sources/fallback.ts`
-
-### P3: Slow Response Times
-
-1. Check if cache is warm (first request after cold start is slower)
-2. Monitor `/api/metrics` endpoint if available
-3. If persistent, check for N+1 queries or unbounded data fetching
-
-### P4: Wrong Rankings
-
-1. Test with a simple query: `curl /api/search?q=SUV diesel`
-2. Check NLP parsing: verify `criteria` in response
-3. Check TOPSIS weights in `apps/web/src/lib/matching.ts`
-4. Verify vehicle data quality in fallback dataset
+- Ne jamais commit `.env`
+- La `GOOGLE_API_KEY` est visible dans l'historique git — REVOQUER dans Google Cloud Console

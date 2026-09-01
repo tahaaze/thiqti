@@ -11,7 +11,7 @@
 
 SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain, développée dans le cadre d'un stage chez Volund Ventures par 2 étudiants.
 
-**Phase 1 MVP** : moteur de recherche en langage naturel, classement multicritère TOPSIS avec explicabilité, baromètre d'e-réputation et comparateur de véhicules. Le système agrège les données depuis 4 sources (Auto24.ma, SoeezAuto.ma, Avito.ma, dataset fallback) et indexe **170+ véhicules**.
+**Phase 1 MVP** : moteur de recherche en langage naturel, classement multicritère TOPSIS avec explicabilité, baromètre d'e-réputation et comparateur de véhicules. Le système agrège les données en temps réel depuis **7 sources live marocaines** (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf ; Auto24.ma et Avito.ma autorisées par écrit le 2026-08-12, ADR-005) et indexe **438 véhicules** au moment de la soutenance. Un catalogue hors-ligne de **196 véhicules de démonstration** (jeu de données fictif, marqué `isDemoData`) sert de filet de secours et n'est pas une source de données réelle.
 
 **Positionnement** : le premier moteur de recherche automobile au Maroc combinant NLP, matching adaptatif et réputation agrégée.
 
@@ -33,21 +33,37 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 ## 3. Architecture Technique
 
 ```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Next.js 15  │────▶│  NLP Engine  │────▶│ TOPSIS Ranker│
-│  + React 19  │     │ (regex/NLP)  │     │  (multicritère)│
-└──────────────┘     └──────────────┘     └──────────────┘
-       │                                         │
-       ▼                                         ▼
-┌──────────────┐                         ┌──────────────┐
-│  PostgreSQL   │                         │   Results    │
-│  (Phase 2)    │                         │ + explication│
-└──────────────┘                         └──────────────┘
-       ▲                                         │
-       │           ┌──────────────┐              │
-       └───────────│   Playwright  │◀─────────────┘
-                   │  (scraping)   │
-                   └──────────────┘
+                    ┌──────────────────────────────────────────────┐
+                    │  Sources live marocaines (fetch au besoin)    │
+                    │  - Moteur.ma (scraping HTML natif, 383)       │
+                    │  - ElectroDrive.ma (API JSON, 50)             │
+                    │  - Autera.ma (API JSON, 5)                    │
+                    └──────────────────────────────────────────────┘
+                                      │
+                                      ▼
+                    ┌──────────────────────────────────────────────┐
+                    │   Cache (mémoire TTL 10 min + disque)        │
+                    │   .cache/thiqti-cars.json                    │
+                    └──────────────────────────────────────────────┘
+                                      │  si 0 résultat live
+                                      ▼
+               ┌──────────────────────────────────────────────────┐
+               │  Catalogue démo hors-ligne (196 véhicules)       │
+               │  marqué isDemoData — bandeau « non garanti »      │
+               └──────────────────────────────────────────────────┘
+                                      │
+        ┌─────────────────────────────┼─────────────────────────────┐
+        ▼                             ▼                             ▼
+┌──────────────┐            ┌──────────────┐            ┌──────────────┐
+│  Next.js 15  │           │  NLP Engine  │           │ TOPSIS Ranker│
+│  + React 19  │───────────▶│ (regex/NLP)  │──────────▶│  (multicritère)│
+└──────────────┘            └──────────────┘            └──────────────┘
+        │                                                    │
+        ▼                                                    ▼
+┌──────────────┐                                    ┌──────────────┐
+│ PostgreSQL   │                                    │   Results    │
+│  (Phase 2)   │                                    │ + explication│
+└──────────────┘                                    └──────────────┘
 ```
 
 | Couche | Technologie | Choix justifié |
@@ -55,7 +71,7 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 | Frontend | Next.js 15 + TypeScript + Tailwind CSS | SSR pour SEO, React 19, CSS utility-first |
 | API | Next.js API Routes | Monolithe simplifié pour MVP |
 | Base de données | PostgreSQL 16 + pgvector | Recherche vectorielle prête pour Phase 2 |
-| Collecte | Playwright | Gestion des sites SPA (Avito, Avito) |
+| Collecte | Fetch natif Node.js + APIs JSON | Scraping HTML léger (Moteur.ma) + API JSON (ElectroDrive.ma, Autera.ma) ; cache mémoire + disque |
 | Matching | TOPSIS | Algorithme MCDM standard, interprétable |
 | NLP | Regex + dictionnaires | Zéro dépendance externe, latence < 10ms |
 
@@ -65,7 +81,8 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 
 ### 4.1 Fonctionnalités livrées
 
-- **170+ véhicules indexés** depuis 4 sources (Auto24, SoeezAuto, Avito, Fallback)
+- **438 véhicules indexés** depuis 3 sources live marocaines (Moteur.ma, ElectroDrive.ma, Autera.ma)
+- **Catalogue de démonstration** : 196 véhicules neufs hors-ligne, clairement marqués `isDemoData` (jeu fictif non garanti, jamais compté comme source réelle)
 - **NLP en français** : extraction de marque, modèle, budget, carrosserie, motorisation, ville, année, kilométrage
 - **TOPSIS avec explicabilité** : chaque résultat inclut un score et les raisons du classement
 - **Baromètre d'e-réputation** : seuil de fiabilité à 30 avis, 6 catégories (confort, consommation, fiabilité, etc.)
@@ -80,10 +97,10 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 | Métrique | Valeur |
 |----------|--------|
 | Latence NLP | < 10 ms |
-| Latence matching | < 50 ms (170 véhicules) |
+| Latence matching | < 50 ms (438 véhicules) |
 | Coût infrastructure MVP | **$0.00/mois** (Vercel Free) |
-| Sources actives | 4 (Auto24, SoeezAuto, Avito, Fallback) |
-| Tests unitaires | Vitest + Playwright |
+| Sources actives | 7 live (Autera.ma, Moteur.ma, ElectroDrive.ma, AutoHall.ma, Auto24.ma, Avito.ma, Moteur-Neuf) + catalogue démo hors-ligne en secours (`isDemoData`) |
+| Tests unitaires | Vitest |
 | Pipeline CI/CD | GitHub Actions → Vercel |
 
 ---
@@ -92,10 +109,10 @@ SLEIPNIR est une plateforme IA de recherche automobile pour le marché marocain,
 
 | Difficulté | Impact | Résolution |
 |-----------|--------|------------|
-| **Avito SPA** (Single Page Application) | Scraping impossible en HTTP simple | Playwright pour le rendu côté client |
+| **Sites d'annonces (Auto24, Avito)** | Non validés initialement (cahier des charges §7.3) ; **autorisés par écrit le 2026-08-12** (encadrant Y. Boumalek / direction Z. Sabti, ADR-005 amendé) | Sources autorisées et actives dans l'agrégateur ; SoeezAuto reste rejetée |
 | **Déduplication** entre sources | Véhicules en double avec prix/année différents | Clé composite `{make}_{model}_{year}_{price}` + merge images |
 | **Google Custom Search API** | Pas de recherche image en gratuit | Images CDN autoevolution + placeholders par marque |
-| **Normalisation des scores** | Formats de prix/km différents par source | Pipeline de normalisation (`normalize.ts`) avec tolérance |
+| **Normalisation des scores** | Formats de prix/km différents par source | Pipeline de normalisation centralisé dans `types.ts` (`normalizeBrand`, `formatPriceDH`) avec tolérance |
 
 ---
 

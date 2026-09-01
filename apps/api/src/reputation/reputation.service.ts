@@ -28,43 +28,58 @@ export class ReputationService {
 
   async computeScore(vehicleId: string): Promise<ReputationScore> {
     const reviews = await this.getReviews(vehicleId);
-    const avgReviewScore =
+    const avgRating =
       reviews.length > 0
-        ? reviews.reduce((sum, r) => sum + (Number(r.score) || 0), 0) / reviews.length
-        : 50;
+        ? reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / reviews.length
+        : 0;
 
-    const historyScore = 80 + Math.random() * 15;
-    const mechanicalScore = 75 + Math.random() * 20;
-    const priceValueScore = 70 + Math.random() * 25;
+    const roundedAvg = avgRating > 0 ? Math.round(avgRating * 10) / 10 : 0;
 
-    const overall = (
-      historyScore * 0.3 +
-      mechanicalScore * 0.3 +
-      avgReviewScore * 10 * 0.25 +
-      priceValueScore * 0.15
-    ).toFixed(1);
+    const topPros = this.topTags(reviews, "pros");
+    const topCons = this.topTags(reviews, "cons");
+
+    let reliability: string | null = null;
+    if (reviews.length > 0) {
+      if (roundedAvg >= 7) reliability = "fiable";
+      else if (roundedAvg >= 4) reliability = "moyen";
+      else reliability = "insuffisant";
+    }
 
     const existing = await this.scoreRepo.findOne({ where: { vehicle_id: vehicleId } });
 
     if (existing) {
-      existing.overall = Number(overall);
-      existing.history = Number(historyScore.toFixed(1));
-      existing.mechanical = Number(mechanicalScore.toFixed(1));
-      existing.reviews = Number((avgReviewScore * 10).toFixed(1));
-      existing.price_value = Number(priceValueScore.toFixed(1));
-      existing.analysis = `Based on ${reviews.length} reviews. Overall: ${overall}/100.`;
+      existing.avg_rating = roundedAvg;
+      existing.total_reviews = reviews.length;
+      existing.reliability = reliability;
+      existing.top_pros = topPros;
+      existing.top_cons = topCons;
       return this.scoreRepo.save(existing);
     }
 
     const score = this.scoreRepo.create({
       vehicle_id: vehicleId,
-      overall: Number(overall),
-      history: Number(historyScore.toFixed(1)),
-      mechanical: Number(mechanicalScore.toFixed(1)),
-      reviews: Number((avgReviewScore * 10).toFixed(1)),
-      price_value: Number(priceValueScore.toFixed(1)),
-      analysis: `Based on ${reviews.length} reviews. Overall: ${overall}/100.`,
+      avg_rating: roundedAvg,
+      total_reviews: reviews.length,
+      reliability,
+      top_pros: topPros,
+      top_cons: topCons,
     });
     return this.scoreRepo.save(score);
+  }
+
+  private topTags(reviews: Review[], field: "pros" | "cons"): string[] {
+    const counts = new Map<string, number>();
+    for (const review of reviews) {
+      const items = field === "pros" ? review.pros : review.cons;
+      if (!items) continue;
+      for (const item of items) {
+        const key = item.trim();
+        if (key) counts.set(key, (counts.get(key) || 0) + 1);
+      }
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([tag]) => tag);
   }
 }

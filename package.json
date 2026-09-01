@@ -1,17 +1,29 @@
 {
   "name": "thiqti",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/api\" \"npm run dev -w apps/ai\"",
+    "dev": "npm run dev -w apps/web",
+    "dev:api": "npm run start:dev -w apps/api",
     "build": "npm run build -w apps/web && node copy-static.js",
-    "start": "node apps/web/.next/standalone/server.js",
+    "start": "node apps/web/.next/standalone/apps/web/server.js",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/api",
+    "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/api",
+    "test": "npm run test -w apps/web && npm run test -w apps/api",
+    "test:watch": "npm run test:watch -w apps/web",
+    "test:coverage": "npm run test:coverage -w apps/web && npm run test:coverage -w apps/api",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "typescript": "^5.5.0"
+    "next": "^15.5.22",
+    "pg": "^8.12.0",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
   }
 }

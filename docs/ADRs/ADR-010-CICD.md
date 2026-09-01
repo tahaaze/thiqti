@@ -1,49 +1,40 @@
 # ADR-010: CI/CD
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Mohamed Taha Ait Ouahammi, Younes Boumalek
-**Réf**: VV-SLP-2026-001
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-Le pipeline CI/CD doit garantir la qualité du code et automatiser le déploiement.
+Thiqti doit garantir la qualite du code avant deploiement: verification TypeScript, lint, build, et tests.
 
-## Décision
+## Options Considerees
 
-### Phase 1: GitHub Actions (gratuit)
+### Option A (rejetee): GitHub Actions custom (Docker build + tests + scan securite)
 
-```yaml
-# .github/workflows/ci.yml
-on: [push, pull_request]
-jobs:
-  lint:
-    - npm run lint (ESLint)
-    - npm run typecheck (TypeScript strict)
-  build:
-    - npm run build
-  test:
-    - (aucun framework de test configuré en Phase 1)
-```
+- **Avantages**: Controle total, etapes customisees, scan securite (Trivy)
+- **Inconvenients**: Configuration complexe, temps d'execution long, cout compute
+- **Motif du rejet**: Surdimensionne; les scans de securite sont inutiles sans base de donnees ni API externe
 
-### Checks obligatoires
+### Option B (rejetee): Husky + lint-staged + pre-commit hooks
 
-| Check | Outil | Bloquant |
-|-------|-------|----------|
-| Lint | ESLint (next/core-web-vitals) | Oui |
-| Type check | `tsc --noEmit` | Oui |
-| Build | `next build` | Oui |
-| Tests | (none Phase 1) | Non |
+- **Avantages**: Verification immediate avant commit, pas de boucle CI longue
+- **Inconvenients**: Contournable (--no-verify), pas de verification centralisee, pas de gate de deploiement
+- **Motif du rejet**: Ne remplace pas une CI; les developpeurs peuvent contourner les hooks; pas de trace des verifications
 
-### Déploiement
+### Option C (retenue): GitHub Actions minimal + Vercel auto-deploy
 
-| Environnement | Déclencheur | Action |
-|---------------|-------------|--------|
-| Preview | Pull request | Vercel Preview |
-| Production | Push main | Vercel Production |
+- **CI**: `npm run typecheck` + `npm run lint` sur chaque PR (ubuntu-latest, Node 20)
+- **CD**: Vercel auto-deploy sur chaque push (branche = preview, main = production)
+- **Gate**: Pipeline CI doit passer pour merger; Vercel Checks bloque si build echoue
 
-## Conséquences
+## Decision
 
-- Le lint + typecheck bloquent les merges cassés
-- Pas de tests unitaires en Phase 1 (reporté Phase 2)
-- Le build vérifie que le code compile proprement
+GitHub Actions (typecheck + lint) comme gate de PR, Vercel auto-deploy pour le CD.
+
+## Consequences
+
+- **Positif**: Zero cout (GitHub Actions gratuit), deploiement automatique, gate de qualite minimal
+- **Negatif**: Pas de tests end-to-end, pas de scan de securite automatise
+- **Risque**: Si `npm run typecheck` echoue sur un commit non lie au changement, le developeur peut etre bloque; mitigation: `tsconfig.json` strict mais avec `skipLibCheck: true`

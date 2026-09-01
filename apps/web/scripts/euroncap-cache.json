@@ -1,0 +1,3444 @@
+{
+  "generatedAt": "2026-08-05T14:01:04.081Z",
+  "source": "Euro NCAP (euroncap.com/api/CarListRoute) + NHTSA (api.nhtsa.gov)",
+  "entries": [
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "stars": 2,
+      "ratingYear": 2017,
+      "className": "Roadster",
+      "source": "euroncap",
+      "id": "0652"
+    },
+    {
+      "make": "Ford",
+      "model": "Ka+",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0658"
+    },
+    {
+      "make": "Volvo",
+      "model": "S90",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0659"
+    },
+    {
+      "make": "Volvo",
+      "model": "V90",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0659pm"
+    },
+    {
+      "make": "Audi",
+      "model": "Q5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1106"
+    },
+    {
+      "make": "Citroën",
+      "model": "C3",
+      "stars": 4,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0661"
+    },
+    {
+      "make": "FIAT",
+      "model": "500",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0662"
+    },
+    {
+      "make": "Toyota",
+      "model": "C-HR+",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1206"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Discovery",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0664"
+    },
+    {
+      "make": "Nissan",
+      "model": "Micra",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1188"
+    },
+    {
+      "make": "FIAT",
+      "model": "Doblo",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0666"
+    },
+    {
+      "make": "BMW",
+      "model": "5 Series",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1032"
+    },
+    {
+      "make": "BMW",
+      "model": "6 Series",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0667pm"
+    },
+    {
+      "make": "Škoda",
+      "model": "Kodiaq",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1074"
+    },
+    {
+      "make": "MINI",
+      "model": "Countryman",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1069"
+    },
+    {
+      "make": "Suzuki",
+      "model": "Swift",
+      "stars": 3,
+      "ratingYear": 2024,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1036"
+    },
+    {
+      "make": "Opel",
+      "model": "Insignia",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0672"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Arteon",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0673"
+    },
+    {
+      "make": "Hyundai",
+      "model": "i30",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0674"
+    },
+    {
+      "make": "SEAT",
+      "model": "Ibiza",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0932"
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "Stelvio",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0676"
+    },
+    {
+      "make": "Honda",
+      "model": "Civic",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0945"
+    },
+    {
+      "make": "Kia",
+      "model": "Rio",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0678"
+    },
+    {
+      "make": "Kia",
+      "model": "Stonic",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0678pm"
+    },
+    {
+      "make": "MAZDA",
+      "model": "CX-5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1204"
+    },
+    {
+      "make": "Opel",
+      "model": "Ampera-e",
+      "stars": 4,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0680"
+    },
+    {
+      "make": "Ford",
+      "model": "Fiesta",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0681"
+    },
+    {
+      "make": "Opel",
+      "model": "Karl",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0682"
+    },
+    {
+      "make": "Renault",
+      "model": "Koleos",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0684"
+    },
+    {
+      "make": "Opel",
+      "model": "Grandland X",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0685"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "C-Class Cabriolet",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0686"
+    },
+    {
+      "make": "Kia",
+      "model": "Picanto",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0687"
+    },
+    {
+      "make": "Jeep",
+      "model": "Compass",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1218"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Range Rover Velar",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0689"
+    },
+    {
+      "make": "FIAT",
+      "model": "Punto",
+      "stars": 0,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0690"
+    },
+    {
+      "make": "Opel",
+      "model": "Crossland X",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0691"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Polo",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0890"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "T-Roc",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1114"
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Eclipse Cross",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1133"
+    },
+    {
+      "make": "Citroën",
+      "model": "C3 Aircross",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0696"
+    },
+    {
+      "make": "Škoda",
+      "model": "Karoq",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0697"
+    },
+    {
+      "make": "SEAT",
+      "model": "Arona",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0942"
+    },
+    {
+      "make": "Volvo",
+      "model": "XC60",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0699"
+    },
+    {
+      "make": "Ford",
+      "model": "Grand C-MAX",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0701"
+    },
+    {
+      "make": "Ford",
+      "model": "C-MAX",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0701pm"
+    },
+    {
+      "make": "Subaru",
+      "model": "Impreza",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1058"
+    },
+    {
+      "make": "Subaru",
+      "model": "XV",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0704pm"
+    },
+    {
+      "make": "Jaguar",
+      "model": "E-Pace",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0705"
+    },
+    {
+      "make": "Porsche",
+      "model": "Cayenne",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1201"
+    },
+    {
+      "make": "MG",
+      "model": "ZS",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0707"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1126"
+    },
+    {
+      "make": "BMW",
+      "model": "X4",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0708pm"
+    },
+    {
+      "make": "Hyundai",
+      "model": "KONA",
+      "stars": 4,
+      "ratingYear": 2023,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1051"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "X-Class",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "0710"
+    },
+    {
+      "make": "DS",
+      "model": "7 Crossback",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0711"
+    },
+    {
+      "make": "Dacia",
+      "model": "Duster",
+      "stars": 3,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1075"
+    },
+    {
+      "make": "Toyota",
+      "model": "Aygo",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0713"
+    },
+    {
+      "make": "Toyota",
+      "model": "Yaris",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1174"
+    },
+    {
+      "make": "Jaguar",
+      "model": "F-Pace",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0716"
+    },
+    {
+      "make": "Kia",
+      "model": "Stinger",
+      "stars": 5,
+      "ratingYear": 2017,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0717"
+    },
+    {
+      "make": "Citroën",
+      "model": "e-Mehari",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0718"
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "Giulietta",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0719"
+    },
+    {
+      "make": "DS",
+      "model": "3",
+      "stars": 3,
+      "ratingYear": 2017,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0720"
+    },
+    {
+      "make": "Nissan",
+      "model": "Leaf",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0723"
+    },
+    {
+      "make": "Ford",
+      "model": "Focus",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0814"
+    },
+    {
+      "make": "Volvo",
+      "model": "XC40",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0725"
+    },
+    {
+      "make": "Audi",
+      "model": "A6",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1140"
+    },
+    {
+      "make": "Audi",
+      "model": "A7",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0728pm"
+    },
+    {
+      "make": "Ford",
+      "model": "Tourneo Connect",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0948"
+    },
+    {
+      "make": "Suzuki",
+      "model": "Jimny",
+      "stars": 3,
+      "ratingYear": 2018,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0730"
+    },
+    {
+      "make": "Hyundai",
+      "model": "SANTA FE",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1078"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Touareg",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0732"
+    },
+    {
+      "make": "Peugeot",
+      "model": "Rifter",
+      "stars": 4,
+      "ratingYear": 2018,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0733"
+    },
+    {
+      "make": "Opel",
+      "model": "Combo Tour",
+      "stars": 4,
+      "ratingYear": 2018,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0733p2"
+    },
+    {
+      "make": "Toyota",
+      "model": "Proace City",
+      "stars": 4,
+      "ratingYear": 2018,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0733p3"
+    },
+    {
+      "make": "Citroën",
+      "model": "Berlingo",
+      "stars": 4,
+      "ratingYear": 2018,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0733pm"
+    },
+    {
+      "make": "Peugeot",
+      "model": "508",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0734"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0737"
+    },
+    {
+      "make": "MAZDA",
+      "model": "6",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0738"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "A-Class",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0739"
+    },
+    {
+      "make": "Hyundai",
+      "model": "NEXO",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1147"
+    },
+    {
+      "make": "Volvo",
+      "model": "V60",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0741"
+    },
+    {
+      "make": "Volvo",
+      "model": "S60",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0741pm"
+    },
+    {
+      "make": "Jaguar",
+      "model": "I-Pace",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0742"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "stars": 5,
+      "ratingYear": 2018,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0743"
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "stars": 1,
+      "ratingYear": 2018,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0744"
+    },
+    {
+      "make": "Audi",
+      "model": "Q3",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1138"
+    },
+    {
+      "make": "FIAT",
+      "model": "Panda",
+      "stars": 0,
+      "ratingYear": 2018,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0746"
+    },
+    {
+      "make": "Citroën",
+      "model": "C5 Aircross",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1195"
+    },
+    {
+      "make": "Honda",
+      "model": "CR-V",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1050"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G-Class",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0749"
+    },
+    {
+      "make": "Aiways",
+      "model": "U5",
+      "stars": 3,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0750"
+    },
+    {
+      "make": "SEAT",
+      "model": "Tarraco",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0751"
+    },
+    {
+      "make": "Audi",
+      "model": "Q8 e-tron",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0752"
+    },
+    {
+      "make": "Renault",
+      "model": "Clio",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1189"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "B-Class",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0754"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLA",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0754pm"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLE",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0755"
+    },
+    {
+      "make": "DS",
+      "model": "3 Crossback",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0756"
+    },
+    {
+      "make": "Kia",
+      "model": "Ceed",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0757"
+    },
+    {
+      "make": "MAZDA",
+      "model": "3",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0758"
+    },
+    {
+      "make": "SsangYong",
+      "model": "Korando",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0759"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Range Rover Evoque",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0760"
+    },
+    {
+      "make": "Lexus",
+      "model": "UX",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0761"
+    },
+    {
+      "make": "Toyota",
+      "model": "Corolla",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0762"
+    },
+    {
+      "make": "Toyota",
+      "model": "RAV4",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0764"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "T-Cross",
+      "stars": 3,
+      "ratingYear": 2025,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1134"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1110"
+    },
+    {
+      "make": "Audi",
+      "model": "A1",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0772"
+    },
+    {
+      "make": "BMW",
+      "model": "3 Series",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0774"
+    },
+    {
+      "make": "BMW",
+      "model": "Z4",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Roadster",
+      "source": "euroncap",
+      "id": "0775"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "EQC",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0776"
+    },
+    {
+      "make": "Peugeot",
+      "model": "208",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0777"
+    },
+    {
+      "make": "Škoda",
+      "model": "Kamiq",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0778"
+    },
+    {
+      "make": "Škoda",
+      "model": "Scala",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0779"
+    },
+    {
+      "make": "BMW",
+      "model": "1 Series",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1125"
+    },
+    {
+      "make": "BMW",
+      "model": "2 Series Gran Coupe",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1146"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1084"
+    },
+    {
+      "make": "Opel",
+      "model": "Corsa",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0784"
+    },
+    {
+      "make": "Škoda",
+      "model": "Octavia",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1143"
+    },
+    {
+      "make": "Audi",
+      "model": "A3",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1149"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Up!",
+      "stars": 3,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0787"
+    },
+    {
+      "make": "SEAT",
+      "model": "Mii",
+      "stars": 3,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0787p2"
+    },
+    {
+      "make": "Škoda",
+      "model": "Citigo",
+      "stars": 3,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0787pm"
+    },
+    {
+      "make": "Audi",
+      "model": "Q7",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0788"
+    },
+    {
+      "make": "Audi",
+      "model": "Q8",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0789"
+    },
+    {
+      "make": "Ford",
+      "model": "Puma",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0986"
+    },
+    {
+      "make": "Ford",
+      "model": "Kuga",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0792"
+    },
+    {
+      "make": "Ford",
+      "model": "Mondeo",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0793"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLB",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0794"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "EQB",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0794pm"
+    },
+    {
+      "make": "MG",
+      "model": "HS",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1061"
+    },
+    {
+      "make": "MG",
+      "model": "ZS EV",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0797"
+    },
+    {
+      "make": "Nissan",
+      "model": "Juke",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0798"
+    },
+    {
+      "make": "Peugeot",
+      "model": "2008",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0799"
+    },
+    {
+      "make": "Porsche",
+      "model": "Taycan",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0800"
+    },
+    {
+      "make": "SEAT",
+      "model": "Leon",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1122pm"
+    },
+    {
+      "make": "CUPRA",
+      "model": "Leon",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1122"
+    },
+    {
+      "make": "Subaru",
+      "model": "Forester",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1059"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model X",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0804"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Golf",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1115"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "CLA",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1108"
+    },
+    {
+      "make": "Renault",
+      "model": "Captur",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1082"
+    },
+    {
+      "make": "Renault",
+      "model": "Arkana",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0807pm"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Defender",
+      "stars": 5,
+      "ratingYear": 2020,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0811"
+    },
+    {
+      "make": "MAZDA",
+      "model": "CX-30",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0812"
+    },
+    {
+      "make": "Jeep",
+      "model": "Cherokee",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0813"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Sharan",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "0817"
+    },
+    {
+      "make": "SEAT",
+      "model": "Alhambra",
+      "stars": 4,
+      "ratingYear": 2019,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "0817pm"
+    },
+    {
+      "make": "Jeep",
+      "model": "Renegade",
+      "stars": 3,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0818"
+    },
+    {
+      "make": "MAZDA",
+      "model": "2",
+      "stars": 5,
+      "ratingYear": 2020,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0821pm"
+    },
+    {
+      "make": "CUPRA",
+      "model": "BORN",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1119"
+    },
+    {
+      "make": "Honda",
+      "model": "Jazz",
+      "stars": 5,
+      "ratingYear": 2020,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0830"
+    },
+    {
+      "make": "Honda",
+      "model": "e",
+      "stars": 4,
+      "ratingYear": 2020,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0831"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "ID.3",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1101"
+    },
+    {
+      "make": "MAZDA",
+      "model": "MX-30",
+      "stars": 5,
+      "ratingYear": 2020,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0841"
+    },
+    {
+      "make": "Isuzu",
+      "model": "D-MAX",
+      "stars": 5,
+      "ratingYear": 2020,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "0844"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Caddy",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1185"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "ID.4",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1116"
+    },
+    {
+      "make": "Hyundai",
+      "model": "i10",
+      "stars": 3,
+      "ratingYear": 2020,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0847"
+    },
+    {
+      "make": "Škoda",
+      "model": "ENYAQ iV",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0848"
+    },
+    {
+      "make": "Kia",
+      "model": "Sorento",
+      "stars": 5,
+      "ratingYear": 2020,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0849"
+    },
+    {
+      "make": "Toyota",
+      "model": "Mirai",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0850"
+    },
+    {
+      "make": "Genesis",
+      "model": "GV80",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0851"
+    },
+    {
+      "make": "Genesis",
+      "model": "G80",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0852"
+    },
+    {
+      "make": "Polestar",
+      "model": "2",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0855"
+    },
+    {
+      "make": "Renault",
+      "model": "Kangoo",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0856"
+    },
+    {
+      "make": "Nissan",
+      "model": "Townstar",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0856pm"
+    },
+    {
+      "make": "Citroën",
+      "model": "C4",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0857"
+    },
+    {
+      "make": "Opel",
+      "model": "Mokka",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0859"
+    },
+    {
+      "make": "Dacia",
+      "model": "Sandero Stepway",
+      "stars": 2,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0861"
+    },
+    {
+      "make": "Dacia",
+      "model": "Sandero",
+      "stars": 2,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0861p2"
+    },
+    {
+      "make": "Dacia",
+      "model": "Logan",
+      "stars": 2,
+      "ratingYear": 2021,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0861pm"
+    },
+    {
+      "make": "CUPRA",
+      "model": "Formentor",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1120"
+    },
+    {
+      "make": "BMW",
+      "model": "4 Series Coupé",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0869"
+    },
+    {
+      "make": "BMW",
+      "model": "4 Series Convertible",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0870"
+    },
+    {
+      "make": "Audi",
+      "model": "Q4 e-tron",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1182"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0872"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "T-Class",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0873"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "Citan Tourer",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0873pm"
+    },
+    {
+      "make": "MG",
+      "model": "Marvel R",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0874"
+    },
+    {
+      "make": "Toyota",
+      "model": "Yaris Cross",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1164"
+    },
+    {
+      "make": "Škoda",
+      "model": "Fabia",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0876"
+    },
+    {
+      "make": "Lynk & Co",
+      "model": "1",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0877"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Taigo",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0878"
+    },
+    {
+      "make": "BMW",
+      "model": "iX",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0883"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang Mach-E",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0884"
+    },
+    {
+      "make": "NIO",
+      "model": "ES8",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0888"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "EQS",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0889"
+    },
+    {
+      "make": "Hyundai",
+      "model": "BAYON",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0891"
+    },
+    {
+      "make": "Hyundai",
+      "model": "i20",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0891pm"
+    },
+    {
+      "make": "Hyundai",
+      "model": "IONIQ 5",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0893"
+    },
+    {
+      "make": "Hyundai",
+      "model": "TUCSON",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0895"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "EQA",
+      "stars": 5,
+      "ratingYear": 2019,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0897"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Range Rover",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0898"
+    },
+    {
+      "make": "Genesis",
+      "model": "GV70",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0900"
+    },
+    {
+      "make": "Renault",
+      "model": "ZOE",
+      "stars": 0,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0903"
+    },
+    {
+      "make": "BMW",
+      "model": "2 Series Coupé",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0904"
+    },
+    {
+      "make": "Nissan",
+      "model": "Qashqai",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1212"
+    },
+    {
+      "make": "Lexus",
+      "model": "NX",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0908"
+    },
+    {
+      "make": "Honda",
+      "model": "HR-V",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0909"
+    },
+    {
+      "make": "Dacia",
+      "model": "Spring",
+      "stars": 1,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0910"
+    },
+    {
+      "make": "FIAT",
+      "model": "500e",
+      "stars": 4,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0911"
+    },
+    {
+      "make": "Genesis",
+      "model": "G70",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0912"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Touran",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0914"
+    },
+    {
+      "make": "Opel",
+      "model": "Astra",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0915"
+    },
+    {
+      "make": "Citroën",
+      "model": "C5 X",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0916"
+    },
+    {
+      "make": "DS",
+      "model": "9",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0917"
+    },
+    {
+      "make": "DS",
+      "model": "4",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0918"
+    },
+    {
+      "make": "Peugeot",
+      "model": "308",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0919"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "C-Class",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0920"
+    },
+    {
+      "make": "Renault",
+      "model": "Megane E-Tech",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0921"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "ID.Buzz",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "1186"
+    },
+    {
+      "make": "smart",
+      "model": "#1",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0923"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0926"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Multivan",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "1184"
+    },
+    {
+      "make": "Nissan",
+      "model": "Ariya",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0928"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "ID.5",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0929"
+    },
+    {
+      "make": "Isuzu",
+      "model": "D-Max Crew Cab",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "0933"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "EQE",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0936"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLC",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0937"
+    },
+    {
+      "make": "Kia",
+      "model": "EV6",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0938"
+    },
+    {
+      "make": "MAZDA",
+      "model": "CX-60",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0940"
+    },
+    {
+      "make": "Toyota",
+      "model": "Aygo X",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1165"
+    },
+    {
+      "make": "Renault",
+      "model": "Austral",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "0943"
+    },
+    {
+      "make": "Renault",
+      "model": "Rafale",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "0943pm"
+    },
+    {
+      "make": "Dacia",
+      "model": "Jogger",
+      "stars": 1,
+      "ratingYear": 2021,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "0947"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "0951"
+    },
+    {
+      "make": "Hyundai",
+      "model": "IONIQ 6",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0952"
+    },
+    {
+      "make": "Volvo",
+      "model": "C40 Recharge",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0957"
+    },
+    {
+      "make": "BMW",
+      "model": "i4",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "0958"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Discovery Sport",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0959"
+    },
+    {
+      "make": "Land Rover",
+      "model": "Range Rover Sport",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0960"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model Y",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1181"
+    },
+    {
+      "make": "Genesis",
+      "model": "GV60",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0982"
+    },
+    {
+      "make": "GWM",
+      "model": "Wey 05",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0983"
+    },
+    {
+      "make": "Maxus",
+      "model": "MIFA 9",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "0985"
+    },
+    {
+      "make": "Lucid",
+      "model": "Air",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0987"
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "0988"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model S",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "0990"
+    },
+    {
+      "make": "Alfa Romeo",
+      "model": "Tonale",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0991"
+    },
+    {
+      "make": "BYD",
+      "model": "ATTO 3",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0992"
+    },
+    {
+      "make": "Toyota",
+      "model": "bZ4X",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1163"
+    },
+    {
+      "make": "Subaru",
+      "model": "Solterra",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1163pm"
+    },
+    {
+      "make": "Toyota",
+      "model": "Corolla Cross",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0994"
+    },
+    {
+      "make": "Lexus",
+      "model": "RX",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "0995"
+    },
+    {
+      "make": "BMW",
+      "model": "2 Series Active Tourer",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "0996"
+    },
+    {
+      "make": "BMW",
+      "model": "X1",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0997"
+    },
+    {
+      "make": "CHERY",
+      "model": "OMODA5",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "0998"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Amarok",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "0999"
+    },
+    {
+      "make": "Kia",
+      "model": "Niro",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1000"
+    },
+    {
+      "make": "MG",
+      "model": "4 Electric",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1001"
+    },
+    {
+      "make": "GWM",
+      "model": "ORA 03",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1002"
+    },
+    {
+      "make": "Peugeot",
+      "model": "408",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1006"
+    },
+    {
+      "make": "NIO",
+      "model": "ET7",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1007"
+    },
+    {
+      "make": "VinFast",
+      "model": "VF8",
+      "stars": 4,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1008"
+    },
+    {
+      "make": "Mobilize",
+      "model": "Limo",
+      "stars": 4,
+      "ratingYear": 2022,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1011"
+    },
+    {
+      "make": "Nissan",
+      "model": "X-Trail",
+      "stars": 5,
+      "ratingYear": 2021,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1012"
+    },
+    {
+      "make": "Porsche",
+      "model": "Macan",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1018"
+    },
+    {
+      "make": "Ford",
+      "model": "Tourneo Custom",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1019pm"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Passat",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1021"
+    },
+    {
+      "make": "Škoda",
+      "model": "Superb",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1022"
+    },
+    {
+      "make": "NIO",
+      "model": "EL7",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1023"
+    },
+    {
+      "make": "NIO",
+      "model": "ET5",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1024"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "ID.7",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1025"
+    },
+    {
+      "make": "smart",
+      "model": "#3",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1029"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Tiguan",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1033"
+    },
+    {
+      "make": "XPENG",
+      "model": "P7",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1034"
+    },
+    {
+      "make": "ZEEKR",
+      "model": "1",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1037"
+    },
+    {
+      "make": "ZEEKR",
+      "model": "X",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1038"
+    },
+    {
+      "make": "BYD",
+      "model": "DOLPHIN",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1040"
+    },
+    {
+      "make": "Lexus",
+      "model": "RZ",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1043"
+    },
+    {
+      "make": "BYD",
+      "model": "SEAL",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1044"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "EQE SUV",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1045"
+    },
+    {
+      "make": "BYD",
+      "model": "SEAL-U",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1046"
+    },
+    {
+      "make": "Honda",
+      "model": "ZR-V",
+      "stars": 4,
+      "ratingYear": 2023,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1047"
+    },
+    {
+      "make": "XPENG",
+      "model": "G9",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1048"
+    },
+    {
+      "make": "BYD",
+      "model": "TANG",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1049"
+    },
+    {
+      "make": "Kia",
+      "model": "EV9",
+      "stars": 5,
+      "ratingYear": 2023,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1052"
+    },
+    {
+      "make": "Ford",
+      "model": "Tourneo Courier",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1177"
+    },
+    {
+      "make": "NIO",
+      "model": "EL6",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1054"
+    },
+    {
+      "make": "Audi",
+      "model": "Q6 e-tron",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1056"
+    },
+    {
+      "make": "MG",
+      "model": "3",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1057"
+    },
+    {
+      "make": "Subaru",
+      "model": "Crosstrek",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1058pm"
+    },
+    {
+      "make": "Maxus",
+      "model": "MIFA 7",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "1060"
+    },
+    {
+      "make": "MG",
+      "model": "ZS Hybrid",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1062"
+    },
+    {
+      "make": "Jeep",
+      "model": "Avenger",
+      "stars": 3,
+      "ratingYear": 2024,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1063"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "E-Class",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1064"
+    },
+    {
+      "make": "BMW",
+      "model": "X2",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1065"
+    },
+    {
+      "make": "MINI",
+      "model": "Cooper E",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1066"
+    },
+    {
+      "make": "Renault",
+      "model": "Scenic E-Tech",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1067"
+    },
+    {
+      "make": "Leapmotor",
+      "model": "C10",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1070"
+    },
+    {
+      "make": "Maxus",
+      "model": "eTERRON 9",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "1071"
+    },
+    {
+      "make": "Renault",
+      "model": "Espace",
+      "stars": 5,
+      "ratingYear": 2022,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "1072"
+    },
+    {
+      "make": "Renault",
+      "model": "Symbioz",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1076"
+    },
+    {
+      "make": "Changan Deepal",
+      "model": "S07",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1079"
+    },
+    {
+      "make": "Renault",
+      "model": "5",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1080"
+    },
+    {
+      "make": "Ford",
+      "model": "Capri",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1085"
+    },
+    {
+      "make": "XPENG",
+      "model": "G6",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1086"
+    },
+    {
+      "make": "Alpine",
+      "model": "A290",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1087"
+    },
+    {
+      "make": "Hongqi",
+      "model": "E-HS9",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1090"
+    },
+    {
+      "make": "Audi",
+      "model": "A5",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1094"
+    },
+    {
+      "make": "Lexus",
+      "model": "LBX",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1095"
+    },
+    {
+      "make": "JAECOO",
+      "model": "7 PHEV",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1097"
+    },
+    {
+      "make": "Volvo",
+      "model": "EX30",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1098"
+    },
+    {
+      "make": "CUPRA",
+      "model": "Tavascan",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1099"
+    },
+    {
+      "make": "MAZDA",
+      "model": "CX-80",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1100"
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "ASX",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1104"
+    },
+    {
+      "make": "Audi",
+      "model": "A6 e-tron",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1105"
+    },
+    {
+      "make": "CUPRA",
+      "model": "TERRAMAR",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1107"
+    },
+    {
+      "make": "MG",
+      "model": "MGS5 EV",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1109"
+    },
+    {
+      "make": "Kia",
+      "model": "EV3",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1111"
+    },
+    {
+      "make": "Voyah",
+      "model": "COURAGE",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1112"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Tayron",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1113"
+    },
+    {
+      "make": "BYD",
+      "model": "SEALION 7",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1117"
+    },
+    {
+      "make": "Polestar",
+      "model": "3",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1118"
+    },
+    {
+      "make": "ZEEKR",
+      "model": "7X",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1123"
+    },
+    {
+      "make": "MINI",
+      "model": "Cooper",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1124"
+    },
+    {
+      "make": "MINI",
+      "model": "Aceman",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1127"
+    },
+    {
+      "make": "Škoda",
+      "model": "Elroq",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1128"
+    },
+    {
+      "make": "Škoda",
+      "model": "Enyaq",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1128pm"
+    },
+    {
+      "make": "Cadillac",
+      "model": "OPTIQ",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1129"
+    },
+    {
+      "make": "Alpine",
+      "model": "A390",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1130"
+    },
+    {
+      "make": "smart",
+      "model": "#5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1135"
+    },
+    {
+      "make": "GEELY",
+      "model": "EX5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1136"
+    },
+    {
+      "make": "MAZDA",
+      "model": "6e",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1137"
+    },
+    {
+      "make": "Peugeot",
+      "model": "3008",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1141"
+    },
+    {
+      "make": "Renault",
+      "model": "4",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1142"
+    },
+    {
+      "make": "Dacia",
+      "model": "Bigster",
+      "stars": 3,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1144"
+    },
+    {
+      "make": "Polestar",
+      "model": "4",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1145"
+    },
+    {
+      "make": "firefly",
+      "model": "firefly",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1151"
+    },
+    {
+      "make": "MG",
+      "model": "MGS6 EV",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1152"
+    },
+    {
+      "make": "IM",
+      "model": "IM5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1153"
+    },
+    {
+      "make": "IM",
+      "model": "IM6",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1154"
+    },
+    {
+      "make": "MG",
+      "model": "MG4 EV URBAN",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1156"
+    },
+    {
+      "make": "Hyundai",
+      "model": "IONIQ 9",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1157"
+    },
+    {
+      "make": "Kia",
+      "model": "EV5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1158"
+    },
+    {
+      "make": "Kia",
+      "model": "PV5 Passenger",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "1159"
+    },
+    {
+      "make": "Suzuki",
+      "model": "e VITARA",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1160"
+    },
+    {
+      "make": "Changan Deepal",
+      "model": "S05",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1162"
+    },
+    {
+      "make": "Lynk & Co",
+      "model": "2",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1166"
+    },
+    {
+      "make": "Lynk & Co",
+      "model": "8",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1167"
+    },
+    {
+      "make": "Kia",
+      "model": "EV4",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1168"
+    },
+    {
+      "make": "AION",
+      "model": "V",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1169"
+    },
+    {
+      "make": "Togg",
+      "model": "T10X",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1170"
+    },
+    {
+      "make": "Togg",
+      "model": "T10F",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1171"
+    },
+    {
+      "make": "CHERY",
+      "model": "TIGGO 7",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1172"
+    },
+    {
+      "make": "EBRO",
+      "model": "s700",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1173"
+    },
+    {
+      "make": "Dongfeng",
+      "model": "BOX",
+      "stars": 3,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1175"
+    },
+    {
+      "make": "Lucid",
+      "model": "Gravity",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1179"
+    },
+    {
+      "make": "Volvo",
+      "model": "EX90",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1180"
+    },
+    {
+      "make": "OMODA",
+      "model": "9",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1183"
+    },
+    {
+      "make": "Mitsubishi",
+      "model": "Grandis",
+      "stars": 4,
+      "ratingYear": 2024,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1187"
+    },
+    {
+      "make": "CHERY",
+      "model": "TIGGO 8",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1190"
+    },
+    {
+      "make": "Peugeot",
+      "model": "5008",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1191"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "CLE Coupé",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1192"
+    },
+    {
+      "make": "EXLANTIX",
+      "model": "ES",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1193"
+    },
+    {
+      "make": "EXLANTIX",
+      "model": "ET",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1194"
+    },
+    {
+      "make": "Opel",
+      "model": "Grandland",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1196"
+    },
+    {
+      "make": "EBRO",
+      "model": "s800",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1197"
+    },
+    {
+      "make": "MG",
+      "model": "P9 EV",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "Pickup Truck",
+      "source": "euroncap",
+      "id": "1198"
+    },
+    {
+      "make": "Hongqi",
+      "model": "EHS5",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1199"
+    },
+    {
+      "make": "Hyundai",
+      "model": "INSTER",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1200"
+    },
+    {
+      "make": "MG",
+      "model": "MGS9 PHEV",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1203"
+    },
+    {
+      "make": "Toyota",
+      "model": "Urban Cruiser",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small MPV",
+      "source": "euroncap",
+      "id": "1207"
+    },
+    {
+      "make": "Volkswagen",
+      "model": "Caravelle",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Large MPV",
+      "source": "euroncap",
+      "id": "1208"
+    },
+    {
+      "make": "BYD",
+      "model": "DOLPHIN SURF",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "City Car",
+      "source": "euroncap",
+      "id": "1209"
+    },
+    {
+      "make": "BYD",
+      "model": "SEAL 6",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1210"
+    },
+    {
+      "make": "GEELY",
+      "model": "STARRAY EM-i",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1211"
+    },
+    {
+      "make": "DS",
+      "model": "N°8",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Executive Car",
+      "source": "euroncap",
+      "id": "1213"
+    },
+    {
+      "make": "EBRO",
+      "model": "s400",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1216"
+    },
+    {
+      "make": "Leapmotor",
+      "model": "B10",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small Family Car",
+      "source": "euroncap",
+      "id": "1217"
+    },
+    {
+      "make": "Hongqi",
+      "model": "EHS7",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1219"
+    },
+    {
+      "make": "CHERY",
+      "model": "TIGGO 4",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1224"
+    },
+    {
+      "make": "DS",
+      "model": "N°7",
+      "stars": 4,
+      "ratingYear": 2025,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1225"
+    },
+    {
+      "make": "Subaru",
+      "model": "E-Outback",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1228"
+    },
+    {
+      "make": "ZEEKR",
+      "model": "7GT",
+      "stars": 5,
+      "ratingYear": 2026,
+      "className": "Large Family Car",
+      "source": "euroncap",
+      "id": "1229"
+    },
+    {
+      "make": "Subaru",
+      "model": "Uncharted",
+      "stars": 5,
+      "ratingYear": 2025,
+      "className": "Small SUV",
+      "source": "euroncap",
+      "id": "1230"
+    },
+    {
+      "make": "BMW",
+      "model": "iX3",
+      "stars": 5,
+      "ratingYear": 2026,
+      "className": "Large SUV",
+      "source": "euroncap",
+      "id": "1232"
+    },
+    {
+      "make": "Hyundai",
+      "model": "Elantra",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "2024 Hyundai Elantra 4 DR FWD",
+      "source": "nhtsa",
+      "id": "19543"
+    },
+    {
+      "make": "Kia",
+      "model": "Carnival",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "2024 Kia Carnival PV Later Release FWD",
+      "source": "nhtsa",
+      "id": "20793"
+    },
+    {
+      "make": "Nissan",
+      "model": "Pathfinder",
+      "stars": 5,
+      "ratingYear": 2024,
+      "className": "2024 Nissan Pathfinder SUV AWD",
+      "source": "nhtsa",
+      "id": "19563"
+    }
+  ]
+}

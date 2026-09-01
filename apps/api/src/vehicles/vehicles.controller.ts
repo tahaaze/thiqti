@@ -51,7 +51,7 @@ export class VehiclesController {
   }
 
   @Delete(":id")
-  @ApiOperation({ summary: "Soft-delete a vehicle" })
+  @ApiOperation({ summary: "Delete a vehicle" })
   remove(@Param("id") id: string) {
     return this.service.remove(id);
   }

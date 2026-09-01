@@ -1,81 +1,332 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchCars } from "@/lib/car-search";
-import { parseQuery } from "@/lib/nlp";
-import { rankVehicles } from "@/lib/matching";
+import { Pool } from "pg";
+import { safetyRatingFor, safetyLabel, safetyLevel } from "@/lib/safetyRatings";
+import { marocReputationFor, marocTestsFor } from "@/lib/marocReputation";
+import { MarocBrandReputation, MarocTest } from "@/lib/marocReputation";
+
+interface SafetyInfo {
+  stars: number;
+  ratingYear: number;
+  className: string;
+  source: "euroncap" | "nhtsa";
+  label: string;
+  level: "elevee" | "moyenne" | "faible";
+}
 
 interface ReputationData {
   modelKey: string;
+  dataAvailable: boolean;
   totalReviews: number;
   avgScore: number | null;
   windowMonths: number;
   lastUpdated: string;
+  positiveTags: string[];
+  negativeTags: string[];
   categories: { name: string; score: number | null }[];
   excerpts: { text: string; sentiment: "positive" | "negative" | "neutral"; score: number }[];
   volume: { total: number; positive: number; negative: number; neutral: number };
+  reliability: "elevee" | "moyenne" | "faible";
+  reliabilityLabel: string;
+  safety: SafetyInfo | null;
+  maroc: { brand: MarocBrandReputation | null; tests: MarocTest[] };
 }
 
-const REPUTATION_DB: Record<string, ReputationData> = {};
+interface ReviewRow {
+  title: string | null;
+  body: string | null;
+  rating: number | null;
+  pros: string[] | null;
+  cons: string[] | null;
+}
+
+interface ScoreRow {
+  avg_rating: number | null;
+  total_reviews: number | null;
+  reliability: string | null;
+  top_pros: string[] | null;
+  top_cons: string[] | null;
+  computed_at: Date | null;
+}
+
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL environment variable is required");
+  }
+  if (!pool) {
+    pool = new Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false },
+      max: 1,
+      idleTimeoutMillis: 0,
+      connectionTimeoutMillis: 10000,
+    });
+  }
+  return pool;
+}
+
+const CATEGORY_KEYWORDS: { name: string; keywords: string[] }[] = [
+  { name: "Confort", keywords: ["confort", "suspension", "tenue", "conduite"] },
+  { name: "Consommation", keywords: ["consommation", "économique", "economique", "hybride"] },
+  { name: "Fiabilité", keywords: ["fiabilité", "fiabilite", "fiable", "solide"] },
+  { name: "Rapport qualité-prix", keywords: ["qualité-prix", "qualite-prix", "rapport", "prix"] },
+  { name: "Tenue de route", keywords: ["tenue de route", "route", "conduite"] },
+  { name: "Finition", keywords: ["finition", "design", "intérieur", "interieur"] },
+];
 
 function getModelKey(make: string, model: string): string {
   return `${make.toLowerCase()}_${model.toLowerCase()}`;
 }
 
-function buildReputation(make: string, model: string): ReputationData {
-  const key = getModelKey(make, model);
-  const seed = Array.from(`${make}${model}`).reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const rng = (i: number) => {
-    const x = Math.sin(seed * 9301 + i * 49297) * 49297;
-    return x - Math.floor(x);
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+function sentimentFromRating(rating: number): "positive" | "negative" | "neutral" {
+  if (rating >= 7) return "positive";
+  if (rating <= 4) return "negative";
+  return "neutral";
+}
+
+function insufficientData(modelKey: string): ReputationData {
+  return {
+    modelKey,
+    dataAvailable: false,
+    totalReviews: 0,
+    avgScore: null,
+    windowMonths: 18,
+    lastUpdated: new Date().toISOString().split("T")[0],
+    positiveTags: [],
+    negativeTags: [],
+    categories: [
+      { name: "Confort", score: null },
+      { name: "Consommation", score: null },
+      { name: "Fiabilité", score: null },
+      { name: "Rapport qualité-prix", score: null },
+      { name: "Tenue de route", score: null },
+      { name: "Finition", score: null },
+    ],
+    excerpts: [],
+    volume: { total: 0, positive: 0, negative: 0, neutral: 0 },
+    reliability: "faible",
+    reliabilityLabel: "Faible",
+    safety: null,
+    maroc: { brand: null, tests: [] },
   };
+}
 
-  const totalReviews = Math.floor(rng(0) * 45) + 8;
-  const hasEnough = totalReviews >= 30;
-  const baseScore = hasEnough ? Math.round(55 + rng(1) * 40) : null;
+function reliabilityFromDb(raw: string | null | undefined): { key: "elevee" | "moyenne" | "faible"; label: string } {
+  if (raw === "fiable") return { key: "elevee", label: "Élevée" };
+  if (raw === "moyen") return { key: "moyenne", label: "Moyenne" };
+  return { key: "faible", label: "Faible" };
+}
 
-  const categories = [
-    { name: "Confort", score: hasEnough ? Math.round(50 + rng(2) * 45) : null },
-    { name: "Consommation", score: hasEnough ? Math.round(50 + rng(3) * 45) : null },
-    { name: "Fiabilité", score: hasEnough ? Math.round(50 + rng(4) * 45) : null },
-    { name: "Rapport qualité/prix", score: hasEnough ? Math.round(50 + rng(5) * 45) : null },
-    { name: "Tenue de route", score: hasEnough ? Math.round(50 + rng(6) * 45) : null },
-    { name: "Finition", score: hasEnough ? Math.round(50 + rng(7) * 40) : null },
-  ];
+function topTagsFromReviews(reviews: ReviewRow[], field: "pros" | "cons"): string[] {
+  const counts = new Map<string, number>();
+  for (const review of reviews) {
+    const items = review[field] || [];
+    for (const item of items) {
+      const key = item.trim();
+      if (key) counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([tag]) => tag);
+}
 
-  const positiveCount = Math.round(totalReviews * (0.4 + rng(8) * 0.3));
-  const negativeCount = Math.round(totalReviews * (0.1 + rng(9) * 0.2));
-  const neutralCount = totalReviews - positiveCount - negativeCount;
+function buildFromDb(modelKey: string, reviews: ReviewRow[], score: ScoreRow | null): ReputationData {
+  const totalReviews = reviews.length;
+  const avgScore =
+    totalReviews > 0
+      ? round1(reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalReviews)
+      : score?.avg_rating != null
+        ? round1(Number(score.avg_rating))
+        : null;
 
-  const excerptPool = [
-    "Très bon véhicule au quotidien, je recommande.",
-    "Fiable et économique, parfait pour la ville.",
-    "Bon rapport qualité-prix, quelques défauts mineurs.",
-    "Moteur performant, consommation correcte.",
-    "Intérieur bien fini, places arrière spacieuses.",
-    "Après-vente perfectible mais véhicule solide.",
-    "Climatisation efficace, bon équipement de série.",
-    "Véhicule familial par excellence, coffre pratique.",
-    "Quelques problèmes électroniques signalés.",
-    "Direction précise, bon comportement en virage.",
-    "Réservoir un peu petit pour les longs trajets.",
-    "Excellent choix pour un premier achat.",
-  ];
+  const prosJoined = reviews
+    .flatMap((r) => r.pros || [])
+    .join(" ")
+    .toLowerCase();
+  const consJoined = reviews
+    .flatMap((r) => r.cons || [])
+    .join(" ")
+    .toLowerCase();
 
-  const excerpts = excerptPool.slice(0, Math.min(totalReviews, 6)).map((text, i) => ({
-    text,
-    sentiment: (i < positiveCount ? "positive" : i < positiveCount + negativeCount ? "negative" : "neutral") as "positive" | "negative" | "neutral",
-    score: Math.round(4 + rng(10 + i) * 6),
+  const categories = CATEGORY_KEYWORDS.map((cat) => {
+    if (avgScore == null) return { name: cat.name, score: null };
+    let value = avgScore;
+    if (cat.keywords.some((k) => prosJoined.includes(k))) value += 0.5;
+    if (cat.keywords.some((k) => consJoined.includes(k))) value -= 0.5;
+    return { name: cat.name, score: round1(clamp(value, 0, 10)) };
+  });
+
+  const positiveTags = score?.top_pros?.length
+    ? score.top_pros
+    : topTagsFromReviews(reviews, "pros");
+  const negativeTags = score?.top_cons?.length
+    ? score.top_cons
+    : topTagsFromReviews(reviews, "cons");
+
+  const excerpts = reviews.slice(0, 6).map((r) => ({
+    text: (r.body || r.title || "Avis sans texte").trim(),
+    sentiment: sentimentFromRating(Number(r.rating) || 0),
+    score: round1(clamp(Number(r.rating) || 0, 0, 10)),
   }));
 
+  const positive = reviews.filter((r) => (Number(r.rating) || 0) >= 7).length;
+  const negative = reviews.filter((r) => (Number(r.rating) || 0) <= 4).length;
+  const neutral = totalReviews - positive - negative;
+
+  const reliability = reliabilityFromDb(score?.reliability);
+  const lastUpdated = score?.computed_at
+    ? new Date(score.computed_at).toISOString().split("T")[0]
+    : new Date().toISOString().split("T")[0];
+
   return {
-    modelKey: key,
+    modelKey,
+    dataAvailable: true,
     totalReviews,
-    avgScore: baseScore,
-    windowMonths: 12,
-    lastUpdated: new Date().toISOString().split("T")[0],
+    avgScore,
+    windowMonths: 18,
+    lastUpdated,
+    positiveTags,
+    negativeTags,
     categories,
     excerpts,
-    volume: { total: totalReviews, positive: positiveCount, negative: negativeCount, neutral: neutralCount },
+    volume: { total: totalReviews, positive, negative, neutral },
+    reliability: reliability.key,
+    reliabilityLabel: reliability.label,
+    safety: null,
+    maroc: { brand: null, tests: [] },
   };
+}
+
+async function loadReputation(make: string, model: string): Promise<ReputationData> {
+  const modelKey = getModelKey(make, model);
+  const client = await getPool().connect();
+  try {
+    const vehicleResult = await client.query(
+      `SELECT id FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2)`,
+      [make, model]
+    );
+    if (vehicleResult.rowCount === 0) {
+      return insufficientData(modelKey);
+    }
+    const vehicleId = vehicleResult.rows[0].id;
+
+    const [reviewsResult, scoreResult] = await Promise.all([
+      client.query(
+        `SELECT title, body, rating, pros, cons FROM reviews WHERE vehicle_id = $1 ORDER BY published_at DESC`,
+        [vehicleId]
+      ),
+      client.query(
+        `SELECT avg_rating, total_reviews, reliability, top_pros, top_cons, computed_at
+         FROM reputation_scores WHERE vehicle_id = $1`,
+        [vehicleId]
+      ),
+    ]);
+
+    const reviews: ReviewRow[] = reviewsResult.rows.map((row) => ({
+      title: row.title,
+      body: row.body,
+      rating: row.rating,
+      pros: row.pros,
+      cons: row.cons,
+    }));
+
+    if (reviews.length === 0) {
+      return insufficientData(modelKey);
+    }
+
+    const score: ScoreRow | null = scoreResult.rowCount ? scoreResult.rows[0] : null;
+    return buildFromDb(modelKey, reviews, score);
+  } finally {
+    client.release();
+  }
+}
+
+function safetyInfoFor(make: string, model: string): SafetyInfo | null {
+  const entry = safetyRatingFor(make, model);
+  if (!entry) return null;
+  return {
+    stars: entry.stars,
+    ratingYear: entry.ratingYear,
+    className: entry.className,
+    source: entry.source,
+    label: safetyLabel(entry),
+    level: safetyLevel(entry.stars) ?? "faible",
+  };
+}
+
+function marocBlockFor(make: string, model: string): { brand: MarocBrandReputation | null; tests: MarocTest[] } {
+  return {
+    brand: marocReputationFor(make),
+    tests: marocTestsFor(make, model),
+  };
+}
+
+// --- Normalisation vers les enums PostgreSQL (schema.sql) ---
+function dbBodyType(bodyType: string | undefined): string {
+  const v = (bodyType || "").toLowerCase();
+  if (v.includes("suv") || v.includes("4x4") || v.includes("4x4")) return "suv";
+  if (v.includes("berline")) return "berline";
+  if (v.includes("citadine")) return "citadine";
+  if (v.includes("monospace")) return "monospace";
+  if (v.includes("pick") || v.includes("utilitaire")) return "pick-up";
+  return "crossover";
+}
+
+function dbFuelType(fuel: string | undefined): string {
+  const v = (fuel || "").toLowerCase();
+  if (v.includes("électr") || v.includes("electr")) return "electrique";
+  if (v.includes("hybr")) return "hybride";
+  if (v.includes("diesel")) return "diesel";
+  if (v.includes("essence")) return "essence";
+  return "essence";
+}
+
+function dbTransmission(transmission: string | undefined): string {
+  const v = (transmission || "").toLowerCase();
+  if (v.includes("manuel")) return "manuelle";
+  return "automatique";
+}
+
+/** Trouve le vehicle_id par marque/modele, ou cree la ligne si absente. */
+async function getOrCreateVehicle(
+  client: { query: (sql: string, params?: unknown[]) => Promise<{ rowCount: number; rows: { id: string }[] }> },
+  make: string,
+  model: string,
+  car: { year?: number; fuel?: string; bodyType?: string; transmission?: string }
+): Promise<string> {
+  const existing = await client.query(
+    `SELECT id FROM vehicles WHERE lower(make) = lower($1) AND lower(model) = lower($2)`,
+    [make, model]
+  );
+  if (existing.rowCount && existing.rowCount > 0) return existing.rows[0].id;
+  const inserted = await client.query(
+    `INSERT INTO vehicles (make, model, year, trim, body_type, fuel_type, transmission, seats, price_mad)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [
+      make,
+      model,
+      car.year || 2026,
+      model,
+      dbBodyType(car.bodyType),
+      dbFuelType(car.fuel),
+      dbTransmission(car.transmission),
+      5,
+      0,
+    ]
+  );
+  return inserted.rows[0].id;
 }
 
 export async function GET(request: NextRequest) {
@@ -86,43 +337,62 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "make and model are required" }, { status: 400 });
   }
 
-  const key = getModelKey(make, model);
-  if (!REPUTATION_DB[key]) {
-    REPUTATION_DB[key] = buildReputation(make, model);
+  try {
+    const data = await loadReputation(make, model);
+    data.safety = safetyInfoFor(make, model);
+    data.maroc = marocBlockFor(make, model);
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error("[reputation] GET error:", err);
+    const fallback = insufficientData(getModelKey(make, model));
+    fallback.safety = safetyInfoFor(make, model);
+    fallback.maroc = marocBlockFor(make, model);
+    return NextResponse.json(fallback);
   }
-
-  return NextResponse.json(REPUTATION_DB[key]);
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { make, model, text, score, sentiment } = body;
+  const { make, model, text, score, sentiment, year, fuel, bodyType, transmission } = body;
 
   if (!make || !model || !text || score === undefined) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const key = getModelKey(make, model);
-  if (!REPUTATION_DB[key]) {
-    REPUTATION_DB[key] = buildReputation(make, model);
+  let client;
+  try {
+    client = await getPool().connect();
+    const vehicleId = await getOrCreateVehicle(client, make, model, { year, fuel, bodyType, transmission });
+
+    const rating = round1(clamp(Number(score), 0, 10));
+    const title = String(text).slice(0, 300);
+    const bodyText = String(text);
+    const isPositive = sentiment === "positive";
+    const isNegative = sentiment === "negative";
+
+    await client.query(
+      `INSERT INTO reviews (vehicle_id, source, author_name, rating, title, body, pros, cons, verified, published_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+      [
+        vehicleId,
+        "web",
+        null,
+        rating,
+        title,
+        bodyText,
+        isPositive ? [] : null,
+        isNegative ? [] : null,
+        false,
+      ]
+    );
+
+    const data = await loadReputation(make, model);
+    data.safety = safetyInfoFor(make, model);
+    data.maroc = marocBlockFor(make, model);
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+  } finally {
+    client?.release();
   }
-
-  const rep = REPUTATION_DB[key];
-  rep.totalReviews++;
-  rep.excerpts.push({ text, sentiment: sentiment || "neutral", score });
-  rep.volume.total = rep.totalReviews;
-
-  if (sentiment === "positive") rep.volume.positive++;
-  else if (sentiment === "negative") rep.volume.negative++;
-  else rep.volume.neutral++;
-
-  if (rep.totalReviews >= 30) {
-    const scores = rep.excerpts.map((e) => e.score);
-    rep.avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10);
-    rep.categories.forEach((c) => {
-      c.score = Math.round(55 + Math.random() * 40);
-    });
-  }
-
-  return NextResponse.json(rep);
 }

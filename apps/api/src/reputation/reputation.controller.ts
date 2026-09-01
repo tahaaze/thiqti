@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post } from "@nestjs/common";
+import { Controller, Get, Param, Post, ParseUUIDPipe } from "@nestjs/common";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { ReputationService } from "./reputation.service";
 
@@ -9,19 +9,25 @@ export class ReputationController {
 
   @Get("vehicle/:vehicleId")
   @ApiOperation({ summary: "Get reputation score for a vehicle" })
-  getScore(@Param("vehicleId") vehicleId: string) {
+  getScore(
+    @Param("vehicleId", ParseUUIDPipe) vehicleId: string
+  ) {
     return this.service.getScore(vehicleId);
   }
 
   @Get("vehicle/:vehicleId/reviews")
   @ApiOperation({ summary: "Get reviews for a vehicle" })
-  getReviews(@Param("vehicleId") vehicleId: string) {
+  getReviews(
+    @Param("vehicleId", ParseUUIDPipe) vehicleId: string
+  ) {
     return this.service.getReviews(vehicleId);
   }
 
   @Post("vehicle/:vehicleId/compute")
   @ApiOperation({ summary: "Trigger reputation score computation" })
-  computeScore(@Param("vehicleId") vehicleId: string) {
+  computeScore(
+    @Param("vehicleId", ParseUUIDPipe) vehicleId: string
+  ) {
     return this.service.computeScore(vehicleId);
   }
 }

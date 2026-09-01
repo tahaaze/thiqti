@@ -1,122 +1,157 @@
-import { writeFileSync } from "fs";
+// ============================================================================
+// RESOLUTION DE PHOTOS REELLES PAR MODELE (Wikipedia / Wikimedia Commons)
+// ============================================================================
+//
+// Sans cle API, sans scraping : les photos proviennent de Wikipedia/Commons
+// (licence libre). Le script parcourt le catalogue marocain + les modeles du
+// seed, trouve pour chaque modele une photo reelle et enregistre l'URL dans
+// scripts/image-cache.json (consommee ensuite par src/lib/images.ts).
+//
+// Usage : npx tsx scripts/fetch-images.ts [--limit N]
+// ============================================================================
+
+import { writeFileSync, readFileSync } from "fs";
 import { join } from "path";
+import { getFallbackCars } from "../src/lib/sources/fallback";
+import { imageKey } from "../src/lib/images";
 
-const API_KEY = "AIzaSyAdlPEXkhqIHhQBxvqYu5_pHxMa6hPjcjY";
-const CX = "e0af8e4e17f5a4e65";
+const WIKI_REST = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+const WIKI_API = "https://en.wikipedia.org/w/api.php";
+const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
+const USER_AGENT = "Thiqti/1.0 (image resolver; contact: dev@thiqti.ma)";
 
-interface CarEntry {
-  make: string;
-  model: string;
-  year: number;
+interface ImageResult {
+  url: string;
+  title: string;
 }
 
-const CARS: CarEntry[] = [
-  { make: "Dacia", model: "Sandero", year: 2024 },
-  { make: "Dacia", model: "Sandero Stepway", year: 2023 },
-  { make: "Dacia", model: "Logan", year: 2024 },
-  { make: "Dacia", model: "Duster", year: 2024 },
-  { make: "Dacia", model: "Duster", year: 2023 },
-  { make: "Dacia", model: "Jogger", year: 2024 },
-  { make: "Renault", model: "Clio", year: 2024 },
-  { make: "Renault", model: "Clio E-Tech", year: 2024 },
-  { make: "Renault", model: "Megane E-TECH", year: 2024 },
-  { make: "Renault", model: "Austral", year: 2024 },
-  { make: "Renault", model: "Kardian", year: 2024 },
-  { make: "Renault", model: "Duster", year: 2023 },
-  { make: "Renault", model: "Symbol", year: 2022 },
-  { make: "Peugeot", model: "208", year: 2024 },
-  { make: "Peugeot", model: "2008", year: 2024 },
-  { make: "Peugeot", model: "3008", year: 2024 },
-  { make: "Peugeot", model: "308 GT", year: 2023 },
-  { make: "Toyota", model: "Yaris Hybrid", year: 2024 },
-  { make: "Toyota", model: "Yaris Cross", year: 2024 },
-  { make: "Toyota", model: "Corolla Hybrid", year: 2024 },
-  { make: "Toyota", model: "RAV4 Hybrid", year: 2024 },
-  { make: "Toyota", model: "C-HR", year: 2023 },
-  { make: "Hyundai", model: "Tucson", year: 2024 },
-  { make: "Hyundai", model: "i20", year: 2024 },
-  { make: "Hyundai", model: "Kona Hybrid", year: 2024 },
-  { make: "Hyundai", model: "Bayon", year: 2023 },
-  { make: "Kia", model: "Sportage", year: 2024 },
-  { make: "Kia", model: "Niro Hybrid", year: 2024 },
-  { make: "Kia", model: "Picanto", year: 2024 },
-  { make: "Kia", model: "Stonic", year: 2023 },
-  { make: "Volkswagen", model: "Golf", year: 2024 },
-  { make: "Volkswagen", model: "T-Roc", year: 2024 },
-  { make: "Volkswagen", model: "Tiguan", year: 2024 },
-  { make: "Volkswagen", model: "Polo", year: 2023 },
-  { make: "BMW", model: "Serie 1", year: 2024 },
-  { make: "BMW", model: "X1", year: 2024 },
-  { make: "BMW", model: "X3", year: 2023 },
-  { make: "Mercedes", model: "Classe A", year: 2024 },
-  { make: "Mercedes", model: "GLA", year: 2024 },
-  { make: "BYD", model: "Seal U", year: 2024 },
-  { make: "BYD", model: "ATTO 3", year: 2024 },
-  { make: "MG", model: "HS", year: 2024 },
-  { make: "MG", model: "ZS EV", year: 2024 },
-  { make: "Ford", model: "Kuga", year: 2023 },
-  { make: "Ford", model: "Fiesta", year: 2022 },
-  { make: "Nissan", model: "Qashqai", year: 2024 },
-  { make: "Nissan", model: "Juke", year: 2023 },
-  { make: "Fiat", model: "Tipo", year: 2023 },
-  { make: "Fiat", model: "500", year: 2024 },
-  { make: "Citroen", model: "C3", year: 2024 },
-  { make: "Citroen", model: "C5 Aircross", year: 2023 },
-  { make: "Opel", model: "Corsa", year: 2024 },
-  { make: "Opel", model: "Grandland", year: 2024 },
-  { make: "Jeep", model: "Renegade", year: 2023 },
-  { make: "Skoda", model: "Octavia", year: 2024 },
-  { make: "Seat", model: "Leon", year: 2024 },
-  { make: "Seat", model: "Ibiza", year: 2023 },
-  { make: "Suzuki", model: "Vitara", year: 2024 },
-  { make: "Volvo", model: "XC40", year: 2024 },
-  { make: "DFSK", model: "E5", year: 2024 },
-  { make: "Mazda", model: "CX-30", year: 2024 },
-  { make: "Renault", model: "Clio", year: 2019 },
-  { make: "Peugeot", model: "206", year: 2018 },
-  { make: "Dacia", model: "Logan MCV", year: 2020 },
-  { make: "Hyundai", model: "i10", year: 2021 },
-  { make: "Kia", model: "Picanto", year: 2020 },
-];
-
-async function searchImage(query: string): Promise<string> {
-  const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX}&q=${encodeURIComponent(query)}&searchType=image&imgSize=large&num=1&fields=items(link)`;
+async function getJson(url: string): Promise<any> {
+  const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+  if (!res.ok) return null;
   try {
-    const res = await fetch(url);
-    if (!res.ok) return "";
-    const data = await res.json();
-    return data.items?.[0]?.link || "";
+    return await res.json();
   } catch {
-    return "";
+    return null;
   }
+}
+
+/** Meilleur titre de page Wikipedia pour une requete (opensearch). */
+async function searchTitle(query: string): Promise<string> {
+  const url = `${WIKI_API}?action=opensearch&format=json&limit=5&redirects=resolve&search=${encodeURIComponent(query)}`;
+  const data = await getJson(url);
+  const titles: string[] = data && Array.isArray(data[1]) ? data[1] : [];
+  return titles[0] || "";
+}
+
+/** Photo principale (vignette <=800px, generation a la demande par Commons). */
+async function photoForTitle(title: string): Promise<string> {
+  const data = await getJson(`${WIKI_REST}${encodeURIComponent(title)}`);
+  const thumb: string | undefined = data?.thumbnail?.source;
+  const orig: string | undefined = data?.originalimage?.source;
+  const raw = thumb || orig || "";
+  if (!raw) return "";
+  // Le nom de fichier est le dernier segment (ex. "330px-Dacia_Duster_....jpg").
+  // On passe par Special:FilePath?width=800 : Commons genere une vignette valide
+  // (les autres largeurs fixes sont refusees par upload.wikimedia.org, HTTP 400).
+  const file = decodeURIComponent(raw.split("?")[0].split("/").pop() || "").replace(/^\d+px-/, "");
+  if (!file) return "";
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=800`;
+}
+
+/** Secours : recherche d'une photo sur Wikimedia Commons. */
+async function photoFromCommons(query: string): Promise<string> {
+  const url =
+    `${COMMONS_API}?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=5` +
+    `&gsrsearch=${encodeURIComponent(`${query} car`)}&prop=imageinfo&iiprop=url&iiurlwidth=1000`;
+  const data = await getJson(url);
+  const pages = data?.query?.pages;
+  if (!pages) return "";
+  for (const p of Object.values<any>(pages)) {
+    const url = p.imageinfo?.[0]?.thumburl || p.imageinfo?.[0]?.url || "";
+    if (/\.(jpe?g|png|webp)($|\?)/i.test(url)) return url;
+  }
+  return "";
+}
+
+async function resolvePhoto(make: string, model: string): Promise<ImageResult> {
+  const queries = [
+    `${make} ${model}`,
+    `${make} ${model} car`,
+  ];
+  for (const q of queries) {
+    const title = await searchTitle(q);
+    if (!title) continue;
+    const url = await photoForTitle(title);
+    if (url) return { url, title };
+  }
+  const url = await photoFromCommons(`${make} ${model}`);
+  return url ? { url, title: `${make} ${model}` } : { url: "", title: "" };
+}
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 async function main() {
-  const imageMap: Record<string, string> = {};
-  const total = CARS.length;
+  const limitIdx = process.argv.indexOf("--limit");
+  const limit = limitIdx !== -1 ? Number(process.argv[limitIdx + 1]) : Infinity;
 
-  for (let i = 0; i < total; i++) {
-    const car = CARS[i];
-    const query = `${car.year} ${car.make} ${car.model}`;
-    const key = `${car.make.toLowerCase()}_${car.model.toLowerCase()}_${car.year}`;
+  const catalogue = getFallbackCars();
+  const extras: [string, string][] = [
+    ["Mitsubishi", "Outlander"],
+    ["Toyota", "RAV4"],
+    ["Hyundai", "Tucson"],
+    ["Kia", "Sportage"],
+    ["Nissan", "Qashqai"],
+    ["Ford", "Kuga"],
+  ];
 
-    if (imageMap[key]) continue;
-
-    process.stdout.write(`[${i + 1}/${total}] ${query}...`);
-    const imageUrl = await searchImage(query);
-    if (imageUrl) {
-      imageMap[key] = imageUrl;
-      console.log(` OK`);
-    } else {
-      console.log(` FAILED`);
+  const seen = new Set<string>();
+  const entries: [string, string][] = [];
+  for (const car of catalogue) {
+    const key = imageKey(car.make, car.model);
+    if (!seen.has(key)) {
+      seen.add(key);
+      entries.push([car.make, car.model]);
     }
-
-    if (i < total - 1) await new Promise((r) => setTimeout(r, 200));
+  }
+  for (const [make, model] of extras) {
+    const key = imageKey(make, model);
+    if (!seen.has(key)) {
+      seen.add(key);
+      entries.push([make, model]);
+    }
   }
 
   const outPath = join(__dirname, "image-cache.json");
-  writeFileSync(outPath, JSON.stringify(imageMap, null, 2));
-  console.log(`\nSaved ${Object.keys(imageMap).length} images to ${outPath}`);
+  let cache: Record<string, string> = {};
+  try {
+    cache = JSON.parse(readFileSync(outPath, "utf-8"));
+  } catch {}
+
+  let updated = 0;
+  const total = Math.min(entries.length, limit);
+  for (let i = 0; i < total; i++) {
+    const [make, model] = entries[i];
+    const key = imageKey(make, model);
+    if (cache[key]) {
+      process.stdout.write(`[${i + 1}/${total}] ${make} ${model} (cache)\n`);
+      continue;
+    }
+    process.stdout.write(`[${i + 1}/${total}] ${make} ${model} ... `);
+    const res = await resolvePhoto(make, model);
+    if (res.url) {
+      cache[key] = res.url;
+      updated++;
+      console.log(`OK (${res.title})`);
+    } else {
+      console.log("AUCUNE PHOTO");
+    }
+    await sleep(120);
+  }
+
+  writeFileSync(outPath, JSON.stringify(cache, null, 2));
+  console.log(`\n${Object.keys(cache).length} modeles avec photo. ${updated} nouveaux. -> ${outPath}`);
 }
 
 main();

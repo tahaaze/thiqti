@@ -1,0 +1,1502 @@
+{
+  "version": 1,
+  "date": "2026-08-05",
+  "dataset": "apps/web/src/lib/sources/fallback.ts",
+  "description": "Benchmark du pipeline NLP + TOPSIS. Chaque requete est executee sur le jeu de donnees reel (vehicules neufs). expectCriteria compare l'extraction NLP exacte. Les assertions verifient les proprietes du classement. Les bornes de prix correspondent au calcul meetsBudget (min/max +/- tolerance).",
+  "queries": [
+    {
+      "id": "B001",
+      "category": "budget",
+      "query": "budget 200000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 170000,
+        "budgetMax": 230000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMin",
+          "value": 144500
+        },
+        {
+          "type": "priceMax",
+          "value": 264500
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "minTotal",
+          "value": 50
+        },
+        {
+          "type": "maxTotal",
+          "value": 176
+        }
+      ]
+    },
+    {
+      "id": "B002",
+      "category": "budget",
+      "query": "entre 150000 et 200000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 150000,
+        "budgetMax": 200000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMin",
+          "value": 127500
+        },
+        {
+          "type": "priceMax",
+          "value": 230000
+        },
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 50
+        },
+        {
+          "type": "maxTotal",
+          "value": 160
+        }
+      ]
+    },
+    {
+      "id": "B003",
+      "category": "budget",
+      "query": "sous 180000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": 180000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMax",
+          "value": 207000
+        },
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 40
+        },
+        {
+          "type": "maxTotal",
+          "value": 150
+        }
+      ]
+    },
+    {
+      "id": "B004",
+      "category": "budget",
+      "query": "autour de 250000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 200000,
+        "budgetMax": 300000,
+        "budgetTolerance": 0.2,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMin",
+          "value": 160000
+        },
+        {
+          "type": "priceMax",
+          "value": 360000
+        },
+        {
+          "type": "topFuel",
+          "value": "Essence"
+        },
+        {
+          "type": "minTotal",
+          "value": 100
+        },
+        {
+          "type": "maxTotal",
+          "value": 256
+        }
+      ]
+    },
+    {
+      "id": "B005",
+      "category": "budget",
+      "query": "plus de 300000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 300000,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMin",
+          "value": 255000
+        },
+        {
+          "type": "topFuel",
+          "value": "Hybride"
+        },
+        {
+          "type": "minTotal",
+          "value": 80
+        },
+        {
+          "type": "maxTotal",
+          "value": 176
+        }
+      ]
+    },
+    {
+      "id": "B006",
+      "category": "budget",
+      "query": "100000 درهم",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 85000,
+        "budgetMax": 115000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMin",
+          "value": 72250
+        },
+        {
+          "type": "priceMax",
+          "value": 132250
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "maxTotal",
+          "value": 34
+        }
+      ]
+    },
+    {
+      "id": "B007",
+      "category": "budget",
+      "query": "ف 200000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 170000,
+        "budgetMax": 230000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "priceMin",
+          "value": 144500
+        },
+        {
+          "type": "priceMax",
+          "value": 264500
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "minTotal",
+          "value": 50
+        },
+        {
+          "type": "maxTotal",
+          "value": 176
+        }
+      ]
+    },
+    {
+      "id": "B008",
+      "category": "carrosserie",
+      "query": "SUV",
+      "expectCriteria": {
+        "carrosserie": "SUV",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "SUV"
+        },
+        {
+          "type": "topMake",
+          "value": "Chery"
+        },
+        {
+          "type": "minTotal",
+          "value": 80
+        },
+        {
+          "type": "maxTotal",
+          "value": 182
+        }
+      ]
+    },
+    {
+      "id": "B009",
+      "category": "carrosserie",
+      "query": "citadine",
+      "expectCriteria": {
+        "carrosserie": "Citadine",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Citadine"
+        },
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 25
+        },
+        {
+          "type": "maxTotal",
+          "value": 66
+        }
+      ]
+    },
+    {
+      "id": "B010",
+      "category": "carrosserie",
+      "query": "berline",
+      "expectCriteria": {
+        "carrosserie": "Berline",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Berline"
+        },
+        {
+          "type": "topMake",
+          "value": "Changan"
+        },
+        {
+          "type": "minTotal",
+          "value": 18
+        },
+        {
+          "type": "maxTotal",
+          "value": 46
+        }
+      ]
+    },
+    {
+      "id": "B011",
+      "category": "carrosserie",
+      "query": "monospace",
+      "expectCriteria": {
+        "carrosserie": "Monospace",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Monospace"
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "minTotal",
+          "value": 1
+        },
+        {
+          "type": "maxTotal",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "B012",
+      "category": "carrosserie",
+      "query": "pickup",
+      "expectCriteria": {
+        "carrosserie": "Utilitaire",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Utilitaire"
+        },
+        {
+          "type": "topMake",
+          "value": "Citroën"
+        },
+        {
+          "type": "minTotal",
+          "value": 1
+        },
+        {
+          "type": "maxTotal",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "B013",
+      "category": "carrosserie",
+      "query": "4x4",
+      "expectCriteria": {
+        "carrosserie": "SUV",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "SUV"
+        },
+        {
+          "type": "minTotal",
+          "value": 80
+        },
+        {
+          "type": "maxTotal",
+          "value": 182
+        }
+      ]
+    },
+    {
+      "id": "B014",
+      "category": "carburant",
+      "query": "diesel",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Diesel",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "fuel",
+          "value": "Diesel"
+        },
+        {
+          "type": "topMake",
+          "value": "Citroën"
+        },
+        {
+          "type": "minTotal",
+          "value": 40
+        },
+        {
+          "type": "maxTotal",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "B015",
+      "category": "carburant",
+      "query": "essence",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Essence",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "fuel",
+          "value": "Essence"
+        },
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 80
+        },
+        {
+          "type": "maxTotal",
+          "value": 192
+        }
+      ]
+    },
+    {
+      "id": "B016",
+      "category": "carburant",
+      "query": "hybride",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Hybride",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "fuel",
+          "value": "Hybride"
+        },
+        {
+          "type": "topMake",
+          "value": "Toyota"
+        },
+        {
+          "type": "minTotal",
+          "value": 30
+        },
+        {
+          "type": "maxTotal",
+          "value": 72
+        }
+      ]
+    },
+    {
+      "id": "B017",
+      "category": "carburant",
+      "query": "électrique",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Électrique",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "fuel",
+          "value": "Électrique"
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "minTotal",
+          "value": 10
+        },
+        {
+          "type": "maxTotal",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "id": "B018",
+      "category": "carburant",
+      "query": "مازوت",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Diesel",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "fuel",
+          "value": "Diesel"
+        },
+        {
+          "type": "minTotal",
+          "value": 40
+        },
+        {
+          "type": "maxTotal",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "B019",
+      "category": "carburant",
+      "query": "كهرباء",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Électrique",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "fuel",
+          "value": "Électrique"
+        },
+        {
+          "type": "minTotal",
+          "value": 10
+        },
+        {
+          "type": "maxTotal",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "id": "B020",
+      "category": "marque",
+      "query": "Toyota",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": "Toyota",
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "make",
+          "value": "Toyota"
+        },
+        {
+          "type": "topMake",
+          "value": "Toyota"
+        },
+        {
+          "type": "minTotal",
+          "value": 10
+        },
+        {
+          "type": "maxTotal",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "id": "B021",
+      "category": "marque",
+      "query": "Dacia",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": "Dacia",
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "make",
+          "value": "Dacia"
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "minTotal",
+          "value": 15
+        },
+        {
+          "type": "maxTotal",
+          "value": 44
+        }
+      ]
+    },
+    {
+      "id": "B022",
+      "category": "marque",
+      "query": "تويوتا",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": "Toyota",
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "make",
+          "value": "Toyota"
+        },
+        {
+          "type": "topMake",
+          "value": "Toyota"
+        },
+        {
+          "type": "minTotal",
+          "value": 10
+        },
+        {
+          "type": "maxTotal",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "id": "B023",
+      "category": "marque",
+      "query": "Mercedes",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": "Mercedes",
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "make",
+          "value": "Mercedes"
+        },
+        {
+          "type": "topMake",
+          "value": "Mercedes"
+        },
+        {
+          "type": "minTotal",
+          "value": 3
+        },
+        {
+          "type": "maxTotal",
+          "value": 12
+        }
+      ]
+    },
+    {
+      "id": "B024",
+      "category": "annee",
+      "query": "depuis 2023",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": 2023,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "yearMin",
+          "value": 2023
+        },
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 150
+        },
+        {
+          "type": "maxTotal",
+          "value": 201
+        }
+      ]
+    },
+    {
+      "id": "B025",
+      "category": "transmission",
+      "query": "automatique",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": "Automatique",
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "transmission",
+          "value": "Automatique"
+        },
+        {
+          "type": "topMake",
+          "value": "Dacia"
+        },
+        {
+          "type": "minTotal",
+          "value": 130
+        },
+        {
+          "type": "maxTotal",
+          "value": 288
+        }
+      ]
+    },
+    {
+      "id": "B026",
+      "category": "ville",
+      "query": "Casablanca",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": "Casablanca",
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "topCity",
+          "value": "Casablanca"
+        },
+        {
+          "type": "minTotal",
+          "value": 150
+        },
+        {
+          "type": "maxTotal",
+          "value": 392
+        }
+      ]
+    },
+    {
+      "id": "B027",
+      "category": "intention",
+      "query": "familial",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "familial"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 150
+        },
+        {
+          "type": "maxTotal",
+          "value": 392
+        }
+      ]
+    },
+    {
+      "id": "B028",
+      "category": "intention",
+      "query": "sport",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "sportif"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 150
+        },
+        {
+          "type": "maxTotal",
+          "value": 392
+        }
+      ]
+    },
+    {
+      "id": "B029",
+      "category": "intention",
+      "query": "économique",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "economique"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "topMake",
+          "value": "Changan"
+        },
+        {
+          "type": "minTotal",
+          "value": 150
+        },
+        {
+          "type": "maxTotal",
+          "value": 392
+        }
+      ]
+    },
+    {
+      "id": "B030",
+      "category": "intention",
+      "query": "confort",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "confort"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 150
+        },
+        {
+          "type": "maxTotal",
+          "value": 392
+        }
+      ]
+    },
+    {
+      "id": "B031",
+      "category": "combine",
+      "query": "SUV diesel budget 250000",
+      "expectCriteria": {
+        "carrosserie": "SUV",
+        "motorisation": "Diesel",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 212500,
+        "budgetMax": 287500,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "SUV"
+        },
+        {
+          "type": "fuel",
+          "value": "Diesel"
+        },
+        {
+          "type": "priceMin",
+          "value": 180625
+        },
+        {
+          "type": "priceMax",
+          "value": 330625
+        },
+        {
+          "type": "topMake",
+          "value": "Renault"
+        },
+        {
+          "type": "minTotal",
+          "value": 5
+        },
+        {
+          "type": "maxTotal",
+          "value": 27
+        }
+      ]
+    },
+    {
+      "id": "B032",
+      "category": "combine",
+      "query": "citadine essence pas cher Casablanca",
+      "expectCriteria": {
+        "carrosserie": "Citadine",
+        "motorisation": "Essence",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": null,
+        "budgetTolerance": 0.15,
+        "ville": "Casablanca",
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "economique"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Citadine"
+        },
+        {
+          "type": "fuel",
+          "value": "Essence"
+        },
+        {
+          "type": "topMake",
+          "value": "Renault"
+        },
+        {
+          "type": "topCity",
+          "value": "Casablanca"
+        },
+        {
+          "type": "minTotal",
+          "value": 15
+        },
+        {
+          "type": "maxTotal",
+          "value": 54
+        }
+      ]
+    },
+    {
+      "id": "B033",
+      "category": "combine",
+      "query": "Toyota hybride automatique budget 350000",
+      "expectCriteria": {
+        "carrosserie": null,
+        "motorisation": "Hybride",
+        "transmission": "Automatique",
+        "marque": "Toyota",
+        "modele": null,
+        "budgetMin": 297500,
+        "budgetMax": 402500,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "make",
+          "value": "Toyota"
+        },
+        {
+          "type": "fuel",
+          "value": "Hybride"
+        },
+        {
+          "type": "transmission",
+          "value": "Automatique"
+        },
+        {
+          "type": "topMake",
+          "value": "Toyota"
+        },
+        {
+          "type": "minTotal",
+          "value": 5
+        },
+        {
+          "type": "maxTotal",
+          "value": 15
+        }
+      ]
+    },
+    {
+      "id": "B034",
+      "category": "combine",
+      "query": "SUV familial moins de 300000",
+      "expectCriteria": {
+        "carrosserie": "SUV",
+        "motorisation": null,
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": null,
+        "budgetMax": 300000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "familial"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "SUV"
+        },
+        {
+          "type": "priceMax",
+          "value": 345000
+        },
+        {
+          "type": "topMake",
+          "value": "Chery"
+        },
+        {
+          "type": "minTotal",
+          "value": 40
+        },
+        {
+          "type": "maxTotal",
+          "value": 126
+        }
+      ]
+    },
+    {
+      "id": "B035",
+      "category": "combine",
+      "query": "berline confort automatique budget 400000",
+      "expectCriteria": {
+        "carrosserie": "Berline",
+        "motorisation": null,
+        "transmission": "Automatique",
+        "marque": null,
+        "modele": null,
+        "budgetMin": 340000,
+        "budgetMax": 460000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": [
+          "confort"
+        ]
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Berline"
+        },
+        {
+          "type": "transmission",
+          "value": "Automatique"
+        },
+        {
+          "type": "topMake",
+          "value": "Toyota"
+        },
+        {
+          "type": "minTotal",
+          "value": 3
+        },
+        {
+          "type": "maxTotal",
+          "value": 12
+        }
+      ]
+    },
+    {
+      "id": "B036",
+      "category": "combine",
+      "query": "monospace diesel 7 places budget 400000",
+      "expectCriteria": {
+        "carrosserie": "Monospace",
+        "motorisation": "Diesel",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 340000,
+        "budgetMax": 460000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Monospace"
+        },
+        {
+          "type": "fuel",
+          "value": "Diesel"
+        },
+        {
+          "type": "topMake",
+          "value": "Kia"
+        },
+        {
+          "type": "minTotal",
+          "value": 1
+        },
+        {
+          "type": "maxTotal",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "B037",
+      "category": "combine",
+      "query": "pickup diesel budget 400000",
+      "expectCriteria": {
+        "carrosserie": "Utilitaire",
+        "motorisation": "Diesel",
+        "transmission": null,
+        "marque": null,
+        "modele": null,
+        "budgetMin": 340000,
+        "budgetMax": 460000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": null,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "Utilitaire"
+        },
+        {
+          "type": "fuel",
+          "value": "Diesel"
+        },
+        {
+          "type": "topMake",
+          "value": "Peugeot"
+        },
+        {
+          "type": "minTotal",
+          "value": 1
+        },
+        {
+          "type": "maxTotal",
+          "value": 7
+        }
+      ]
+    },
+    {
+      "id": "B038",
+      "category": "combine",
+      "query": "SUV depuis 2023 automatique budget 400000",
+      "expectCriteria": {
+        "carrosserie": "SUV",
+        "motorisation": null,
+        "transmission": "Automatique",
+        "marque": null,
+        "modele": null,
+        "budgetMin": 340000,
+        "budgetMax": 460000,
+        "budgetTolerance": 0.15,
+        "ville": null,
+        "anneeMin": 2023,
+        "anneeMax": null,
+        "kmMax": null,
+        "intent": []
+      },
+      "assertions": [
+        {
+          "type": "bodyType",
+          "value": "SUV"
+        },
+        {
+          "type": "transmission",
+          "value": "Automatique"
+        },
+        {
+          "type": "yearMin",
+          "value": 2023
+        },
+        {
+          "type": "topMake",
+          "value": "Chery"
+        },
+        {
+          "type": "minTotal",
+          "value": 30
+        },
+        {
+          "type": "maxTotal",
+          "value": 60
+        }
+      ]
+    }
+  ]
+}

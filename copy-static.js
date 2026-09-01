@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 
 const webDir = path.join(__dirname, "apps", "web");
-const standalone = path.join(webDir, ".next", "standalone");
+const standaloneApp = path.join(webDir, ".next", "standalone", "apps", "web");
 const srcStatic = path.join(webDir, ".next", "static");
 const srcPublic = path.join(webDir, "public");
 
@@ -25,13 +25,24 @@ function copyDir(src, dest) {
   }
 }
 
-const staticDest = path.join(standalone, ".next", "static");
-const publicDest = path.join(standalone, "public");
+const staticDest = path.join(standaloneApp, ".next", "static");
+const publicDest = path.join(standaloneApp, "public");
 
 console.log(`Copying ${srcStatic} -> ${staticDest}`);
 copyDir(srcStatic, staticDest);
 
 console.log(`Copying ${srcPublic} -> ${publicDest}`);
 copyDir(srcPublic, publicDest);
+
+// Copy cars-snapshot.json (read by aggregator at runtime)
+const snapshotSrc = path.join(webDir, "src", "data", "cars-snapshot.json");
+const snapshotDest = path.join(standaloneApp, "src", "data", "cars-snapshot.json");
+if (fs.existsSync(snapshotSrc)) {
+  fs.mkdirSync(path.dirname(snapshotDest), { recursive: true });
+  console.log(`Copying ${snapshotSrc} -> ${snapshotDest}`);
+  fs.copyFileSync(snapshotSrc, snapshotDest);
+} else {
+  console.warn("cars-snapshot.json not found, skipping");
+}
 
 console.log("Static assets copied successfully.");

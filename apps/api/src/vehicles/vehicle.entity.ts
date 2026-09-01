@@ -21,47 +21,56 @@ export class Vehicle {
   @Column()
   year!: number;
 
-  @Column("decimal", { precision: 12, scale: 0 })
-  price!: number;
-
-  @Column("decimal", { precision: 10, scale: 0 })
-  km!: number;
+  @Column()
+  trim!: string;
 
   @Column()
-  fuel!: string;
+  body_type!: string;
 
-  @Column({ nullable: true })
+  @Column()
+  fuel_type!: string;
+
+  @Column()
   transmission!: string;
 
-  @Column({ nullable: true })
-  hp!: number;
+  @Column({ default: 5 })
+  seats!: number;
+
+  @Column("decimal", { precision: 12, scale: 0 })
+  price_mad!: number;
+
+  @Column("decimal", { precision: 12, scale: 0, nullable: true })
+  price_old_mad!: number | null;
 
   @Column({ nullable: true })
-  color!: string;
+  power_ch!: number;
 
-  @Column({ nullable: true })
-  city!: string;
+  @Column("real", { nullable: true })
+  consumption_l100!: number | null;
+
+  @Column("int", { nullable: true })
+  co2_gkm!: number | null;
+
+  @Column("real", { nullable: true })
+  accel_0_100!: number | null;
+
+  @Column("int", { nullable: true })
+  trunk_liters!: number | null;
+
+  @Column("int", { nullable: true })
+  length_mm!: number | null;
+
+  @Column("int", { nullable: true })
+  width_mm!: number | null;
+
+  @Column("int", { nullable: true })
+  height_mm!: number | null;
+
+  @Column("int", { nullable: true })
+  wheelbase_mm!: number | null;
 
   @Column({ nullable: true })
   image_url!: string;
-
-  @Column("decimal", { precision: 4, scale: 1, nullable: true })
-  engine!: number;
-
-  @Column({ nullable: true })
-  doors!: number;
-
-  @Column({ nullable: true })
-  seats!: number;
-
-  @Column("decimal", { precision: 5, scale: 1, nullable: true })
-  score!: number;
-
-  @Column({ default: true })
-  is_active!: boolean;
-
-  @Column({ nullable: true })
-  dealer_id!: string;
 
   @CreateDateColumn()
   created_at!: Date;

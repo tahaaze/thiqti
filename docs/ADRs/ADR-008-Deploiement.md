@@ -1,58 +1,40 @@
-# ADR-008: Déploiement et Infrastructure
+# ADR-008: Deploiement
 
-**Statut**: Accepté
-**Date**: 2026-07-17
-**Décideurs**: Mohamed Taha Ait Ouahammi, Younes Boumalek
-**Réf**: VV-SLP-2026-001, §9.4
+**Statut**: Accepte
+**Date**: 2026-07-29
+**Decideurs**: Equipe Thiqti
+**Ref**: VV-SLP-2026-001
 
 ## Contexte
 
-Le MVP doit être déployé en production avec HTTPS pour la démo finale (M5, 13 août).
+Thiqti doit etre deploye sur une plateforme supportant Next.js 15 (App Router), avec un budget proche de zero et une disponibilite minimale requise.
 
-## Décision
+## Options Considerees
 
-### Phase 1: Vercel (recommandé)
+### Option A (rejetee): Serveur VPS (DigitalOcean / Hetzner)
 
-| Aspect | Choix |
-|--------|-------|
-| Plateforme | Vercel (gratuit pour projets open-source/non-commercial) |
-| Build | `next build` + output standalone |
-| Domaine | Nom de domaine temporaire ou IP Vercel |
-| SSL | Automatique via Vercel |
-| Variables d'env | Vercel Dashboard |
+- **Avantages**: Controle total, cout fixe (~5$/mois), pas de limits serverless
+- **Inconvenients**: Gestion du serveur (OS, securite, mises a jour), SSL manuel, pas de CI/CD integre
+- **Motif du rejet**: Cout d'administration > cout financier; l'equipe n'a pas d'ops dedie
 
-### Docker (alternatif local)
+### Option B (rejetee): Railway / Fly.io
 
-```yaml
-# docker-compose.yml
-services:
-  web:
-    build: .
-    ports: ["3000:3000"]
-    environment:
-      - NODE_ENV=production
-  api:
-    build: ./apps/api
-    ports: ["3001:3001"]
-  ai:
-    build: ./apps/ai
-    ports: ["8000:8000"]
-```
+- **Avantages**: Deploiement simple, scaling automatique
+- **Inconvenients**: Cout variable, moins de fonctionnalites que Vercel pour Next.js
+- **Motif du rejet**: Vercel offre un support Next.js natif (zero configuration); Railway n'optimise pas le SSR
 
-### Structure de déploiement
+### Option C (retenue): Vercel (Hobby, $0/mois)
 
-```
-Production (M5)
-  └── apps/web (Next.js standalone)
-       ├── /api/search
-       ├── /api/reputation
-       ├── /results
-       ├── /vehicle/[slug]
-       └── / (landing page)
-```
+- **Configuration**: Projet lie au depot GitHub, deploiement automatique par branche
+- **Domaine**: thiqti.vercel.app (Phase 1), domaine personnalise (Phase 2)
+- **Limites**: 100 Go bandwidth, 10s fonction timeout, 50Mo fonction size (suffisant pour Phase 1)
 
-## Conséquences
+## Decision
 
-- Vercel = zero-config pour Next.js, déploiement en 1 click
-- Les API routes Next.js suffisent pour Phase 1 (pas besoin de NestJS en prod)
-- Le Dockerfile existe pour un déploiement containerisé si nécessaire
+Deploiement sur Vercel (plan Hobby, gratuit), avec deploiement automatique par branche.
+
+## Consequences
+
+- **Positif**: Zero cout, deploiement automatique, SSL automatique, preview deploy par PR
+- **Negatif**: Limite a 10s par fonction serverless; pas de cron jobs natifs (script build-time seulement)
+- **Risque**: Si le dataset depasse 500 vehicules, le bundle peut depasser 50Mo; mitigation: deplacer le dataset vers un CDN ou API externe

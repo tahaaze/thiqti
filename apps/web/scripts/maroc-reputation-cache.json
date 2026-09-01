@@ -1,0 +1,317 @@
+{
+  "generatedAt": "2026-08-06",
+  "source": "Sites officiels marocains + Le Guide Auto (leguideauto.ma, reseau concessionnaires) + Moteur.ma (essais) + reseaux sociaux officiels. Toutes les URLs proviennent de recherches verifiees le 2026-08-05 et 2026-08-06. Aucune donnee inventee.",
+  "brands": [
+    {
+      "make": "Dacia",
+      "distributor": "Auto Hall (Dacia Maroc)",
+      "officialSite": { "label": "dacia.ma", "url": "https://www.dacia.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Dacia (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/dacia", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [
+        { "model": "Duster", "title": "Dacia Duster 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/dacia-duster-3914.html", "verifiedAt": "2026-08-05" },
+        { "model": "Sandero", "title": "Dacia Sandero 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/dacia-sandero-4447.html", "verifiedAt": "2026-08-06" }
+      ],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Renault",
+      "distributor": "Renault Maroc",
+      "officialSite": { "label": "renault.ma", "url": "https://www.renault.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Renault (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/renault", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [
+        { "model": "Clio", "title": "Renault Clio 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/renault-clio-4636.html", "verifiedAt": "2026-08-05" },
+        { "model": "Captur", "title": "Renault Captur 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/renault-captur-4599.html", "verifiedAt": "2026-08-06" }
+      ],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Peugeot",
+      "distributor": "SOPRIAM (Stellantis)",
+      "officialSite": { "label": "peugeot.ma", "url": "https://www.peugeot.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Peugeot (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/peugeot", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [
+        { "model": "208", "title": "Peugeot 208 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/peugeot-208-1955.html", "verifiedAt": "2026-08-05" },
+        { "model": "2008", "title": "Peugeot 2008 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/peugeot-2008-2127.html", "verifiedAt": "2026-08-06" }
+      ],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Citroën",
+      "distributor": "SOPRIAM (Stellantis)",
+      "officialSite": { "label": "citroen.ma", "url": "https://www.citroen.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Citroën (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/citroen", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Toyota",
+      "distributor": "Toyota du Maroc",
+      "officialSite": { "label": "toyota.ma", "url": "https://www.toyota.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Toyota (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/toyota", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [
+        { "model": "RAV4", "title": "Toyota RAV-4 neuve au Maroc : guide d'achat", "url": "https://www.moteur.ma/fr/sp/neuf/voiture-neuve-maroc/toyota/rav-4/", "verifiedAt": "2026-08-05" },
+        { "model": "Corolla", "title": "Essai Express Toyota Corolla Sport : l'hybride de référence", "url": "https://www.moteur.ma/fr/guide-achat/actualite/essai-express-toyota-corolla-sport-lhybride-de-reference-729.html", "verifiedAt": "2026-08-06" }
+      ],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Hyundai",
+      "distributor": "Global Engines",
+      "officialSite": { "label": "hyundai.ma", "url": "https://www.hyundai.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Hyundai (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/hyundai", "verifiedAt": "2026-08-05" },
+      "socials": [
+        { "network": "facebook", "label": "Hyundai Maroc (page officielle)", "url": "https://www.facebook.com/hyundai.maroc/", "verifiedAt": "2026-08-05" }
+      ],
+      "tests": [
+        { "model": "Tucson", "title": "Hyundai Tucson 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/hyundai-tucson-2947.html", "verifiedAt": "2026-08-05" },
+        { "model": "Creta", "title": "Hyundai Creta 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/hyundai-creta-3790.html", "verifiedAt": "2026-08-06" }
+      ],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Kia",
+      "distributor": "Kia Maroc",
+      "officialSite": { "label": "kia.ma", "url": "https://kia.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Kia (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/kia", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [
+        { "model": "EV6", "title": "Kia EV6 2026 : vidéos d'essai, présentation et test", "url": "https://www.moteur.ma/fr/watch/video/kia-ev6-3670.html", "verifiedAt": "2026-08-06" }
+      ],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Volkswagen",
+      "distributor": "Centrale Automobile Chérifienne (CAC)",
+      "officialSite": { "label": "volkswagen.ma", "url": "https://www.volkswagen.ma/fr.html", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Volkswagen (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/volkswagen", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Audi",
+      "distributor": "Centrale Automobile Chérifienne (CAC)",
+      "officialSite": { "label": "audi.ma", "url": "https://www.audi.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Audi (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/audi", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Škoda",
+      "distributor": "Centrale Automobile Chérifienne (CAC)",
+      "officialSite": { "label": "skoda.ma", "url": "https://www.skoda.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Škoda (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/skoda", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Seat",
+      "distributor": "Centrale Automobile Chérifienne (CAC)",
+      "officialSite": { "label": "seat.ma", "url": "https://www.seat.ma/home", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Seat (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/seat", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Ford",
+      "distributor": "SCAMA (Auto Hall)",
+      "officialSite": { "label": "ford.ma", "url": "https://ford.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Ford (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/ford", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Nissan",
+      "distributor": "Nissan Maroc",
+      "officialSite": { "label": "nissan-morocco.com", "url": "https://www.nissan-morocco.com/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Nissan (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/nissan", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "BMW",
+      "distributor": "SMEIA (importateur exclusif)",
+      "officialSite": { "label": "bmw.ma", "url": "https://www.bmw.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau BMW (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/bmw", "verifiedAt": "2026-08-05" },
+      "socials": [
+        { "network": "instagram", "label": "BMW Maroc - Smeia", "url": "https://www.instagram.com/bmw_maroc_officiel/", "verifiedAt": "2026-08-05" }
+      ],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Mercedes",
+      "distributor": "Auto Nejma (distributeur général depuis 1963)",
+      "officialSite": { "label": "mercedes-benz.ma", "url": "https://www.mercedes-benz.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Mercedes-Benz (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/mercedes", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Fiat",
+      "distributor": "FCAM (Stellantis)",
+      "officialSite": { "label": "fiat.ma", "url": "https://www.fiat.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Fiat (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/fiat", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Opel",
+      "distributor": "SMAA (Auto Hall)",
+      "officialSite": { "label": "opel.ma", "url": "https://www.opel.ma/fr/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Opel (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/opel", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Jeep",
+      "distributor": "FCAM (Stellantis)",
+      "officialSite": { "label": "jeep.com/ma", "url": "https://www.jeep.com/ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Jeep (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/jeep", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Suzuki",
+      "distributor": "CFAO Mobility",
+      "officialSite": { "label": "suzukimaroc.com", "url": "https://www.suzukimaroc.com/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Suzuki (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/suzuki", "verifiedAt": "2026-08-05" },
+      "socials": [
+        { "network": "facebook", "label": "Suzuki Maroc (CFAO)", "url": "https://www.facebook.com/suzukimaroc/", "verifiedAt": "2026-08-05" }
+      ],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Mazda",
+      "distributor": "Smeia / Jama Auto (importateur exclusif)",
+      "officialSite": { "label": "mazda-ma.com", "url": "https://www.mazda-ma.com/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Mazda (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/mazda", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Honda",
+      "distributor": "Univers Motors (importateur exclusif depuis 1973)",
+      "officialSite": { "label": "honda-mideast.com/fr-ma", "url": "https://honda-mideast.com/fr-ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Honda (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/honda", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Volvo",
+      "distributor": "Volvo Cars Morocco",
+      "officialSite": { "label": "volvocars.com/ma", "url": "https://www.volvocars.com/ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Volvo (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/volvo", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "MG",
+      "distributor": "MG Motor Maroc",
+      "officialSite": { "label": "mg-maroc.com", "url": "https://www.mg-maroc.com/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau MG (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/mg", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "BYD",
+      "distributor": "Auto Nejma Maroc",
+      "officialSite": { "label": "byd-maroc.com", "url": "https://byd-maroc.com/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau BYD (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/byd", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Chery",
+      "distributor": "Marque Chery distribuée via OMODA & JAECOO (CFAO Mobility)",
+      "resellers": { "label": "Réseau Chery (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/chery", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Omoda",
+      "distributor": "CFAO Mobility",
+      "officialSite": { "label": "omodaauto.ma", "url": "https://www.omodaauto.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Omoda (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/omoda", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Jaecoo",
+      "distributor": "CFAO Mobility",
+      "officialSite": { "label": "jaecoo.ma", "url": "https://www.jaecoo.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Jaecoo (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/jaecoo", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Changan",
+      "distributor": "Changan Maroc",
+      "officialSite": { "label": "changan.ma", "url": "https://www.changan.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Changan (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/changan", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Haval",
+      "distributor": "Great Wall Motors Maroc (GWM)",
+      "officialSite": { "label": "greatwallmotors.ma", "url": "https://www.greatwallmotors.ma/", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "Geely",
+      "distributor": "Geely Maroc",
+      "officialSite": { "label": "geely.ma", "url": "https://geely.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau Geely (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/geely", "verifiedAt": "2026-08-05" },
+      "socials": [
+        { "network": "facebook", "label": "Geely Morocco (page officielle)", "url": "https://www.facebook.com/GeelyMorocco/", "verifiedAt": "2026-08-05" }
+      ],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "GAC",
+      "distributor": "M-AUTOMOTIV (importateur exclusif depuis 2026)",
+      "officialSite": { "label": "gacgroup.com/en-ma", "url": "https://www.gacgroup.com/en-ma", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau GAC (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/gac", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    },
+    {
+      "make": "DFSK",
+      "distributor": "Africa Motors (Auto Hall)",
+      "officialSite": { "label": "dfsk.ma", "url": "https://www.dfsk.ma/", "verifiedAt": "2026-08-05" },
+      "resellers": { "label": "Réseau DFSK (Le Guide Auto)", "url": "https://www.leguideauto.ma/le-neuf/les-concessionnaires/dfsk", "verifiedAt": "2026-08-05" },
+      "socials": [],
+      "tests": [],
+      "verifiedAt": "2026-08-05"
+    }
+  ]
+}

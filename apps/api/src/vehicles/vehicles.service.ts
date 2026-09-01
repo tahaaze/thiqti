@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Like } from "typeorm";
+import { Repository, FindOptionsWhere } from "typeorm";
 import { Vehicle } from "./vehicle.entity";
 import { CreateVehicleDto } from "./create-vehicle.dto";
 import { UpdateVehicleDto } from "./update-vehicle.dto";
@@ -19,25 +19,31 @@ export class VehiclesService {
   }
 
   async search(query: SearchVehiclesDto) {
-    const qb = this.repo.createQueryBuilder("v").where("v.is_active = :active", { active: true });
+    const where: FindOptionsWhere<Vehicle> = {};
+
+    if (query.make) where.make = query.make;
+    if (query.model) where.model = query.model;
+    if (query.body_type) where.body_type = query.body_type;
+    if (query.fuel_type) where.fuel_type = query.fuel_type;
+    if (query.transmission) where.transmission = query.transmission;
+
+    const qb = this.repo.createQueryBuilder("v");
 
     if (query.make) qb.andWhere("v.make ILIKE :make", { make: `%${query.make}%` });
     if (query.model) qb.andWhere("v.model ILIKE :model", { model: `%${query.model}%` });
-    if (query.fuel) qb.andWhere("v.fuel = :fuel", { fuel: query.fuel });
-    if (query.city) qb.andWhere("v.city ILIKE :city", { city: `%${query.city}%` });
-    if (query.min_price) qb.andWhere("v.price >= :minPrice", { minPrice: query.min_price });
-    if (query.max_price) qb.andWhere("v.price <= :maxPrice", { maxPrice: query.max_price });
-    if (query.min_km) qb.andWhere("v.km >= :minKm", { minKm: query.min_km });
-    if (query.max_km) qb.andWhere("v.km <= :maxKm", { maxKm: query.max_km });
+    if (query.body_type) qb.andWhere("v.body_type = :bodyType", { bodyType: query.body_type });
+    if (query.fuel_type) qb.andWhere("v.fuel_type = :fuelType", { fuelType: query.fuel_type });
+    if (query.transmission) qb.andWhere("v.transmission = :transmission", { transmission: query.transmission });
+    if (query.min_price) qb.andWhere("v.price_mad >= :minPrice", { minPrice: query.min_price });
+    if (query.max_price) qb.andWhere("v.price_mad <= :maxPrice", { maxPrice: query.max_price });
     if (query.min_year) qb.andWhere("v.year >= :minYear", { minYear: query.min_year });
     if (query.max_year) qb.andWhere("v.year <= :maxYear", { maxYear: query.max_year });
-    if (query.min_score) qb.andWhere("v.score >= :minScore", { minScore: query.min_score });
 
     const limit = query.limit || 20;
     const offset = query.offset || 0;
 
-    qb.orderBy("v.score", "DESC")
-      .addOrderBy("v.created_at", "DESC")
+    qb.orderBy("v.year", "DESC")
+      .addOrderBy("v.price_mad", "ASC")
       .skip(offset)
       .take(limit);
 
@@ -46,7 +52,7 @@ export class VehiclesService {
   }
 
   async findAll(): Promise<Vehicle[]> {
-    return this.repo.find({ where: { is_active: true }, order: { score: "DESC" } });
+    return this.repo.find({ order: { year: "DESC", price_mad: "ASC" } });
   }
 
   async findOne(id: string): Promise<Vehicle> {
@@ -63,6 +69,6 @@ export class VehiclesService {
 
   async remove(id: string): Promise<void> {
     await this.findOne(id);
-    await this.repo.update(id, { is_active: false });
+    await this.repo.delete(id);
   }
 }

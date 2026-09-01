@@ -3,8 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
 } from "typeorm";
 
 @Entity("reviews")
@@ -15,20 +13,32 @@ export class Review {
   @Column()
   vehicle_id!: string;
 
-  @Column({ nullable: true })
-  author!: string;
+  @Column("varchar", { length: 50, default: "aggregated" })
+  source!: string;
+
+  @Column("varchar", { length: 200, nullable: true })
+  author_name!: string | null;
+
+  @Column("real", { nullable: true })
+  rating!: number | null;
+
+  @Column("varchar", { length: 300, nullable: true })
+  title!: string | null;
 
   @Column("text", { nullable: true })
-  text!: string;
+  body!: string | null;
 
-  @Column("decimal", { precision: 3, scale: 1, nullable: true })
-  score!: number;
+  @Column("text", { array: true, nullable: true })
+  pros!: string[] | null;
 
-  @Column({ nullable: true })
-  sentiment!: string;
+  @Column("text", { array: true, nullable: true })
+  cons!: string[] | null;
 
   @Column({ default: false })
-  is_verified!: boolean;
+  verified!: boolean;
+
+  @CreateDateColumn()
+  published_at!: Date;
 
   @CreateDateColumn()
   created_at!: Date;
