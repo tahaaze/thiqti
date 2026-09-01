@@ -446,23 +446,25 @@ export default function VehiclePage({ params }: { params: Promise<{ slug: string
                         </div>
                       </div>
 
-                      {/* Sentiment */}
-                      <div className="flex gap-4">
-                        <div className="flex items-center gap-1.5">
-                          <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-                          <span className="text-sm font-bold text-green-600">{scrapedRep!.sentiment.positive}%</span>
-                          <span className="text-[10px] text-muted">Positif</span>
+                      {/* Sentiment — only when reviews exist */}
+                      {scrapedRep!.reviewCount > 0 && (
+                        <div className="flex gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                            <span className="text-sm font-bold text-green-600">{scrapedRep!.sentiment.positive}%</span>
+                            <span className="text-[10px] text-muted">Positif</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <TrendingDown className="h-3.5 w-3.5 text-red-600" />
+                            <span className="text-sm font-bold text-red-600">{scrapedRep!.sentiment.negative}%</span>
+                            <span className="text-[10px] text-muted">Négatif</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-bold text-gray-500">{scrapedRep!.sentiment.neutral}%</span>
+                            <span className="text-[10px] text-muted">Neutre</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <TrendingDown className="h-3.5 w-3.5 text-red-600" />
-                          <span className="text-sm font-bold text-red-600">{scrapedRep!.sentiment.negative}%</span>
-                          <span className="text-[10px] text-muted">Négatif</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-gray-500">{scrapedRep!.sentiment.neutral}%</span>
-                          <span className="text-[10px] text-muted">Neutre</span>
-                        </div>
-                      </div>
+                      )}
 
                       {/* Catégories */}
                       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">

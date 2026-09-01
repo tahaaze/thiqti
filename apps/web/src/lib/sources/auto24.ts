@@ -30,6 +30,7 @@ interface Auto24Item {
   price: number;
   city: string;
   image: string;
+  photos: string[];
   url: string;
   year?: number;
   km?: number;
@@ -70,6 +71,7 @@ function extractItems(html: string): Auto24Item[] {
           const price = item.offers?.price || item.offers?.lowPrice || 0;
           const url = item.url || "";
           const image = item.image || "";
+          const photos = Array.isArray(image) ? image.filter(Boolean) : image ? [image] : [];
           if (title && price > 0) {
             const idMatch = url.match(/\/(\d+)/);
             items.push({
@@ -77,7 +79,8 @@ function extractItems(html: string): Auto24Item[] {
               title,
               price: Number(price),
               city: item.seller?.address?.addressLocality || "",
-              image: Array.isArray(image) ? image[0] : image,
+              image: photos[0] || "",
+              photos,
               url: url.startsWith("http") ? url : `${BASE_URL}${url}`,
             });
           }
@@ -125,6 +128,7 @@ function extractItems(html: string): Auto24Item[] {
       price,
       city: "",
       image: imgs[i] || "",
+      photos: imgs[i] ? [imgs[i]] : [],
       url: links[i]?.startsWith("http") ? links[i] : `${BASE_URL}${links[i] || ""}`,
     });
   }
@@ -208,7 +212,7 @@ function mapItem(item: Auto24Item): UnifiedCar | null {
     url: item.url,
     score: computeScore(year || 2020, km, item.price),
     scrapedAt: new Date().toISOString(),
-    photos: item.image ? [item.image] : [],
+    photos: item.photos.length > 0 ? item.photos : item.image ? [item.image] : [],
     inventoryType: "used",
     safety: null,
   };

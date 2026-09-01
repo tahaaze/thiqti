@@ -69,6 +69,7 @@ interface MoteurDetail {
   reviews?: number;
   phone?: string;
   whatsappHref?: string;
+  photos: string[];
 }
 
 function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
@@ -228,6 +229,14 @@ async function fetchDetail(url: string): Promise<MoteurDetail | null> {
 
     if (!phone && !whatsapp && !sellerName && !sellerSince && rating5 === undefined) return null;
 
+    const photos: string[] = [];
+    const galleryRegex = /<img[^>]*src="(https?:\/\/[^"]*\/uploads\/[^"]*\.(?:jpg|jpeg|png|webp)[^"]*)"/gi;
+    let gm: RegExpExecArray | null;
+    while ((gm = galleryRegex.exec(html)) !== null) {
+      const url = gm[1];
+      if (!photos.includes(url)) photos.push(url);
+    }
+
     return {
       sellerName: sellerName || undefined,
       sellerSince,
@@ -235,6 +244,7 @@ async function fetchDetail(url: string): Promise<MoteurDetail | null> {
       reviews: reviews > 0 ? reviews : undefined,
       phone,
       whatsappHref: whatsapp ? `https://wa.me/${whatsapp}` : undefined,
+      photos,
     };
   } catch {
     return null;
@@ -301,7 +311,7 @@ export async function fetchMoteurCars(): Promise<UnifiedCar[]> {
       url: card.url,
       score: computeScore(card.year || 2020, card.km, card.price),
       scrapedAt: new Date().toISOString(),
-      photos: card.image ? [card.image] : [],
+      photos: detail && detail.photos.length > 0 ? detail.photos : card.image ? [card.image] : [],
       inventoryType: "used",
       safety: null,
       contact: {

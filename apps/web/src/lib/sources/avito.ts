@@ -32,6 +32,7 @@ interface AvitoItem {
   price: number;
   city: string;
   image: string;
+  photos: string[];
   url: string;
   year?: number;
   km?: number;
@@ -72,6 +73,7 @@ function extractItems(html: string): AvitoItem[] {
         const price = data.offers?.price || data.offers?.lowPrice || 0;
         const url = data.url || "";
         const image = data.image || "";
+        const photos = Array.isArray(image) ? image.filter(Boolean) : image ? [image] : [];
 
         if (title && price > 0) {
           const idMatch = url.match(/\/(\d+)/);
@@ -80,7 +82,8 @@ function extractItems(html: string): AvitoItem[] {
             title,
             price: Number(price),
             city: data.seller?.address?.addressLocality || "",
-            image: Array.isArray(image) ? image[0] : image,
+            image: photos[0] || "",
+            photos,
             url: url.startsWith("http") ? url : `${BASE_URL}${url}`,
           });
         }
@@ -125,12 +128,15 @@ function extractItems(html: string): AvitoItem[] {
     const link = links[i];
     const img = imgs[i] || "";
 
+    const fullImg = img.startsWith("http") ? img : img ? `${BASE_URL}${img}` : "";
+
     items.push({
       id: `avito_${link.match(/\/(\d+)$/)?.[1] || i}`,
       title,
       price,
       city: "",
-      image: img.startsWith("http") ? img : img ? `${BASE_URL}${img}` : "",
+      image: fullImg,
+      photos: fullImg ? [fullImg] : [],
       url: link.startsWith("http") ? link : `${BASE_URL}${link}`,
     });
   }
@@ -223,7 +229,7 @@ function mapItem(item: AvitoItem): UnifiedCar | null {
     url: item.url,
     score: computeScore(year || 2020, km, item.price),
     scrapedAt: new Date().toISOString(),
-    photos: item.image ? [item.image] : [],
+    photos: item.photos.length > 0 ? item.photos : item.image ? [item.image] : [],
     inventoryType: "used",
     safety: null,
   };

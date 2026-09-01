@@ -184,7 +184,7 @@ function matches(re: RegExp, text: string): boolean {
 export function detectInventory(input: string): InventoryChoice {
   const n = input.toLowerCase();
   if (/\bneuf\b|neuve|nouveau|\bnew\b|0 km|0km|zero km|km 0|جديد|جديدة/.test(n)) return "new";
-  if (/\boccasion\b|occasions|d'occasion|usag|used|seconde main|مستعمل|مستعملة/.test(n)) return "used";
+  if (/\boccasion\b|occasions|d'occasion|usag|used|seconde main|مستعمل|مستعملة|mesta[3a]ml[ae]?|msthml[ae]?|msthm[ae]?|mst[ae]m[la]/.test(n)) return "used";
   return null;
 }
 

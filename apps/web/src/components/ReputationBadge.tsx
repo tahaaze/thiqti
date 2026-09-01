@@ -88,21 +88,23 @@ export default function ReputationBadge({
         </div>
       </div>
 
-      {/* Sentiment */}
-      <div className="mt-3 flex gap-1">
-        {[
-          { label: "Positif", pct: reputation.sentiment.positive, color: "bg-green-500" },
-          { label: "Négatif", pct: reputation.sentiment.negative, color: "bg-red-500" },
-          { label: "Neutre", pct: reputation.sentiment.neutral, color: "bg-gray-400" },
-        ].map((s) => (
-          <div key={s.label} className="flex-1">
-            <div className="h-1.5 overflow-hidden rounded-full bg-line">
-              <div className={`h-full ${s.color}`} style={{ width: `${s.pct}%` }} />
+      {/* Sentiment — only when reviews exist */}
+      {reputation.reviewCount > 0 && (
+        <div className="mt-3 flex gap-1">
+          {[
+            { label: "Positif", pct: reputation.sentiment.positive, color: "bg-green-500" },
+            { label: "Négatif", pct: reputation.sentiment.negative, color: "bg-red-500" },
+            { label: "Neutre", pct: reputation.sentiment.neutral, color: "bg-gray-400" },
+          ].map((s) => (
+            <div key={s.label} className="flex-1">
+              <div className="h-1.5 overflow-hidden rounded-full bg-line">
+                <div className={`h-full ${s.color}`} style={{ width: `${s.pct}%` }} />
+              </div>
+              <p className="mt-0.5 text-[9px] text-muted">{s.pct}% {s.label}</p>
             </div>
-            <p className="mt-0.5 text-[9px] text-muted">{s.pct}% {s.label}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Categories — toggle */}
       <button

@@ -27,6 +27,7 @@ import { fetchAvitoCars } from "./avito";
 import { fetchMoteurNeufCars } from "./moteur-neuf";
 import { cachedImageFor } from "@/lib/images";
 import { safetyRatingFor } from "@/lib/safetyRatings";
+import { deduplicateVehicles } from "./deduplication";
 
 const CACHE_TTL = 10 * 60 * 1000;
 const CACHE_FILE = path.join(process.cwd(), ".cache", "thiqti-cars.json");
@@ -131,14 +132,22 @@ async function loadMergedCars(): Promise<UnifiedCar[]> {
   ]);
   const live = [...autera, ...moteur, ...electro, ...autohall, ...auto24, ...avito, ...moteurNeuf].map(withInferredBody);
 
+  const deduped = deduplicateVehicles(live);
+  if (process.env.NODE_ENV !== "production") {
+    const removed = live.length - deduped.length;
+    if (removed > 0) {
+      console.log(`[dedup] ${live.length} → ${deduped.length} véhicules (${removed} doublons supprimés)`);
+    }
+  }
+
   const withSafety = (car: UnifiedCar): UnifiedCar => ({
     ...car,
     safety: safetyRatingFor(car.make, car.model),
   });
 
   // Source primaire : vraies annonces marocaines (photos, prix MAD, km reels).
-  if (live.length > 0) {
-    return live.map(withSafety);
+  if (deduped.length > 0) {
+    return deduped.map(withSafety);
   }
 
   // Secours hors-ligne : catalogue de DEMONSTRATION (donnees fictives, marquees
